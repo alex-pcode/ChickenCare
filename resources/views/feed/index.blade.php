@@ -53,9 +53,7 @@
             </x-forms.form-row>
 
             <div class="flex justify-center pt-4 border-t border-gray-200 dark:border-gray-700">
-                <button type="submit" class="shiny-cta" :disabled="submitting">
-                    <span x-text="submitting ? 'Adding Feed...' : 'Add Feed'">Add Feed</span>
-                </button>
+                <x-forms.submit-button label="Add Feed" />
             </div>
         </x-forms.form-card>
     </div>

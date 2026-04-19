@@ -39,7 +39,7 @@
     border: none;
     border-radius: $card-radius;
     box-shadow: $shadow-inset;
-    transition: all 0.3s ease;
+    transition: all $transition-duration-slow ease;
 
     &:focus {
         outline: none;

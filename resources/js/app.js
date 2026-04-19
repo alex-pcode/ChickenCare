@@ -1,7 +1,6 @@
 import htmx from 'htmx.org';
 import Alpine from 'alpinejs';
 import Chart from 'chart.js/auto';
-import './charts/expense-pie-chart.js';
 import './viability-calculator.js';
 
 window.htmx = htmx;
@@ -16,11 +15,10 @@ document.body.addEventListener('htmx:beforeSwap', function(evt) {
     }
 });
 
-// Close modal after successful form submission
-document.body.addEventListener('htmx:afterSwap', function(evt) {
-    if (evt.detail.xhr.getResponseHeader('HX-Trigger') === 'closeModal') {
-        document.getElementById('modal-container').innerHTML = '';
-    }
+// Close modal when server sends closeModal trigger
+document.body.addEventListener('closeModal', function() {
+    document.body.style.overflow = '';
+    document.getElementById('modal-container').innerHTML = '';
 });
 
 // Handle session expiry

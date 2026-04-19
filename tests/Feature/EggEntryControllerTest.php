@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\EggEntry;
 use App\Models\User;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -857,11 +859,11 @@ class EggEntryControllerTest extends TestCase
     {
         // Laravel's PreventRequestForgery bypasses in tests (runningUnitTests()),
         // so we verify the middleware is registered in the web group instead.
-        $kernel = $this->app->make(\Illuminate\Contracts\Http\Kernel::class);
+        $kernel = $this->app->make(Kernel::class);
         $middlewareGroups = $kernel->getMiddlewareGroups();
 
         $this->assertContains(
-            \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+            PreventRequestForgery::class,
             $middlewareGroups['web']
         );
     }
@@ -1060,7 +1062,7 @@ class EggEntryControllerTest extends TestCase
             $response = $this->actingAs($user)->get("/app/eggs/{$entry->id}/row");
 
             $response->assertStatus(200);
-            $response->assertSee('egg-counter__color-dot--' . $color, false);
+            $response->assertSee('egg-counter__color-dot--'.$color, false);
         }
     }
 
@@ -1092,7 +1094,7 @@ class EggEntryControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('max-w-32', false);
         $response->assertSee('truncate', false);
-        $response->assertSee('title="' . $entry->notes . '"', false);
+        $response->assertSee('title="'.$entry->notes.'"', false);
     }
 
     public function test_entry_row_displays_dash_when_notes_null(): void
@@ -1118,14 +1120,11 @@ class EggEntryControllerTest extends TestCase
         $response = $this->actingAs($user)->get("/app/eggs/{$entry->id}/row");
 
         $response->assertStatus(200);
-        $response->assertSee('text-red-600', false);
-        $response->assertSee('hover:text-red-800', false);
-        $response->assertSee('dark:text-red-500', false);
-        $response->assertSee('dark:hover:text-red-400', false);
-        $response->assertSee('transition-colors', false);
-        $response->assertSee('hover:bg-red-50', false);
-        $response->assertSee('w-4 h-4', false);
-        $response->assertSee('fill="none" stroke="currentColor"', false);
+        $response->assertSee('data-table__delete-btn', false);
+        $response->assertSee('hx-get="'.route('app.eggs.delete-confirm', $entry).'"', false);
+        $response->assertSee('hx-target="#modal-container"', false);
+        $response->assertSee('fill="none"', false);
+        $response->assertSee('stroke="currentColor"', false);
         // Should NOT see the word "Delete" as text (only in aria-label)
         $content = $response->getContent();
         $this->assertStringNotContainsString('>Delete</button>', $content ?? '');
@@ -1140,7 +1139,7 @@ class EggEntryControllerTest extends TestCase
 
         $response->assertStatus(200);
         // Should use hx-get to load modal, not hx-delete with confirm
-        $response->assertSee('hx-get="' . route('app.eggs.delete-confirm', $entry) . '"', false);
+        $response->assertSee('hx-get="'.route('app.eggs.delete-confirm', $entry).'"', false);
         $response->assertSee('hx-target="#modal-container"', false);
         // Should NOT have native hx-confirm
         $response->assertDontSee('hx-confirm', false);
@@ -1170,9 +1169,9 @@ class EggEntryControllerTest extends TestCase
         $response = $this->actingAs($user)->get("/app/eggs/{$entry->id}/delete-confirm");
 
         $response->assertStatus(200);
-        $response->assertSee('hx-delete="' . route('app.eggs.destroy', $entry) . '"', false);
-        $response->assertSee('hx-target="closest tr"', false);
-        $response->assertSee('hx-on:after-request="close()"', false);
+        $response->assertSee('hx-delete="'.route('app.eggs.destroy', $entry).'"', false);
+        $response->assertSee('hx-target="#egg-entry-'.$entry->id.'"', false);
+        $response->assertSee('hx-swap="outerHTML swap:500ms"', false);
     }
 
     public function test_delete_confirm_modal_authorized_for_owner(): void

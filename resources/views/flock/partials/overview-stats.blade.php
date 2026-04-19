@@ -1,4 +1,4 @@
-<div class="grid grid-cols-2 {{ $overviewStats['showBrooding'] ? 'md:grid-cols-5' : 'md:grid-cols-4' }} gap-4 mb-6">
+<div class="flock__overview-stats {{ $overviewStats['showBrooding'] ? 'flock__overview-stats--5' : 'flock__overview-stats--4' }}">
 
     <div style="animation-delay: 0ms" class="flock-card-entrance">
         <x-ui.stat-card

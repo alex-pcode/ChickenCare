@@ -8,7 +8,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: modal-fade-in 200ms ease-out;
+    animation: modal-fade-in $transition-duration-base ease-out;
 
     &__overlay {
         position: absolute;
@@ -29,7 +29,7 @@
         width: 90%;
         max-height: 90vh;
         overflow-y: auto;
-        animation: modal-slide-up 200ms ease-out;
+        animation: modal-slide-up $transition-duration-base ease-out;
     }
 
     &__header {

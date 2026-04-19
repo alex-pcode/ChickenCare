@@ -5,6 +5,15 @@ $typeIcons = [
     'chicks'   => '🐥',
     'mixed'    => '🥚',
 ];
+
+$sortLink = function (string $col) use ($sort, $dir) {
+    $nextDir = ($sort === $col && $dir === 'asc') ? 'desc' : 'asc';
+    return route('app.batches.index', array_merge(request()->query(), [
+        'sort' => $col,
+        'dir' => $nextDir,
+        'page' => 1,
+    ]));
+};
 @endphp
 
 <section class="batches__list-section"
@@ -18,106 +27,60 @@ $typeIcons = [
          hx-sync="this:replace">
 
     @if($batches->count() === 0)
-        <div class="flex flex-col items-center justify-center py-16 text-center">
-            <span class="text-5xl mb-4">📦</span>
-            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Batches Yet</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Start organizing your flock by adding your first batch
-            </p>
-            <a href="{{ route('app.batches.create') }}" class="btn btn--primary">
-                Add First Batch
-            </a>
-        </div>
+        <x-ui.empty-state
+            title="No Batches Yet"
+            description="Start organizing your flock by adding your first batch"
+            icon="📦"
+            :action="route('app.batches.create')"
+            actionLabel="Add First Batch"
+        />
     @else
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            💡 Click on any batch name to view details, composition, and timeline
-        </p>
+        <p class="batches__hint">💡 Click any row to view details, composition, and timeline.</p>
 
-        <div class="data-table-wrapper overflow-x-auto">
-            <table class="data-table data-table--striped w-full">
+        <div class="data-table-wrapper">
+            <table class="data-table data-table--striped">
                 <thead class="data-table__head">
                     <tr>
-                        {{-- Batch Name: sortable --}}
-                        <th scope="col" class="data-table__header"
-                            aria-sort="{{ $sort === 'batch_name' ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}">
-                            <a href="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'batch_name', 'dir' => $sort === 'batch_name' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-get="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'batch_name', 'dir' => $sort === 'batch_name' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-target="#batches-list-region"
-                               hx-swap="outerHTML"
-                               hx-push-url="true"
-                               class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                Batch Name
-                                @if($sort === 'batch_name')
-                                    <span aria-hidden="true">{{ $dir === 'asc' ? '↑' : '↓' }}</span>
-                                @endif
-                            </a>
-                        </th>
-
-                        {{-- Current Count: sortable --}}
-                        <th scope="col" class="data-table__header"
-                            aria-sort="{{ $sort === 'current_count' ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}">
-                            <a href="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'current_count', 'dir' => $sort === 'current_count' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-get="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'current_count', 'dir' => $sort === 'current_count' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-target="#batches-list-region"
-                               hx-swap="outerHTML"
-                               hx-push-url="true"
-                               class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                Current Count
-                                @if($sort === 'current_count')
-                                    <span aria-hidden="true">{{ $dir === 'asc' ? '↑' : '↓' }}</span>
-                                @endif
-                            </a>
-                        </th>
+                        @foreach ([
+                            'batch_name' => 'Batch Name',
+                            'current_count' => 'Current Count',
+                        ] as $col => $label)
+                            @php($isActive = $sort === $col)
+                            <th scope="col" class="data-table__header"
+                                aria-sort="{{ $isActive ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}">
+                                <a href="{{ $sortLink($col) }}"
+                                   hx-get="{{ $sortLink($col) }}"
+                                   hx-target="#batches-list-region"
+                                   hx-swap="outerHTML"
+                                   hx-push-url="true"
+                                   class="batches__sort-link {{ $isActive ? 'batches__sort-link--active' : '' }}">
+                                    {{ $label }}
+                                    @if($isActive)<span aria-hidden="true">{{ $dir === 'asc' ? '↑' : '↓' }}</span>@endif
+                                </a>
+                            </th>
+                        @endforeach
 
                         <th scope="col" class="data-table__header">Status</th>
 
-                        {{-- Started With: sortable --}}
-                        <th scope="col" class="data-table__header"
-                            aria-sort="{{ $sort === 'initial_count' ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}">
-                            <a href="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'initial_count', 'dir' => $sort === 'initial_count' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-get="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'initial_count', 'dir' => $sort === 'initial_count' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-target="#batches-list-region"
-                               hx-swap="outerHTML"
-                               hx-push-url="true"
-                               class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                Started With
-                                @if($sort === 'initial_count')
-                                    <span aria-hidden="true">{{ $dir === 'asc' ? '↑' : '↓' }}</span>
-                                @endif
-                            </a>
-                        </th>
-
-                        {{-- Acquired: sortable --}}
-                        <th scope="col" class="data-table__header"
-                            aria-sort="{{ $sort === 'acquisition_date' ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}">
-                            <a href="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'acquisition_date', 'dir' => $sort === 'acquisition_date' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-get="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'acquisition_date', 'dir' => $sort === 'acquisition_date' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-target="#batches-list-region"
-                               hx-swap="outerHTML"
-                               hx-push-url="true"
-                               class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                Acquired
-                                @if($sort === 'acquisition_date')
-                                    <span aria-hidden="true">{{ $dir === 'asc' ? '↑' : '↓' }}</span>
-                                @endif
-                            </a>
-                        </th>
-
-                        {{-- Source: sortable --}}
-                        <th scope="col" class="data-table__header"
-                            aria-sort="{{ $sort === 'source' ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}">
-                            <a href="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'source', 'dir' => $sort === 'source' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-get="{{ route('app.batches.index', array_merge(request()->query(), ['sort' => 'source', 'dir' => $sort === 'source' && $dir === 'asc' ? 'desc' : 'asc', 'page' => 1])) }}"
-                               hx-target="#batches-list-region"
-                               hx-swap="outerHTML"
-                               hx-push-url="true"
-                               class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                Source
-                                @if($sort === 'source')
-                                    <span aria-hidden="true">{{ $dir === 'asc' ? '↑' : '↓' }}</span>
-                                @endif
-                            </a>
-                        </th>
+                        @foreach ([
+                            'initial_count' => 'Started With',
+                            'acquisition_date' => 'Acquired',
+                            'source' => 'Source',
+                        ] as $col => $label)
+                            @php($isActive = $sort === $col)
+                            <th scope="col" class="data-table__header"
+                                aria-sort="{{ $isActive ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}">
+                                <a href="{{ $sortLink($col) }}"
+                                   hx-get="{{ $sortLink($col) }}"
+                                   hx-target="#batches-list-region"
+                                   hx-swap="outerHTML"
+                                   hx-push-url="true"
+                                   class="batches__sort-link {{ $isActive ? 'batches__sort-link--active' : '' }}">
+                                    {{ $label }}
+                                    @if($isActive)<span aria-hidden="true">{{ $dir === 'asc' ? '↑' : '↓' }}</span>@endif
+                                </a>
+                            </th>
+                        @endforeach
 
                         <th scope="col" class="data-table__header">Laying Since</th>
                     </tr>
@@ -126,7 +89,7 @@ $typeIcons = [
                 <tbody class="data-table__body">
                     @foreach($batches as $batch)
                         <tr id="batch-row-{{ $batch->id }}"
-                            class="batches__row cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                            class="data-table__row batches__row"
                             onclick="window.location='{{ route('app.batches.show', $batch) }}'"
                             role="row"
                             tabindex="0"
@@ -134,72 +97,48 @@ $typeIcons = [
                             @keydown.enter="window.location='{{ route('app.batches.show', $batch) }}'">
 
                             <td class="data-table__cell">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xl flex-shrink-0" aria-hidden="true">
-                                        {{ $typeIcons[$batch->type] ?? '🐔' }}
-                                    </span>
-                                    <div class="min-w-0 flex-1">
-                                        <div class="font-semibold text-gray-900 dark:text-white break-words hover:text-indigo-600 dark:hover:text-indigo-400">
-                                            {{ $batch->batch_name }}
-                                        </div>
-                                        <div class="text-sm text-gray-600 dark:text-gray-400 break-words">
-                                            {{ $batch->breed }}
-                                        </div>
+                                <div class="batches__name-cell">
+                                    <span class="batches__name-icon" aria-hidden="true">{{ $typeIcons[$batch->type] ?? '🐔' }}</span>
+                                    <div class="batches__name-info">
+                                        <span class="batches__name-primary">{{ $batch->batch_name }}</span>
+                                        <span class="batches__name-secondary">{{ $batch->breed }}</span>
                                     </div>
                                 </div>
                             </td>
 
                             <td class="data-table__cell">
-                                <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                                    {{ $batch->current_count }}
-                                </span>
+                                <span class="batches__count-value">{{ $batch->current_count }}</span>
                             </td>
 
                             <td class="data-table__cell">
                                 @if($batch->actual_laying_start_date !== null)
-                                    <span class="text-xs px-2 py-1 rounded-full font-medium inline-flex items-center gap-1 bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800">
-                                        🥚 Laying
-                                    </span>
+                                    <span class="batches__status batches__status--laying">🥚 Laying</span>
                                 @elseif(in_array($batch->type, ['hens', 'mixed']))
-                                    <span class="text-xs px-2 py-1 rounded-full font-medium inline-flex items-center gap-1 bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800">
-                                        ⏳ Not Laying
-                                    </span>
+                                    <span class="batches__status batches__status--not-laying">⏳ Not Laying</span>
                                 @else
-                                    <span class="text-gray-400">—</span>
+                                    <span class="batches__muted">—</span>
                                 @endif
                             </td>
 
+                            <td class="data-table__cell">{{ $batch->initial_count }}</td>
+
+                            <td class="data-table__cell">{{ $batch->acquisition_date->format('M j, Y') }}</td>
+
                             <td class="data-table__cell">
-                                <span class="font-semibold text-gray-700 dark:text-gray-300">
-                                    {{ $batch->initial_count }}
-                                </span>
+                                {{ $batch->source ?: '—' }}
                             </td>
 
                             <td class="data-table__cell">
-                                <span class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $batch->acquisition_date->format('M j, Y') }}
-                                </span>
-                            </td>
-
-                            <td class="data-table__cell">
-                                <span class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $batch->source ?: '—' }}
-                                </span>
-                            </td>
-
-                            <td class="data-table__cell">
-                                <div class="flex items-center gap-2">
+                                <span class="batches__laying-date-cell">
                                     @if($batch->actual_laying_start_date)
-                                        <span class="text-sm text-gray-700 dark:text-gray-300">
-                                            {{ $batch->actual_laying_start_date->format('M j, Y') }}
-                                        </span>
+                                        {{ $batch->actual_laying_start_date->format('M j, Y') }}
                                     @elseif(in_array($batch->type, ['hens', 'mixed']))
-                                        <span class="text-gray-500 italic text-sm">Not set</span>
+                                        <span class="batches__muted"><em>Not set</em></span>
                                     @else
-                                        <span class="text-gray-400">—</span>
+                                        <span class="batches__muted">—</span>
                                     @endif
                                     <button type="button"
-                                            class="batches__laying-date-btn text-sm hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                            class="batches__laying-date-btn"
                                             hx-get="{{ route('app.batches.laying-date-modal', $batch) }}"
                                             hx-target="#modal-container"
                                             hx-swap="innerHTML"
@@ -208,7 +147,7 @@ $typeIcons = [
                                             @click.stop>
                                         📅
                                     </button>
-                                </div>
+                                </span>
                             </td>
                         </tr>
                     @endforeach
@@ -217,9 +156,7 @@ $typeIcons = [
         </div>
 
         @if($batches->hasPages())
-            <div class="mt-4">
-                <x-tables.pagination :paginator="$batches" />
-            </div>
+            <x-tables.pagination :paginator="$batches" />
         @endif
     @endif
 

@@ -1,3 +1,10 @@
+<div id="crm-reports-customer-wrapper"
+     hx-get="{{ route('app.crm.index', array_filter(['tab' => 'reports', 'view' => 'customer', 'customer_id' => $customerId ?? null])) }}"
+     hx-trigger="crm:changed from:body"
+     hx-target="this"
+     hx-swap="innerHTML"
+     hx-headers='{"HX-Target": "crm-reports-customer-wrapper"}'>
+
 {{-- Customer Selector --}}
 <div class="crm-reports__customer-select">
     <div class="form-group">
@@ -247,3 +254,5 @@
         </div>
     </div>
 @endif
+
+</div>

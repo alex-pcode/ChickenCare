@@ -6,7 +6,8 @@
 ])
 
 <div id="{{ $id }}" class="modal modal--{{ $size }}" role="dialog" aria-modal="true" aria-labelledby="{{ $id }}-title"
-     x-data="{ close() { document.getElementById('modal-container').innerHTML = ''; } }"
+     x-data="{ close() { document.body.style.overflow = ''; document.getElementById('modal-container').innerHTML = ''; } }"
+     x-init="document.body.style.overflow = 'hidden'"
      @keydown.escape.window="close()">
     <div class="modal__overlay" @click="close()"></div>
     <div class="modal__content">

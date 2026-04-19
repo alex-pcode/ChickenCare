@@ -524,7 +524,10 @@ class ExpenseControllerTest extends TestCase
             ->delete("/app/expenses/{$expense->id}");
 
         $response->assertStatus(200);
-        $response->assertHeader('HX-Trigger', 'expenses:changed');
+        $triggerHeader = $response->headers->get('HX-Trigger');
+        $triggers = json_decode($triggerHeader, true);
+        $this->assertArrayHasKey('expenses:changed', $triggers);
+        $this->assertArrayHasKey('toast:success', $triggers);
         $this->assertDatabaseMissing('expenses', ['id' => $expense->id]);
     }
 }

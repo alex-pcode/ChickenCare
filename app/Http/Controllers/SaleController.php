@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
 use App\Models\Sale;
+use App\Services\CrmReportsService;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -37,8 +38,12 @@ class SaleController extends Controller
         $sale = $request->user()->sales()->create($request->validated());
         $sale->load('customer');
 
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
+
         if ($this->isHtmx($request)) {
-            return view('sales.partials.entry-row', compact('sale'));
+            return response()
+                ->view('sales.partials.entry-row', compact('sale'))
+                ->header('HX-Trigger', 'crm:changed');
         }
 
         return redirect()->route('app.sales.index')->with('success', 'Sale recorded.');
@@ -70,8 +75,12 @@ class SaleController extends Controller
         $sale->update($request->validated());
         $sale->load('customer');
 
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
+
         if ($this->isHtmx($request)) {
-            return view('sales.partials.entry-row', compact('sale'));
+            return response()
+                ->view('sales.partials.entry-row', compact('sale'))
+                ->header('HX-Trigger', 'crm:changed');
         }
 
         return redirect()->route('app.sales.index')->with('success', 'Sale updated.');
@@ -83,8 +92,10 @@ class SaleController extends Controller
 
         $sale->delete();
 
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
+
         if ($this->isHtmx($request)) {
-            return response('', 200);
+            return response('', 200)->header('HX-Trigger', 'crm:changed');
         }
 
         return redirect()->route('app.sales.index')->with('success', 'Sale deleted.');
@@ -97,6 +108,10 @@ class SaleController extends Controller
         $sale->update(['paid' => ! $sale->paid]);
         $sale->load('customer');
 
-        return view('sales.partials.entry-row', compact('sale'));
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
+
+        return response()
+            ->view('sales.partials.entry-row', compact('sale'))
+            ->header('HX-Trigger', 'crm:changed');
     }
 }

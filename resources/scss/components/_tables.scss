@@ -46,9 +46,50 @@
         color: $color-neutral-700;
     }
 
+    &__actions {
+        display: flex;
+        gap: $space-2;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    &__delete-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: $space-1;
+        border-radius: $space-1;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: $color-error;
+        @include transition(color, background-color);
+
+        &:hover {
+            color: darken($color-error, 10%);
+            background-color: rgba($color-error, 0.08);
+        }
+
+        svg {
+            width: 1.125rem;
+            height: 1.125rem;
+        }
+    }
+
     &--striped {
         .data-table__body .data-table__row:nth-child(even) {
             background-color: rgba($neu-bg, 0.5);
+        }
+    }
+}
+
+.dark .data-table {
+    &__delete-btn {
+        color: #f87171;
+
+        &:hover {
+            color: #fca5a5;
+            background-color: rgba(127, 29, 29, 0.3);
         }
     }
 }

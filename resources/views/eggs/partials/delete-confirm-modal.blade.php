@@ -5,9 +5,8 @@
     <div class="confirm-delete__actions">
         <button @click="close()" class="btn btn--secondary">Cancel</button>
         <button hx-delete="{{ route('app.eggs.destroy', $entry) }}"
-                hx-target="closest tr"
+                hx-target="#egg-entry-{{ $entry->id }}"
                 hx-swap="outerHTML swap:500ms"
-                hx-on:after-request="close()"
                 class="btn btn--danger">
             Delete
         </button>

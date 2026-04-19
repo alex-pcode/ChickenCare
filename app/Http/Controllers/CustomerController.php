@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\Services\CrmReportsService;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -30,7 +31,7 @@ class CustomerController extends Controller
 
         $customers = $query->orderBy('name')->get();
 
-        if ($this->isHtmx($request) && !$request->hasHeader('HX-Boosted')) {
+        if ($this->isHtmx($request) && ! $request->hasHeader('HX-Boosted')) {
             return view('customers.partials.table', compact('customers'));
         }
 
@@ -45,8 +46,12 @@ class CustomerController extends Controller
     {
         $customer = $request->user()->customers()->create($request->validated());
 
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
+
         if ($this->isHtmx($request)) {
-            return view('customers.partials.entry-row', compact('customer'));
+            return response()
+                ->view('customers.partials.entry-row', compact('customer'))
+                ->header('HX-Trigger', 'crm:changed');
         }
 
         return redirect()->route('app.customers.index')
@@ -72,8 +77,12 @@ class CustomerController extends Controller
         Gate::authorize('update', $customer);
         $customer->update($request->validated());
 
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
+
         if ($this->isHtmx($request)) {
-            return view('customers.partials.entry-row', compact('customer'));
+            return response()
+                ->view('customers.partials.entry-row', compact('customer'))
+                ->header('HX-Trigger', 'crm:changed');
         }
 
         return redirect()->route('app.customers.index')
@@ -85,8 +94,10 @@ class CustomerController extends Controller
         Gate::authorize('delete', $customer);
         $customer->update(['is_active' => false]);
 
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
+
         if ($this->isHtmx($request)) {
-            return response('', 200);
+            return response('', 200)->header('HX-Trigger', 'crm:changed');
         }
 
         return redirect()->route('app.customers.index')

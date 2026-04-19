@@ -4,6 +4,7 @@
     'after',
     'format' => 'number',
     'loading' => false,
+    'semantic' => 'normal',
 ])
 
 @php
@@ -21,6 +22,10 @@
     $diff = $afterVal - $beforeVal;
     $changePercent = $beforeVal != 0 ? round(abs($diff / $beforeVal) * 100, 1) : 0;
     $changeType = $diff > 0 ? 'increase' : ($diff < 0 ? 'decrease' : 'neutral');
+
+    $toneType = $semantic === 'inverse' && $changeType !== 'neutral'
+        ? ($changeType === 'increase' ? 'decrease' : 'increase')
+        : $changeType;
 @endphp
 
 <div class="comparison-card {{ $loading ? 'comparison-card--loading' : '' }}" {{ $attributes }}>
@@ -41,8 +46,8 @@
         <div class="comparison-card__header">
             <h3 class="comparison-card__title">{{ $title }}</h3>
             @if($changeType !== 'neutral')
-                <div class="comparison-card__change comparison-card__change--{{ $changeType }}">
-                    <span class="comparison-card__change-icon comparison-card__change-icon--{{ $changeType }}">
+                <div class="comparison-card__change comparison-card__change--{{ $toneType }}">
+                    <span class="comparison-card__change-icon comparison-card__change-icon--{{ $toneType }}">
                         {{ $changeType === 'increase' ? '↑' : '↓' }}
                     </span>
                     {{ $changePercent }}%

@@ -1,0 +1,964 @@
+// ==========================================================================
+// Dark Mode — Comprehensive overrides
+// ==========================================================================
+// All `.dark` class overrides in one file. Layout dark-mode lives in
+// _layout.scss; everything else goes here.
+
+@use 'variables' as *;
+
+// ---------- Dark-mode colour tokens (local) ----------
+$dm-bg: #1a1a1a;
+$dm-surface: rgba(30, 30, 30, 0.95);
+$dm-surface-elevated: #262626;
+$dm-surface-hover: rgba(255, 255, 255, 0.06);
+$dm-border: rgba(255, 255, 255, 0.1);
+$dm-border-solid: $color-neutral-700;
+$dm-text: $color-neutral-100;
+$dm-text-secondary: $color-neutral-300;
+$dm-text-muted: $color-neutral-400;
+$dm-text-faint: $color-neutral-500;
+$dm-input-bg: #1f1f1f;
+$dm-input-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5), inset -2px -2px 4px rgba(50, 50, 50, 0.3);
+$dm-input-shadow-deep: inset 4px 4px 6px rgba(0, 0, 0, 0.5), inset -4px -4px 6px rgba(50, 50, 50, 0.3);
+$dm-card-bg: rgba(30, 30, 30, 0.9);
+$dm-card-border: rgba(255, 255, 255, 0.08);
+$dm-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+$dm-hover-bg: rgba(255, 255, 255, 0.04);
+
+.dark {
+  // ======================================================================
+  // BASE
+  // ======================================================================
+  a {
+    color: $color-primary-light;
+  }
+
+  // ======================================================================
+  // TABLES
+  // ======================================================================
+  .data-table {
+    background: $dm-card-bg;
+    border-color: $dm-border;
+    box-shadow: $dm-card-shadow;
+
+    &__head {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    &__header {
+      color: $dm-text-muted;
+    }
+
+    &__body .data-table__row {
+      border-top-color: $dm-border-solid;
+
+      &:hover {
+        background-color: $dm-hover-bg;
+      }
+    }
+
+    &__cell {
+      color: $dm-text-secondary;
+    }
+
+    &--striped .data-table__body .data-table__row:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  // ======================================================================
+  // FORMS
+  // ======================================================================
+  .form-label {
+    color: $dm-text-secondary;
+
+    &__required {
+      color: #f87171;
+    }
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    color: $dm-text;
+    background-color: $dm-input-bg;
+    box-shadow: $dm-input-shadow;
+
+    &:focus {
+      box-shadow: $dm-input-shadow-deep;
+    }
+
+    &::placeholder {
+      color: $dm-text-faint;
+    }
+  }
+
+  .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  }
+
+  .form-error {
+    color: #f87171;
+  }
+
+  .form-help-text {
+    color: $dm-text-faint;
+  }
+
+  // ======================================================================
+  // CARDS — Form Card
+  // ======================================================================
+  .form-card {
+    background-color: $dm-bg;
+    box-shadow:
+      10px 10px 20px rgba(0, 0, 0, 0.5),
+      -10px -10px 20px rgba(50, 50, 50, 0.2);
+
+    &__header {
+      border-bottom-color: $dm-border-solid;
+    }
+
+    &__title {
+      color: $dm-text;
+    }
+
+    &__subtitle {
+      color: $dm-text-muted;
+    }
+  }
+
+  // ======================================================================
+  // CARDS — Stat Card
+  // ======================================================================
+  .stat-card {
+    background: $dm-card-bg;
+    border-color: $dm-card-border;
+    box-shadow: $dm-card-shadow;
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.95);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+    }
+
+    &__title {
+      color: $dm-text;
+    }
+
+    &__value {
+      color: $dm-text;
+    }
+
+    &__meta {
+      color: $dm-text-muted;
+    }
+
+    &__icon {
+      color: $dm-text-faint;
+    }
+
+    &--gradient {
+      background: linear-gradient(to right, rgba(30, 58, 138, 0.3), rgba(49, 46, 129, 0.3));
+      border-color: rgba(99, 102, 241, 0.2);
+    }
+  }
+
+  // ======================================================================
+  // CARDS — Progress Card
+  // ======================================================================
+  .progress-card {
+    background: $dm-card-bg;
+    border-color: $dm-card-border;
+    box-shadow: $dm-card-shadow;
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.95);
+    }
+
+    &__title {
+      color: $dm-text;
+    }
+
+    &__percentage {
+      color: $dm-text-muted;
+    }
+
+    &__bar {
+      background-color: rgba(79, 70, 229, 0.2);
+    }
+
+    &__label {
+      color: $dm-text-faint;
+    }
+
+    &__values {
+      color: $dm-text-faint;
+    }
+  }
+
+  // ======================================================================
+  // CARDS — Metric Display
+  // ======================================================================
+  .metric-display {
+    background: $dm-card-bg;
+    border-color: $dm-card-border;
+    box-shadow: $dm-card-shadow;
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.95);
+    }
+
+    &__label {
+      color: $dm-text-secondary;
+    }
+
+    &__value {
+      color: #a5b4fc; // Indigo light for contrast
+    }
+
+    &__unit {
+      color: $dm-text-faint;
+    }
+
+    &--success .metric-display__value { color: #4ade80; }
+    &--warning .metric-display__value { color: #fbbf24; }
+    &--danger .metric-display__value { color: #f87171; }
+    &--info .metric-display__value { color: #60a5fa; }
+  }
+
+  // ======================================================================
+  // CARDS — Comparison Card
+  // ======================================================================
+  .comparison-card {
+    background: $dm-card-bg;
+    border-color: $dm-card-border;
+    box-shadow: $dm-card-shadow;
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.95);
+    }
+
+    &__title {
+      color: $dm-text;
+    }
+  }
+
+  // ======================================================================
+  // MODALS
+  // ======================================================================
+  .modal {
+    &__content {
+      background: $dm-surface;
+      border-color: $dm-border-solid;
+      box-shadow:
+        8px 8px 16px rgba(0, 0, 0, 0.5),
+        -8px -8px 16px rgba(50, 50, 50, 0.15),
+        0 12px 48px rgba(0, 0, 0, 0.3);
+    }
+
+    &__header {
+      border-bottom-color: $dm-border-solid;
+    }
+
+    &__title {
+      color: $dm-text;
+    }
+
+    &__close {
+      color: $dm-text-faint;
+
+      &:hover {
+        color: $dm-text;
+      }
+    }
+  }
+
+  .confirm-delete__message {
+    color: $dm-text-muted;
+  }
+
+  // ======================================================================
+  // PAGINATION
+  // ======================================================================
+  .pagination {
+    &__link {
+      color: $dm-text-muted;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: $dm-text;
+      }
+
+      &--active {
+        // Primary stays the same
+        &:hover {
+          color: #fff;
+        }
+      }
+
+      &--disabled {
+        color: $color-neutral-600;
+
+        &:hover {
+          color: $color-neutral-600;
+        }
+      }
+    }
+
+    &__ellipsis {
+      color: $color-neutral-600;
+    }
+  }
+
+  // ======================================================================
+  // TIMELINE
+  // ======================================================================
+  .timeline {
+    &::before {
+      background-color: $dm-border-solid;
+    }
+
+    &__marker {
+      border-color: $color-neutral-600;
+      background-color: $dm-surface-elevated;
+    }
+
+    &__date {
+      color: $dm-text-faint;
+    }
+
+    &__description {
+      color: $dm-text-secondary;
+    }
+  }
+
+  // ======================================================================
+  // BADGES — default variant
+  // ======================================================================
+  .badge {
+    background-color: $color-neutral-700;
+    color: $dm-text-secondary;
+
+    // Coloured variants keep their identity but use darker backgrounds
+    &--success {
+      background-color: rgba(45, 125, 70, 0.25);
+      color: #4ade80;
+    }
+
+    &--warning {
+      background-color: rgba(214, 158, 46, 0.2);
+      color: #fbbf24;
+    }
+
+    &--error {
+      background-color: rgba(197, 48, 48, 0.25);
+      color: #fca5a5;
+    }
+
+    &--premium {
+      background-color: rgba(139, 105, 20, 0.25);
+      color: #fbbf24;
+    }
+  }
+
+  // ======================================================================
+  // BUTTONS — secondary
+  // ======================================================================
+  .btn--secondary {
+    background-color: $dm-surface-elevated;
+    color: $dm-text-secondary;
+    border-color: $dm-border-solid;
+    box-shadow:
+      2px 2px 4px rgba(0, 0, 0, 0.3),
+      -2px -2px 4px rgba(50, 50, 50, 0.2);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: $color-primary-light;
+      color: $color-primary-light;
+    }
+  }
+
+  // ======================================================================
+  // AUTH
+  // ======================================================================
+  .auth-layout {
+    background-color: $dm-bg;
+  }
+
+  .auth-form {
+    background: $dm-surface-elevated;
+    box-shadow:
+      4px 4px 8px rgba(0, 0, 0, 0.4),
+      -4px -4px 8px rgba(50, 50, 50, 0.2);
+
+    &__title {
+      color: $dm-text;
+    }
+
+    &__description {
+      color: $dm-text-muted;
+    }
+  }
+
+  // ======================================================================
+  // NEUMORPHIC — .neu-stat (hardcoded white bg)
+  // ======================================================================
+  .neu-stat {
+    background-color: $dm-surface-elevated;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  // ======================================================================
+  // BATCHES
+  // ======================================================================
+  .batches {
+    &__hint {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: $dm-border-solid;
+      color: $dm-text-muted;
+    }
+
+    &__name-primary {
+      color: $dm-text;
+    }
+
+    &__count-value {
+      color: $color-primary-light;
+    }
+
+    &__status {
+      &--laying {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+        border-color: rgba(34, 197, 94, 0.3);
+      }
+
+      &--not-laying {
+        background: rgba(245, 158, 11, 0.15);
+        color: #fbbf24;
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+    }
+
+    // Cards
+    &__card {
+      background: $dm-card-bg;
+      box-shadow: $dm-card-shadow;
+
+      &:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    // Badges
+    &__badge--active {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    &__badge--archived {
+      background: rgba(255, 255, 255, 0.06);
+      color: $dm-text-muted;
+      border-color: $dm-border-solid;
+    }
+
+    &__type-badge {
+      &--hens {
+        background: rgba(254, 243, 199, 0.15);
+        color: #fbbf24;
+      }
+
+      &--roosters {
+        background: rgba(254, 226, 226, 0.15);
+        color: #fca5a5;
+      }
+
+      &--chicks {
+        background: rgba(254, 249, 195, 0.15);
+        color: #fde047;
+      }
+
+      &--mixed {
+        background: rgba(237, 233, 254, 0.15);
+        color: #c4b5fd;
+      }
+    }
+
+    // Event/death rows
+    &__event-row,
+    &__death-row {
+      background: $dm-card-bg;
+      box-shadow: $dm-card-shadow;
+    }
+
+    // Filter bar
+    &__filter-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: $dm-border-solid;
+      color: $dm-text-muted;
+
+      &:hover {
+        background: $dm-hover-bg;
+      }
+
+      &--active {
+        background: $color-primary;
+        color: #fff;
+        border-color: $color-primary;
+      }
+    }
+
+    // Archive button
+    &__archive-btn {
+      color: $dm-text-muted;
+      border-color: $dm-border-solid;
+
+      &:hover {
+        color: #f87171;
+        border-color: #f87171;
+      }
+    }
+
+    // Tabs
+    &__tab {
+      color: $dm-text-muted;
+      border-bottom-color: $dm-border-solid;
+
+      &:hover {
+        color: $dm-text;
+      }
+
+      &--active {
+        color: $color-primary-light;
+        border-bottom-color: $color-primary-light;
+      }
+    }
+
+    &__tabs {
+      border-bottom-color: $dm-border-solid;
+    }
+  }
+
+  // ======================================================================
+  // FLOCK
+  // ======================================================================
+  .flock {
+    &__promo {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: $dm-border-solid;
+    }
+
+    &__migration-notice {
+      background: rgba(254, 252, 232, 0.1);
+      border-color: rgba(253, 230, 138, 0.3);
+    }
+
+    &__event-marker {
+      background: $dm-surface-elevated;
+      border-color: $dm-border-solid;
+    }
+
+    &__timeline::before {
+      background: $dm-border-solid;
+    }
+
+    // Event type badges (dark variants)
+    &__event-type--acquisition {
+      background-color: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    &__event-type--laying_start {
+      background-color: rgba(234, 179, 8, 0.15);
+      color: #fde047;
+      border-color: rgba(234, 179, 8, 0.3);
+    }
+
+    &__event-type--broody {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    &__event-type--hatching {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    &__event-type--other {
+      background-color: rgba(168, 85, 247, 0.15);
+      color: #c4b5fd;
+      border-color: rgba(168, 85, 247, 0.3);
+    }
+  }
+
+  // ======================================================================
+  // EGG COUNTER
+  // ======================================================================
+  .egg-counter {
+    &__form {
+      background-color: $dm-bg;
+      box-shadow:
+        10px 10px 20px rgba(0, 0, 0, 0.5),
+        -10px -10px 20px rgba(50, 50, 50, 0.2);
+    }
+
+    &__input {
+      color: $dm-text;
+      background-color: $dm-input-bg;
+      box-shadow: $dm-input-shadow;
+
+      &:focus {
+        box-shadow: $dm-input-shadow-deep;
+      }
+    }
+
+    &__checkbox {
+      background-color: $dm-input-bg;
+      box-shadow: $dm-input-shadow;
+    }
+
+    &__advanced-section {
+      background: rgba(40, 40, 40, 0.9);
+      border-color: $dm-card-border;
+      box-shadow: $dm-card-shadow;
+    }
+
+    &__backfill-btn {
+      background: linear-gradient(to right, rgba(30, 58, 138, 0.3), rgba(49, 46, 129, 0.3));
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+
+      &:hover {
+        background: linear-gradient(to right, rgba(30, 58, 138, 0.5), rgba(49, 46, 129, 0.5));
+        color: #bfdbfe;
+      }
+    }
+
+    &__backfill-modal-content {
+      background: $dm-surface;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    &__duplicate-confirm {
+      background: rgba(254, 252, 232, 0.1);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    &__goal-cta {
+      background: $dm-card-bg;
+      border-color: $dm-border-solid;
+    }
+  }
+
+  // ======================================================================
+  // CRM
+  // ======================================================================
+  .crm {
+    &__filter {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: $dm-border-solid;
+      color: $dm-text-muted;
+
+      &:hover {
+        color: $dm-text;
+      }
+
+      &--active {
+        color: #fff;
+      }
+    }
+
+    &__row--editing {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &__status--inactive {
+      background: rgba(255, 255, 255, 0.06);
+      color: $dm-text-muted;
+    }
+
+    &__status--active {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+    }
+  }
+
+  .crm-page {
+    &__tab {
+      color: $dm-text-muted;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: $dm-text;
+      }
+
+      &--active {
+        color: #fff;
+
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
+
+    &__welcome {
+      background: rgba(31, 41, 55, 0.9);
+      color: #fff;
+      border-color: $dm-card-border;
+    }
+  }
+
+  .crm-quick-sale {
+    &__error {
+      background: rgba(197, 48, 48, 0.15);
+      color: #fca5a5;
+      border-color: rgba(197, 48, 48, 0.3);
+    }
+  }
+
+  // ======================================================================
+  // SALES
+  // ======================================================================
+  .sales {
+    &__badge {
+      &--paid {
+        background-color: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+      }
+
+      &--unpaid {
+        background-color: rgba(245, 158, 11, 0.15);
+        color: #fbbf24;
+      }
+    }
+
+    &__row--editing {
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+  }
+
+  .sales-reports {
+    &__unpaid--warning {
+      color: #fbbf24;
+    }
+  }
+
+  // ======================================================================
+  // FEED
+  // ======================================================================
+  .feed {
+    &__row--editing {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &__range-selector {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &__range-btn {
+      color: $dm-text-muted;
+
+      &:hover {
+        color: $dm-text;
+      }
+    }
+  }
+
+  // ======================================================================
+  // DASHBOARD
+  // ======================================================================
+  .dashboard {
+    &__activity-item {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &__activity-badge {
+      &--egg {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+      }
+
+      &--sale {
+        background: rgba(59, 130, 246, 0.15);
+        color: #93c5fd;
+      }
+
+      &--batch-event {
+        background: rgba(245, 158, 11, 0.15);
+        color: #fbbf24;
+      }
+    }
+  }
+
+  // ======================================================================
+  // ACCOUNT PAGE
+  // ======================================================================
+  .account-page {
+    &__tabs {
+      border-bottom-color: $dm-border-solid;
+    }
+
+    &__tab {
+      color: $dm-text-muted;
+
+      &:hover {
+        color: $dm-text;
+      }
+
+      &--active {
+        color: #818cf8;
+        border-bottom-color: #818cf8;
+      }
+    }
+  }
+
+  .account-verification {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: $dm-border-solid;
+  }
+
+  .account-theme-toggle__btn {
+    background: $dm-surface-elevated;
+    border-color: $dm-border-solid;
+    color: $dm-text-muted;
+
+    &:hover {
+      color: $dm-text;
+    }
+
+    &--active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: #818cf8;
+      color: #818cf8;
+    }
+  }
+
+  // ======================================================================
+  // IMPORT PAGE
+  // ======================================================================
+  .import-page {
+    &__data-item {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: $dm-border-solid;
+    }
+
+    &__dropzone {
+      border-color: $dm-border-solid;
+
+      &--active {
+        border-color: $color-primary-light;
+        background: rgba($color-primary, 0.08);
+      }
+
+      &--has-file {
+        border-color: $color-primary-light;
+        background: rgba($color-primary, 0.05);
+      }
+    }
+
+    &__preview {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: $dm-border-solid;
+    }
+
+    &__preview-item {
+      background: $dm-surface-elevated;
+      border-color: $dm-border-solid;
+    }
+
+    &__step-desc code {
+      background: rgba(255, 255, 255, 0.08);
+      color: $dm-text-secondary;
+    }
+
+    &__warning-box {
+      background: rgba(214, 158, 46, 0.1);
+      border-color: rgba(214, 158, 46, 0.25);
+    }
+  }
+
+  // ======================================================================
+  // VIABILITY
+  // ======================================================================
+  .viability {
+    &__option-card {
+      background: $dm-card-bg;
+      border-color: $dm-card-border;
+
+      &:hover {
+        border-color: $dm-text-muted;
+      }
+    }
+
+    &__break-even-card {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &__not-viable {
+      background: rgba(214, 158, 46, 0.1);
+    }
+  }
+
+  // ======================================================================
+  // SAVINGS
+  // ======================================================================
+  .savings {
+    &__section-title {
+      color: $dm-text;
+    }
+
+    &__preferences-input {
+      color: $dm-text;
+      background-color: $dm-input-bg;
+      border: 1px solid $dm-border-solid;
+      box-shadow: $dm-input-shadow;
+
+      &:focus {
+        box-shadow: $dm-input-shadow-deep;
+      }
+    }
+
+    &__preferences-save {
+      background-color: $dm-surface-elevated;
+      color: $dm-text-secondary;
+      border: 1px solid $dm-border-solid;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: $dm-text;
+      }
+    }
+  }
+
+  // ======================================================================
+  // GENERIC CSS-VARIABLE OVERRIDES
+  // Used by feature files that reference CSS custom properties
+  // ======================================================================
+  --color-text: #{$dm-text};
+  --color-text-muted: #{$dm-text-muted};
+  --color-surface: #{$dm-surface-elevated};
+  --color-surface-dark: #1f2937;
+  --color-surface-hover: rgba(255, 255, 255, 0.08);
+  --color-bg: #{$dm-bg};
+  --color-bg-alt: rgba(255, 255, 255, 0.04);
+  --color-border: #{$dm-border-solid};
+  --color-border-dark: #374151;
+  --color-primary: #818cf8;
+  --color-success: #4ade80;
+  --color-success-text: #4ade80;
+  --color-success-bg: rgba(34, 197, 94, 0.15);
+  --color-error: #f87171;
+  --color-warning: #fbbf24;
+  --color-warning-text: #fbbf24;
+  --color-warning-bg: rgba(254, 252, 232, 0.1);
+  --color-warning-border: rgba(251, 191, 36, 0.3);
+  --color-info: #60a5fa;
+  --color-info-text: #93c5fd;
+  --color-info-bg: rgba(59, 130, 246, 0.15);
+}

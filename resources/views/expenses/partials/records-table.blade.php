@@ -53,45 +53,43 @@
 
         @if($expenses->hasPages())
             <nav class="pagination" aria-label="Expense pagination">
-                <div class="flex items-center justify-center gap-1 mt-4">
-                    {{-- Previous --}}
-                    @if($expenses->onFirstPage())
-                        <span class="pagination__link pagination__link--disabled">Previous</span>
+                {{-- Previous --}}
+                @if($expenses->onFirstPage())
+                    <span class="pagination__link pagination__link--disabled">Previous</span>
+                @else
+                    <a href="#" class="pagination__link"
+                       hx-get="{{ $expenses->appends(request()->only('sort', 'dir', 'category'))->previousPageUrl() }}"
+                       hx-target="#records-table"
+                       hx-swap="outerHTML"
+                       hx-push-url="true"
+                    >Previous</a>
+                @endif
+
+                {{-- Page Numbers --}}
+                @foreach($expenses->getUrlRange(1, $expenses->lastPage()) as $page => $url)
+                    @if($page == $expenses->currentPage())
+                        <span class="pagination__link pagination__link--active">{{ $page }}</span>
                     @else
                         <a href="#" class="pagination__link"
-                           hx-get="{{ $expenses->appends(request()->only('sort', 'dir', 'category'))->previousPageUrl() }}"
+                           hx-get="{{ $url }}&sort={{ $sort }}&dir={{ $dir }}{{ request('category') ? '&category=' . request('category') : '' }}"
                            hx-target="#records-table"
                            hx-swap="outerHTML"
                            hx-push-url="true"
-                        >Previous</a>
+                        >{{ $page }}</a>
                     @endif
+                @endforeach
 
-                    {{-- Page Numbers --}}
-                    @foreach($expenses->getUrlRange(1, $expenses->lastPage()) as $page => $url)
-                        @if($page == $expenses->currentPage())
-                            <span class="pagination__link pagination__link--active">{{ $page }}</span>
-                        @else
-                            <a href="#" class="pagination__link"
-                               hx-get="{{ $url }}&sort={{ $sort }}&dir={{ $dir }}{{ request('category') ? '&category=' . request('category') : '' }}"
-                               hx-target="#records-table"
-                               hx-swap="outerHTML"
-                               hx-push-url="true"
-                            >{{ $page }}</a>
-                        @endif
-                    @endforeach
-
-                    {{-- Next --}}
-                    @if(!$expenses->hasMorePages())
-                        <span class="pagination__link pagination__link--disabled">Next</span>
-                    @else
-                        <a href="#" class="pagination__link"
-                           hx-get="{{ $expenses->appends(request()->only('sort', 'dir', 'category'))->nextPageUrl() }}"
-                           hx-target="#records-table"
-                           hx-swap="outerHTML"
-                           hx-push-url="true"
-                        >Next</a>
-                    @endif
-                </div>
+                {{-- Next --}}
+                @if(!$expenses->hasMorePages())
+                    <span class="pagination__link pagination__link--disabled">Next</span>
+                @else
+                    <a href="#" class="pagination__link"
+                       hx-get="{{ $expenses->appends(request()->only('sort', 'dir', 'category'))->nextPageUrl() }}"
+                       hx-target="#records-table"
+                       hx-swap="outerHTML"
+                       hx-push-url="true"
+                    >Next</a>
+                @endif
             </nav>
         @endif
     @endif

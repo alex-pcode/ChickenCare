@@ -13,19 +13,19 @@ class EggStatsService
         $thisWeekEnd = $now->copy()->endOfWeek()->toDateString();
         $prevWeekStart = $now->copy()->subWeek()->startOfWeek()->toDateString();
         $prevWeekEnd = $now->copy()->subWeek()->endOfWeek()->toDateString();
-        $thisMonth = $now->month;
-        $thisYear = $now->year;
+        $thisMonthStart = $now->copy()->startOfMonth()->toDateString();
+        $thisMonthEnd = $now->copy()->endOfMonth()->toDateString();
         $prevMonthDate = $now->copy()->subMonth();
-        $prevMonth = $prevMonthDate->month;
-        $prevMonthYear = $prevMonthDate->year;
+        $prevMonthStart = $prevMonthDate->copy()->startOfMonth()->toDateString();
+        $prevMonthEnd = $prevMonthDate->copy()->endOfMonth()->toDateString();
 
         $stats = $user->eggEntries()
             ->selectRaw('COALESCE(SUM(count), 0) as total_eggs')
             ->selectRaw('COUNT(DISTINCT date) as distinct_days')
             ->selectRaw('COALESCE(SUM(CASE WHEN date BETWEEN ? AND ? THEN count ELSE 0 END), 0) as this_week', [$thisWeekStart, $thisWeekEnd])
             ->selectRaw('COALESCE(SUM(CASE WHEN date BETWEEN ? AND ? THEN count ELSE 0 END), 0) as prev_week', [$prevWeekStart, $prevWeekEnd])
-            ->selectRaw("COALESCE(SUM(CASE WHEN CAST(strftime('%m', date) AS INTEGER) = ? AND CAST(strftime('%Y', date) AS INTEGER) = ? THEN count ELSE 0 END), 0) as this_month", [$thisMonth, $thisYear])
-            ->selectRaw("COALESCE(SUM(CASE WHEN CAST(strftime('%m', date) AS INTEGER) = ? AND CAST(strftime('%Y', date) AS INTEGER) = ? THEN count ELSE 0 END), 0) as prev_month", [$prevMonth, $prevMonthYear])
+            ->selectRaw('COALESCE(SUM(CASE WHEN date BETWEEN ? AND ? THEN count ELSE 0 END), 0) as this_month', [$thisMonthStart, $thisMonthEnd])
+            ->selectRaw('COALESCE(SUM(CASE WHEN date BETWEEN ? AND ? THEN count ELSE 0 END), 0) as prev_month', [$prevMonthStart, $prevMonthEnd])
             ->first();
 
         $totalEggs = (int) $stats->total_eggs;

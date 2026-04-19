@@ -18,7 +18,7 @@
         font-size: $font-size-sm;
         color: $color-neutral-600;
         text-decoration: none;
-        border-radius: 0.25rem;
+        border-radius: $radius-sm;
         @include transition;
 
         &:hover {
@@ -34,6 +34,16 @@
             &:hover {
                 background-color: $color-primary-dark;
                 color: #fff;
+            }
+        }
+
+        &--disabled {
+            color: $color-neutral-400;
+            cursor: not-allowed;
+
+            &:hover {
+                background-color: transparent;
+                color: $color-neutral-400;
             }
         }
     }

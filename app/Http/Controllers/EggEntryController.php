@@ -60,7 +60,7 @@ class EggEntryController extends Controller
 
         $existing = $duplicateQuery->first();
 
-        if ($existing && !$request->boolean('confirm_update')) {
+        if ($existing && ! $request->boolean('confirm_update')) {
             if ($this->isHtmx($request)) {
                 return response()
                     ->view('eggs.partials.duplicate-confirm', [
@@ -150,7 +150,7 @@ class EggEntryController extends Controller
         }
 
         return redirect()->route('app.eggs.index')
-            ->with('success', count($entries) . ' entries backfilled.');
+            ->with('success', count($entries).' entries backfilled.');
     }
 
     public function destroy(Request $request, EggEntry $egg)
@@ -159,7 +159,11 @@ class EggEntryController extends Controller
         $egg->delete();
 
         if ($this->isHtmx($request)) {
-            return response('', 200);
+            return response('', 200)
+                ->header('HX-Trigger', json_encode([
+                    'closeModal' => true,
+                    'toast:success' => 'Entry deleted.',
+                ]));
         }
 
         return redirect()->route('app.eggs.index')

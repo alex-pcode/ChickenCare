@@ -2,6 +2,13 @@
     $hasData = ($revenueOverview['totalSales'] ?? 0) > 0;
 @endphp
 
+<div id="crm-reports-overview-wrapper"
+     hx-get="{{ route('app.crm.index', array_filter(['tab' => 'reports', 'view' => 'overview', 'period' => $period ?? 'month', 'from' => $from ?? null, 'to' => $to ?? null])) }}"
+     hx-trigger="crm:changed from:body"
+     hx-target="this"
+     hx-swap="innerHTML"
+     hx-headers='{"HX-Target": "crm-reports-overview-wrapper"}'>
+
 @if(!$hasData)
     <x-ui.empty-state
         icon="📊"
@@ -84,6 +91,7 @@
 
         {{-- KPI Cards --}}
         <div class="crm-reports__kpi-grid">
+            {{-- 1. Revenue --}}
             <x-ui.stat-card
                 title="Revenue"
                 :total="'$' . ($revenueOverview['totalRevenue'] ?? '0.00')"
@@ -91,6 +99,15 @@
                 icon="💰"
                 variant="corner-gradient"
             />
+            {{-- 2. Sales --}}
+            <x-ui.stat-card
+                title="Sales"
+                :total="$revenueOverview['totalSales'] ?? 0"
+                label="transactions"
+                icon="🧾"
+                variant="corner-gradient"
+            />
+            {{-- 3. Eggs Sold --}}
             <x-ui.stat-card
                 title="Eggs Sold"
                 :total="$revenueOverview['totalEggsSold'] ?? 0"
@@ -98,13 +115,7 @@
                 icon="🥚"
                 variant="corner-gradient"
             />
-            <x-ui.stat-card
-                title="Transactions"
-                :total="$revenueOverview['totalSales'] ?? 0"
-                label="total sales"
-                icon="🧾"
-                variant="corner-gradient"
-            />
+            {{-- 4. Avg Sale --}}
             <x-ui.stat-card
                 title="Avg Sale"
                 :total="'$' . ($revenueOverview['avgSaleValue'] ?? '0.00')"
@@ -320,3 +331,5 @@
         @endif
     </div>
 @endif
+
+</div>

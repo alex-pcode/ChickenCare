@@ -39,7 +39,7 @@
         color: $color-neutral-600;
         cursor: pointer;
         flex-shrink: 0;
-        transition: all 200ms ease;
+        transition: all $transition-duration-base ease;
 
         &:hover {
             color: $color-neutral-900;

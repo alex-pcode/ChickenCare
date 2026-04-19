@@ -12,7 +12,7 @@
         success: false,
         errors: [],
         submitting: false
-    }" class="lg:mx-[20%]">
+    }" class="expenses__form-container">
         @include('expenses.partials.banner-success')
         @include('expenses.partials.banner-errors')
 
@@ -30,7 +30,7 @@
             hx-on::after-request="submitting = false; if (event.detail.successful) { success = true; $el.reset(); setTimeout(() => success = false, 3000); }"
             hx-on::response-error="try { errors = Object.values(JSON.parse(event.detail.xhr.responseText).errors).flat(); } catch(e) { errors = ['An unexpected error occurred.']; }"
         >
-            <x-forms.form-row :cols="2">
+            <x-forms.form-row :cols="3">
                 <x-forms.date-input name="date" label="Date" :value="now()->format('Y-m-d')" :max="now()->format('Y-m-d')" required />
                 <x-forms.select
                     name="category"
@@ -40,31 +40,44 @@
                     placeholder=""
                     required
                 />
+                <x-forms.input name="amount" label="Amount (USD)" type="number" required placeholder="0.00" step="0.01" min="0" />
             </x-forms.form-row>
 
             <x-forms.input name="description" label="Description" required placeholder="e.g., Feed purchase from farm store" />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <x-forms.form-row>
-                    <x-forms.input name="amount" label="Amount (USD)" type="number" required placeholder="0.00" step="0.01" min="0" class="w-full md:w-48" />
-                </x-forms.form-row>
-            </div>
-
-            <div class="flex justify-center pt-4 border-t border-gray-200 dark:border-gray-700">
-                <button type="submit" class="shiny-cta" :disabled="submitting">
-                    <span x-text="submitting ? 'Adding Expense...' : 'Add Expense'">Add Expense</span>
-                </button>
+            <div class="expenses__form-actions">
+                <x-forms.submit-button label="Add Expense" />
             </div>
         </x-forms.form-card>
     </div>
 
-    <div class="expenses__breakdown"
-         x-data="expenseBreakdown()"
-         x-init="init()"
-         @expenses:changed.window="refetchStats()">
+    <div class="expenses__headline-stats">
+        <x-ui.comparison-card
+            title="Monthly Expenses"
+            format="currency"
+            semantic="inverse"
+            :before="['value' => $stats['monthOverMonth']['previousMonthTotal'], 'label' => 'Previous Month']"
+            :after="['value' => $stats['monthOverMonth']['thisMonthTotal'], 'label' => 'This Month']" />
+        @include('expenses.partials.cost-per-egg-card', [
+            'costPerEgg' => $stats['costPerEgg'],
+            'costWindowMonths' => $stats['costWindowMonths'],
+        ])
+    </div>
 
-        @include('expenses.partials.breakdown-chart', ['stats' => $stats])
-        @include('expenses.partials.category-summary', ['stats' => $stats])
+    @include('expenses.partials.monthly-trend-chart', ['expenseTrendData' => $stats['monthlyTrend']])
+
+    <div class="expenses__breakdown-grid">
+        @include('expenses.partials.category-summary', [
+            'stats' => $stats,
+            'selectedCategory' => $selectedCategory,
+        ])
+        <div id="category-items-panel" class="glass-card">
+            @include('expenses.partials.category-items', [
+                'selectedCategory' => $selectedCategory,
+                'categoryLabel' => $categoryLabel,
+                'items' => $categoryItems,
+            ])
+        </div>
     </div>
 
     @if($expenses->isEmpty() && !$currentCategory)

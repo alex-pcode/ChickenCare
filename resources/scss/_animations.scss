@@ -1,22 +1,24 @@
+@use 'variables' as *;
+
 // HTMX swap transitions
 .htmx-swapping {
   opacity: 0;
-  transition: opacity 200ms ease-out;
+  transition: opacity $transition-duration-base ease-out;
 }
 
 .htmx-settling {
   opacity: 1;
-  transition: opacity 200ms ease-in;
+  transition: opacity $transition-duration-base ease-in;
 }
 
 .htmx-added {
   opacity: 0;
-  transition: opacity 300ms ease-in;
+  transition: opacity $transition-duration-slow ease-in;
 }
 
 // Fade in
 .fade-in {
-  animation: fadeIn 200ms ease-in forwards;
+  animation: fadeIn $transition-duration-base ease-in forwards;
 }
 
 @keyframes fadeIn {
@@ -26,7 +28,7 @@
 
 // Slide in from right
 .slide-in {
-  animation: slideIn 200ms ease-out forwards;
+  animation: slideIn $transition-duration-base ease-out forwards;
 }
 
 @keyframes slideIn {
@@ -36,11 +38,11 @@
 
 // Modal open/close
 .modal-enter {
-  animation: modalIn 200ms ease-out forwards;
+  animation: modalIn $transition-duration-base ease-out forwards;
 }
 
 .modal-leave {
-  animation: modalOut 150ms ease-in forwards;
+  animation: modalOut $transition-duration-fast ease-in forwards;
 }
 
 @keyframes modalIn {
@@ -55,7 +57,7 @@
 
 // Flash auto-dismiss
 .flash-dismiss {
-  animation: flashDismiss 300ms ease-out 4700ms forwards;
+  animation: flashDismiss $transition-duration-slow ease-out 4700ms forwards;
 }
 
 @keyframes flashDismiss {

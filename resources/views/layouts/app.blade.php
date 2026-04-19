@@ -27,6 +27,7 @@
         <x-layout.mobile-dock />
     </div>
     <div id="modal-container" aria-live="polite"></div>
+    <x-ui.toast />
     @stack('scripts')
 </body>
 </html>

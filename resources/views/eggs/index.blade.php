@@ -71,7 +71,9 @@
                        value="0"
                        min="0"
                        required
-                       placeholder="0">
+                       placeholder="0"
+                       onfocus="this.select()"
+                       onclick="this.select()">
             </div>
         </div>
 
@@ -130,29 +132,7 @@
 
         {{-- Submit Button --}}
         <div class="flex justify-center">
-            <button type="submit"
-                    :disabled="submitting || success"
-                    class="neu-button shiny-cta bg-blue-600 text-white transition-all duration-200 font-medium rounded-lg px-6 py-2 min-w-[200px]"
-                    :class="{
-                        'opacity-70 cursor-not-allowed': submitting,
-                        'bg-green-600 hover:bg-green-700': success
-                    }">
-                <template x-if="submitting">
-                    <div class="flex items-center justify-center gap-2">
-                        <div class="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
-                        <span>Saving...</span>
-                    </div>
-                </template>
-                <template x-else-if="success">
-                    <div class="flex items-center justify-center gap-2">
-                        <span>✓</span>
-                        <span>Saved Successfully!</span>
-                    </div>
-                </template>
-                <template x-else>
-                    <span>Log Eggs</span>
-                </template>
-            </button>
+            <x-forms.submit-button label="Log Eggs" />
         </div>
     </form>
 

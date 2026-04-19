@@ -48,7 +48,7 @@
         />
     </x-forms.form-row>
 
-    <x-forms.form-row :cols="1">
+    <x-forms.form-row :cols="2">
         <x-forms.input
             name="description"
             label="Description"
@@ -56,9 +56,6 @@
             required
             placeholder="What happened?"
         />
-    </x-forms.form-row>
-
-    <x-forms.form-row :cols="1">
         <x-forms.textarea
             name="notes"
             label="Additional Notes"

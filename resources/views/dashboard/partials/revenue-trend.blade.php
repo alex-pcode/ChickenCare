@@ -21,12 +21,17 @@
 
     @push('scripts')
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function initRevenueTrend() {
+        if (!window.Chart) {
+            document.addEventListener('DOMContentLoaded', initRevenueTrend, { once: true });
+            return;
+        }
         const isDark = document.documentElement.classList.contains('dark');
         const chartConfig = (canvasId, chartData) => {
             const ctx = document.getElementById(canvasId);
             if (!ctx) return;
-            new Chart(ctx.getContext('2d'), {
+            window.Chart.getChart(ctx)?.destroy();
+            new window.Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: chartData,
                 options: {
@@ -76,7 +81,7 @@
         mobileData.labels = mobileData.labels.slice(-6);
         mobileData.datasets[0].data = mobileData.datasets[0].data.slice(-6);
         chartConfig('revenue-trend-mobile', mobileData);
-    });
+    })();
     </script>
     @endpush
 @endif

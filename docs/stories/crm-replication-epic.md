@@ -1,3 +1,1181 @@
+# Epic: CRM — Complete Feature Replication
+
+## Epic Goal
+
+Achieve 100% feature parity between the Laravel + HTMX CRM tab and the original React CRM at `d:\Koke\Aplikacija\src\components\features\crm\`.
+
+## Epic Description
+
+### Existing System Context
+
+- **Current Implementation:** Laravel 13 + HTMX + Alpine.js CRM with quick sale, customers, and reports tabs — already functional with CRUD, analytics, and charts
+- **Reference Implementation:** React 19 components at `d:\Koke\Aplikacija\src\components\features\crm\CRM.tsx`, `CustomerList.tsx`, `CRMReports.tsx`, and `d:\Koke\Aplikacija\src\components\features\sales\QuickSale.tsx`, `SalesList.tsx`
+- **Technology Stack:** Laravel 13, HTMX, Alpine.js, Blade, Chart.js (already installed), MariaDB 10.6.22
+- **Integration Points:** Customer model, Sale model, CrmController, CustomerController, SaleController, `CrmReportsService`, `<x-ui.chart>`, `<x-ui.stat-card>`, custom SCSS in `_crm.scss`
+
+### Enhancement Details
+
+The Laravel CRM is already largely feature-complete. This epic closes the remaining visual and functional gaps against the React reference implementation.
+
+**What's Being Changed:**
+
+1. **Revenue Trend Chart — Weekly Granularity** — React shows a weekly area chart (12 weeks desktop / 6 weeks mobile) with `#544CE6` fill. Laravel currently shows a monthly line chart (12 months). Must switch to weekly area chart with responsive breakpoint.
+2. **Sales History — Sortable DataTable with Actions** — React's `SalesList` component renders a sortable DataTable (10-item limit, columns: Customer, Date, Eggs, Amount, Notes, Actions) with inline edit/delete and an "Add Sale" form. Laravel currently renders a static read-only table with no sorting or actions.
+3. **Sales History — Edit Sale Inline** — React allows editing an existing sale from within the reports Sales History section. Laravel CRM currently has no edit-sale capability within the reports tab.
+4. **Sales History — Delete with Confirmation** — React uses `confirm()` dialog before deleting. Laravel CRM reports have no delete action. The customers tab already uses a 3-second armed-delete pattern — reuse that pattern for consistency.
+5. **Revenue Trend Chart — Area Fill Styling** — React uses `fillOpacity: 0.3` area fill with `#544CE6` stroke/fill. Laravel currently renders a standard line chart without fill.
+6. **Cross-Tab Data Refresh** — React calls `onDataChange()` → `silentRefresh()` after any mutation (sale create/edit/delete, customer create/edit/delete). Laravel currently refreshes only the active tab's content. After mutations in the Sales History or Quick Sale tab, report data (KPIs, charts, analytics) must also refresh.
+7. **Minor KPI Label Alignment** — React's revenue overview shows "Sales" (title) / "transactions" (label). Laravel shows "Transactions" / "total sales". Align to match React exactly.
+
+**How It Integrates:**
+
+- Extends existing `CrmReportsService` with a new `weeklyRevenueTrend()` method
+- Extends `CrmController@loadReportsTabData` to include weekly trend data
+- Adds sort + pagination support for Sales History in reports tab
+- Reuses existing `SaleController` store/update/destroy actions
+- Reuses existing armed-delete pattern from customers tab
+- New partial: `resources/views/crm/partials/sales-history.blade.php`
+- SCSS additions isolated to `_crm.scss`
+
+**Success Criteria:**
+
+- Revenue trend chart shows weekly data with area fill, matching React's `RevenueTrendChart` exactly
+- Sales History in reports is a sortable table with edit/delete actions and an inline add-sale form
+- Cross-tab data refresh works: adding a sale in Quick Sale refreshes report stats without full page reload
+- All KPI card labels match React exactly
+- Responsive behavior maintained (6-week chart on mobile, grid collapse)
+- Dark mode support preserved (including chart tooltip theming)
+
+---
+
+## Stories
+
+### Story 1: Weekly Revenue Trend Area Chart
+
+**User Story:**
+
+As a user,
+I want the CRM revenue trend chart to show weekly granularity with an area fill,
+So that I can identify recent revenue patterns at a finer resolution than monthly.
+
+---
+
+**Story Context:**
+
+**Existing System Integration:**
+- `CrmReportsService::revenueTrend(User $user)` currently returns 12 monthly data points using `strftime('%Y-%m', sale_date)` — this is **SQLite syntax** but the production database is **MariaDB 10.6.22**; must switch to `DATE_FORMAT`
+- `CrmController::loadReportsTabData()` passes `$revenueTrend` to the view (line ~105 of controller)
+- `tab-reports-overview.blade.php` renders a single `<x-ui.chart>` with `type="line"`, `fill: true`, `borderColor: #6366f1`, `backgroundColor: rgba(99, 102, 241, 0.1)` — these colors must change to match the React reference
+- `<x-ui.chart>` Blade component (at `resources/views/components/ui/chart.blade.php`) accepts `id`, `type`, `data`, `options`, `height` and renders a `<canvas>` with an inline `<script>` that instantiates `window.Chart`
+- `_crm.scss` has a `.crm-reports__chart-panel` class but no `.crm-reports__revenue-trend` classes yet
+- `_dashboard.scss` already has a dual-canvas pattern (`__revenue-trend--desktop` / `__revenue-trend--mobile` with `@media (min-width: 1024px)` toggle) and `__revenue-canvas-wrap` with fixed heights (350px desktop, 280px mobile) — reuse this exact approach in `_crm.scss`
+
+**Change Scope:**
+1. New `CrmReportsService::weeklyRevenueTrend()` method (MariaDB `YEARWEEK` function)
+2. Existing `CrmReportsService::revenueTrend()` — fix `strftime` → `DATE_FORMAT` for MariaDB compatibility (or deprecate if no longer called)
+3. `CrmController::loadReportsTabData()` — replace `$revenueTrend` with desktop + mobile weekly arrays
+4. `tab-reports-overview.blade.php` — replace single chart with two `<x-ui.chart>` canvases (desktop 12 weeks, mobile 6 weeks)
+5. `_crm.scss` — add responsive show/hide classes and fixed-height canvas wrappers
+6. Cache key for weekly data
+
+**Out of Scope:**
+- Changes to any other chart on the reports page (doughnut, production pipeline, per-customer)
+- Period selector (month/year/custom/all) — the weekly trend is always "last N weeks" regardless of selected period
+- Tooltip theming changes (use existing Chart.js defaults)
+- Dark mode chart color changes (the purple palette works on both light and dark backgrounds)
+
+---
+
+**Acceptance Criteria:**
+
+**Chart Data:**
+1. New `CrmReportsService::weeklyRevenueTrend(User $user, int $weeks = 12): array` method
+2. Returns array of `['label' => 'Mon DD', 'value' => X.XX]` entries, oldest first (e.g., `['label' => 'Jan 06', 'value' => 125.50]`)
+3. Uses `YEARWEEK(sale_date, 1)` for grouping — mode `1` = ISO week (Monday start)
+4. Date range: from `now()->subWeeks($weeks - 1)->startOfWeek(Carbon::MONDAY)` to `now()->endOfWeek(Carbon::SUNDAY)`
+5. Weeks with no sales return `value: 0.00` (zero-filled, not omitted)
+6. Labels use the Monday date of each week formatted as `'M d'` (e.g., `'Apr 06'`)
+7. Revenue values rounded to 2 decimal places
+8. Results cached with key `crm_weekly_revenue_{user_id}` and 5-minute (300s) TTL
+9. Fix existing `revenueTrend()` method: replace `strftime('%Y-%m', sale_date)` with `DATE_FORMAT(sale_date, '%Y-%m')` for MariaDB compatibility
+
+**Chart Styling:**
+1. Chart type remains `line` with `fill: true` (area chart in Chart.js 4.x)
+2. `borderColor`: `#544CE6`
+3. `backgroundColor`: `rgba(84, 76, 230, 0.3)` (30% opacity fill)
+4. `tension: 0.4` (smooth curves)
+5. `pointRadius: 0` (no data point dots — clean area look)
+6. `pointHoverRadius: 4` (dots appear on hover for tooltip targeting)
+7. Legend hidden (`plugins.legend.display: false`)
+8. Y-axis begins at zero (`scales.y.beginAtZero: true`)
+9. `responsive: true` and `maintainAspectRatio: false` (Chart.js fills parent container)
+10. Section title remains "Revenue Trend"
+
+**Responsive Behavior:**
+1. Two `<x-ui.chart>` canvases rendered: one with `id="crm-revenue-trend-desktop"` (12-week data) and one with `id="crm-revenue-trend-mobile"` (6-week data — last 6 entries of the 12-week array)
+2. Desktop canvas wrapped in `.crm-reports__revenue-trend--desktop`: hidden below 1024px, visible at ≥1024px (`display: none` / `display: block`)
+3. Mobile canvas wrapped in `.crm-reports__revenue-trend--mobile`: visible below 1024px, hidden at ≥1024px
+4. Desktop canvas wrapper height: 350px (matches dashboard pattern)
+5. Mobile canvas wrapper height: 280px (matches dashboard pattern)
+6. Both wrappers use `position: relative; width: 100%` for Chart.js responsive sizing
+7. `aria-label` on desktop canvas: `"Weekly revenue trend — last 12 weeks"`
+8. `aria-label` on mobile canvas: `"Weekly revenue trend — last 6 weeks"`
+
+---
+
+**Technical Requirements:**
+
+**Service — `CrmReportsService::weeklyRevenueTrend()`:**
+
+```php
+public function weeklyRevenueTrend(User $user, int $weeks = 12): array
+```
+
+- Query: `$user->sales()->where('sale_date', '>=', $startDate)->selectRaw("YEARWEEK(sale_date, 1) as week_key, COALESCE(SUM(total_amount), 0) as revenue")->groupByRaw("YEARWEEK(sale_date, 1)")->pluck('revenue', 'week_key')`
+- Build the complete weeks array using Carbon, iterating `$weeks` times from the start Monday forward
+- For each week, compute `YEARWEEK` equivalent via `$date->format('o') . $date->format('W')` converted to int (e.g., `202614`) to match the DB key format: `(int) ($date->isoFormat('GGGG') . $date->isoFormat('WW'))`
+- Cache: `Cache::remember("crm_weekly_revenue_{$user->id}", 300, fn () => ...)`
+
+**Service — Fix `revenueTrend()`:**
+
+- Replace `strftime('%Y-%m', sale_date)` with `DATE_FORMAT(sale_date, '%Y-%m')` in both `selectRaw` and `groupByRaw` calls
+
+**Controller — `CrmController::loadReportsTabData()`:**
+
+- Replace `$data['revenueTrend'] = $reportsService->revenueTrend($user)` with:
+  ```php
+  $weeklyTrend = $reportsService->weeklyRevenueTrend($user, 12);
+  $data['weeklyTrendDesktop'] = $weeklyTrend;
+  $data['weeklyTrendMobile'] = array_slice($weeklyTrend, -6);
+  ```
+- Remove or keep the monthly `revenueTrend()` call if other views use it; if only the overview uses it, remove it
+
+**Blade — `tab-reports-overview.blade.php`:**
+
+- Replace the existing single `<x-ui.chart id="crm-revenue-trend" ...>` block with two canvases:
+  ```blade
+  <div class="crm-reports__revenue-trend--desktop">
+      <div class="crm-reports__revenue-canvas-wrap crm-reports__revenue-canvas-wrap--desktop">
+          <x-ui.chart
+              id="crm-revenue-trend-desktop"
+              type="line"
+              :data="[
+                  'labels' => collect($weeklyTrendDesktop)->pluck('label')->toArray(),
+                  'datasets' => [[
+                      'label' => 'Revenue',
+                      'data' => collect($weeklyTrendDesktop)->pluck('value')->toArray(),
+                      'borderColor' => '#544CE6',
+                      'backgroundColor' => 'rgba(84, 76, 230, 0.3)',
+                      'fill' => true,
+                      'tension' => 0.4,
+                      'pointRadius' => 0,
+                      'pointHoverRadius' => 4,
+                  ]],
+              ]"
+              :options="[
+                  'responsive' => true,
+                  'maintainAspectRatio' => false,
+                  'plugins' => ['legend' => ['display' => false]],
+                  'scales' => ['y' => ['beginAtZero' => true]],
+              ]"
+              :height="350"
+              aria-label="Weekly revenue trend — last 12 weeks"
+          />
+      </div>
+  </div>
+
+  <div class="crm-reports__revenue-trend--mobile">
+      <div class="crm-reports__revenue-canvas-wrap crm-reports__revenue-canvas-wrap--mobile">
+          <x-ui.chart
+              id="crm-revenue-trend-mobile"
+              type="line"
+              :data="[
+                  'labels' => collect($weeklyTrendMobile)->pluck('label')->toArray(),
+                  'datasets' => [[
+                      'label' => 'Revenue',
+                      'data' => collect($weeklyTrendMobile)->pluck('value')->toArray(),
+                      'borderColor' => '#544CE6',
+                      'backgroundColor' => 'rgba(84, 76, 230, 0.3)',
+                      'fill' => true,
+                      'tension' => 0.4,
+                      'pointRadius' => 0,
+                      'pointHoverRadius' => 4,
+                  ]],
+              ]"
+              :options="[
+                  'responsive' => true,
+                  'maintainAspectRatio' => false,
+                  'plugins' => ['legend' => ['display' => false]],
+                  'scales' => ['y' => ['beginAtZero' => true]],
+              ]"
+              :height="280"
+              aria-label="Weekly revenue trend — last 6 weeks"
+          />
+      </div>
+  </div>
+  ```
+
+**SCSS — `_crm.scss` additions (BEM under `.crm-reports`):**
+
+```scss
+&__revenue-trend--desktop {
+    display: none;
+    padding: 1.5rem;
+
+    @media (min-width: 1024px) {
+        display: block;
+    }
+}
+
+&__revenue-trend--mobile {
+    display: block;
+    padding: 1rem;
+
+    @media (min-width: 1024px) {
+        display: none;
+    }
+}
+
+&__revenue-canvas-wrap {
+    position: relative;
+    width: 100%;
+
+    &--desktop {
+        height: 350px;
+    }
+
+    &--mobile {
+        height: 280px;
+    }
+}
+```
+
+**Cache Key:**
+
+- Key: `crm_weekly_revenue_{$user->id}`
+- TTL: 300 seconds (5 minutes)
+- Invalidation: not required for this story (cache expires naturally; future stories may add event-driven invalidation on sale create/update/delete)
+
+---
+
+**Tests:**
+
+**Unit — `tests/Unit/CrmReportsServiceWeeklyTrendTest.php`:**
+
+1. `test_weekly_revenue_trend_returns_12_entries_by_default` — Create a user with sales spread across multiple weeks; assert result is an array of 12 items, each with `label` (string) and `value` (numeric) keys
+2. `test_weekly_revenue_trend_returns_requested_number_of_weeks` — Call with `$weeks = 6`; assert exactly 6 entries returned
+3. `test_weekly_revenue_trend_zero_fills_weeks_without_sales` — Create a user with a single sale; assert all 12 entries exist, 11 have `value: 0.00`, 1 has the sale amount
+4. `test_weekly_revenue_trend_sums_multiple_sales_in_same_week` — Create 3 sales in the same ISO week; assert that week's `value` equals the sum of all 3 amounts (rounded to 2 decimals)
+5. `test_weekly_revenue_trend_labels_are_monday_dates` — Assert each label matches `'/^[A-Z][a-z]{2} \d{2}$/'` regex pattern (e.g., `Apr 06`)
+6. `test_weekly_revenue_trend_excludes_sales_outside_range` — Create a sale 13 weeks ago; call with `$weeks = 12`; assert that sale's revenue is NOT included in any entry
+7. `test_weekly_revenue_trend_uses_monday_start_weeks` — Create a sale on a Sunday; assert it falls into the correct Monday-start week bucket (same week as the preceding Monday)
+8. `test_weekly_revenue_trend_result_is_cached` — Call twice; assert `Cache::has('crm_weekly_revenue_{id}')` is true after first call
+9. `test_monthly_revenue_trend_uses_date_format_not_strftime` — Call `revenueTrend()`; assert it doesn't throw a SQL error (validates the `DATE_FORMAT` fix)
+10. `test_weekly_revenue_trend_scoped_to_user` — Create two users with sales; assert each user's trend only includes their own sales
+
+**Feature — `tests/Feature/CrmWeeklyRevenueTrendTest.php`:**
+
+1. `test_reports_overview_contains_weekly_trend_desktop_canvas` — GET `/app/crm?tab=reports`; assert response contains `id="crm-revenue-trend-desktop"`
+2. `test_reports_overview_contains_weekly_trend_mobile_canvas` — GET `/app/crm?tab=reports`; assert response contains `id="crm-revenue-trend-mobile"`
+3. `test_reports_overview_desktop_chart_has_12_data_points` — Create sales in different weeks; GET reports tab; assert the desktop chart data JSON contains 12 label entries
+4. `test_reports_overview_mobile_chart_has_6_data_points` — Same setup; assert the mobile chart data JSON contains 6 label entries
+5. `test_reports_overview_chart_uses_correct_stroke_color` — Assert response contains `#544CE6`
+6. `test_reports_overview_chart_uses_area_fill` — Assert response contains `rgba(84, 76, 230, 0.3)`
+7. `test_reports_overview_no_longer_contains_monthly_trend_labels` — Assert response does NOT contain old monthly label format (e.g., `'Apr 2026'` 12-month pattern); confirms switchover
+8. `test_reports_overview_empty_state_when_no_sales` — User with no sales; GET reports tab; assert empty state component renders (existing behavior preserved)
+
+---
+
+### Story 2: Sales History — Sortable Table with Add Sale Form
+
+**User Story:**
+
+As a user,
+I want to browse, sort, and add sales directly from the CRM reports tab,
+So that I can view my sales history and record new sales without leaving the reports view.
+
+**Note:** Edit and delete functionality for individual sales is delivered in Story 4. This story renders the Actions column with placeholder buttons that Story 4 wires up.
+
+**Acceptance Criteria:**
+
+**Table Structure:**
+1. Section heading "Sales History" (h3, `crm-reports__section-title`) with a "Record Sale" button (`shiny-cta`) aligned right in the header row
+2. Table extracted into new partial: `resources/views/crm/partials/sales-history.blade.php`
+3. Table wrapped in `<div id="crm-sales-history">` for HTMX targeting
+4. Columns in order: Customer, Date, Eggs, Amount, Notes, Actions
+5. **Customer column:** bold customer name (`font-weight: 600`). Displays `Walk-in / No Customer` for null `customer_id` (via Sale model's `withDefault`)
+6. **Date column:** localized date using `$sale->sale_date->format('M d, Y')`
+7. **Eggs column:** total egg count (`$sale->dozen_count * 12 + $sale->individual_count`). When `dozen_count > 0`, show breakdown as `<small class="crm-reports__egg-breakdown">(Xd + Y)</small>` after the count
+8. **Amount column:** `$X.XX` formatted via `number_format($sale->total_amount, 2)`. When `(float) $sale->total_amount === 0.0`, render `<span class="crm-reports__free-badge">FREE</span>`
+9. **Notes column:** truncated to 40 chars via `Str::limit($sale->notes, 40)`, show `—` when null/empty. Uses class `crm-reports__sales-notes` for `max-width` constraint
+10. **Actions column:** edit button (pencil SVG icon) + delete button (circle-x SVG icon), both icon-only with `title` attributes for accessibility
+11. Empty state: `<x-ui.empty-state icon="🧾" title="No Sales Yet" description="Record your first sale to start tracking revenue and customer purchases." />`
+12. Hard limit of 10 rows (no pagination — matches React). Default sort: `sale_date` descending
+13. Each row has `id="crm-sale-{{ $sale->id }}"` for targeted DOM removal on delete
+
+**Sorting:**
+1. Customer, Date, Eggs, and Amount headers are sortable (`data-table__header--sortable` class, `cursor: pointer`)
+2. Notes and Actions headers are NOT sortable
+3. Sort headers use HTMX: `hx-get` targeting `#crm-sales-history` with `hx-swap="innerHTML"`
+4. `hx-get` URL pattern: `route('app.crm.index', ['tab' => 'reports', 'view' => 'overview', 'sales_sort' => $column, 'sales_dir' => $nextDir])` — preserves existing period/date query params
+5. Sort allow-list in `CrmController::loadReportsTabData()`: `['customer_name', 'sale_date', 'dozen_count', 'total_amount']`. Any value outside the allow-list defaults to `sale_date`
+6. Direction validated: `strtolower($dir) === 'asc' ? 'asc' : 'desc'` (same pattern as customers tab)
+7. Active sort column shows arrow indicator: `↑` for asc, `↓` for desc (using `$sortIcon` closure, same as customers-table.blade.php)
+8. `customer_name` sort requires a join or subquery: `->leftJoin('customers', 'sales.customer_id', '=', 'customers.id')->orderBy('customers.name', $dir)->select('sales.*')` — null customer_id rows sort last
+9. Sort state variables `$salesSort` and `$salesDir` passed to the partial
+10. When HTMX request targets `crm-sales-history`, return ONLY the `sales-history` partial (not the full reports overview)
+
+**Add Sale Form:**
+1. "Record Sale" button in header toggles the form open via Alpine.js (`@click="openAddForm()"`)
+2. Form wrapped in `<div x-show="formOpen" x-collapse x-cloak>` with `form-card` styling (same pattern as customers tab)
+3. Form title: "Record Sale"
+4. Form subtitle: "Enter sale details and pricing below"
+5. Form fields (matching QuickSale form for parity):
+   - **Price per Egg ($):** `type="number"`, `step="0.01"`, `min="0"`, placeholder `"0.30"`, `x-model.number="form.price_per_egg"`, triggers `recalcTotal()` on input
+   - **Customer:** `<select>` dropdown with all active customers + `"Select a customer"` placeholder option, `x-model="form.customer_id"`, required
+   - **Sale Date:** `type="date"`, `max="{{ today()->format('Y-m-d') }}"`, `x-model="form.sale_date"`, required, defaults to today
+   - **Number of Eggs:** `type="number"`, `min="0"`, placeholder `"Enter egg count"`, `x-model.number="form.eggs_count"`, required, triggers `recalcTotal()` on input
+   - **Total Amount ($):** `type="number"`, `step="0.01"`, `min="0"`, `x-model.number="form.total_amount"`, required, auto-calculated as `price_per_egg × eggs_count` unless manually overridden (`manualTotal` flag)
+   - **Notes:** `<textarea>`, 2 rows, placeholder `"Any notes about this sale..."`, `x-model="form.notes"`
+6. Layout: Price per Egg + Customer + Sale Date in `form-row--3-col` on md+; Eggs + Total Amount in `form-row--2-col`
+7. Dozen breakdown info shown when `form.eggs_count >= 12`: "X dozen + Y individual" via Alpine template
+8. Submit button: `shiny-cta`, text `"Record Sale"`, disabled when `submitting || !form.customer_id || form.eggs_count === 0`
+9. Loading state: button text changes to `"Recording..."` while submitting
+10. Cancel button (`btn btn--secondary`) calls `closeForm()`, resets all form state
+
+**Form Submission:**
+1. Submit via `fetch()` (NOT HTMX `hx-post`) — matches customers tab pattern for form submission
+2. `POST /app/sales` with JSON body `{ customer_id, sale_date, dozen_count, individual_count, total_amount, notes }`. `dozen_count` and `individual_count` calculated from `form.eggs_count` in Alpine: `Math.floor(form.eggs_count / 12)` and `form.eggs_count % 12`
+3. Request headers: `Content-Type: application/json`, `X-CSRF-TOKEN`, `HX-Request: true`, `Accept: application/json`
+4. On success: close form, reset state, refresh the `#crm-sales-history` container via `htmx.ajax('GET', ...)` to reload the sorted table, dispatch `crm:changed` event on `document.body`
+5. On validation error (422): parse `response.json()` → extract first error from `data.errors` → display in error banner
+6. On network/server error: display generic "Network error. Please try again." in error banner
+
+**Error & Success Display:**
+1. Error banner: `<template x-if="error">` with `crm-reports__sales-error` class, shows error text + Dismiss button
+2. No persistent success banner — form close + table refresh is the success indicator (matches customers tab behavior)
+
+**Alpine.js Component:**
+1. Component function name: `salesHistory()`
+2. State shape (designed to support Story 4's edit/delete extensions without refactoring):
+   ```js
+   {
+       formOpen: false,
+       editing: false,         // true when in edit mode (Story 4)
+       editingSaleId: null,    // sale ID when editing (Story 4)
+       submitting: false,
+       error: null,
+       success: null,          // success message (Story 4)
+       deleteArmed: null,      // sale ID or null (Story 4)
+       deleteTimer: null,      // timeout ref (Story 4)
+       manualTotal: false,
+       form: {                 // nested form object
+           customer_id: '',
+           sale_date: '{{ today()->format("Y-m-d") }}',
+           eggs_count: 0,
+           price_per_egg: 0.30,
+           total_amount: 0,
+           notes: '',
+           paid: true,
+       },
+   }
+   ```
+3. Methods for this story: `openAddForm()`, `closeForm()`, `resetForm()`, `submitSale()`, `recalcTotal()`
+4. Stub methods for Story 4: `openEditForm(sale)`, `cancelEdit()`, `armDelete(id)`, `confirmDelete(id)` — empty no-ops until Story 4 implements them
+5. Registered inline via `x-data="salesHistory()"` on the sales-history section wrapper (inside `tab-reports-overview.blade.php`)
+6. Component script pushed via `@push('scripts')` from the `sales-history.blade.php` partial
+
+**CrmController Changes:**
+1. `loadReportsTabData()` adds `$salesSort` and `$salesDir` from query params (`sales_sort`, `sales_dir`)
+2. Sales sort allow-list: `['customer_name', 'sale_date', 'dozen_count', 'total_amount']`
+3. Replace `CrmReportsService::recentSales()` call with inline query in controller (or new service method) that supports sorting:
+   - Default: `sale_date desc`
+   - `customer_name` sort: left join on `customers` table, order by `customers.name`
+   - All others: direct column sort on `sales` table
+   - Hard limit: `->limit(10)`
+   - Eager load: `->with('customer')`
+4. When HTMX request targets `crm-sales-history`: return `view('crm.partials.sales-history', [...])` directly — skip the full overview partial
+5. Pass `$salesSort`, `$salesDir`, `$recentSales`, `$customers` (for the form dropdown), and current period/from/to (to preserve in sort URLs) to the partial
+
+**New Partial: `resources/views/crm/partials/sales-history.blade.php`:**
+1. Receives: `$recentSales`, `$customers`, `$salesSort`, `$salesDir`, `$period`, `$from`, `$to`
+2. Contains: header with title + Record Sale button, form card (add/edit), error banner, sortable table, empty state
+3. Wrapped in Alpine `x-data="salesHistory()"` at root
+4. Pushes `<script>` block to `@push('scripts')`
+5. Table uses same `data-table` / `data-table--striped` classes as customers table
+
+**SCSS Classes (BEM in `_crm.scss`):**
+1. `.crm-reports__sales-header` — flex row, `justify-content: space-between`, `align-items: center`, margin-bottom
+2. `.crm-reports__sales-notes` — `max-width: 150px`, `overflow: hidden`, `text-overflow: ellipsis`, `white-space: nowrap`
+3. `.crm-reports__sales-actions` — flex row, gap for icon buttons
+4. `.crm-reports__sales-action` — icon button base class (shared by edit + delete)
+5. `.crm-reports__sales-action--edit` — blue icon, hover background transition
+6. `.crm-reports__sales-action--delete` — gray icon, hover red background transition
+7. `.crm-reports__sales-action--armed` — red icon, red-tinted background, pulse animation (wired in Story 4)
+8. `.crm-reports__sales-error` — error banner (red border-left, red-tinted background, flex row with text + dismiss button)
+9. `.crm-reports__sales-eggs-breakdown` — `<small>` styling (muted color, smaller font)
+10. `.crm-reports__free-badge` — already exists (green color badge for $0 sales), verify and reuse
+11. `.crm-reports__form-wrapper` — form expand/collapse container, `margin-bottom: 1rem`
+
+**Technical Requirements:**
+
+- Extract the inline sales table from `tab-reports-overview.blade.php` into `sales-history.blade.php` and `@include` it
+- Reuse `SaleController@store` endpoint (already supports JSON + HTMX)
+- Reuse existing `StoreSaleRequest` form request validation
+- SVG icons for edit (pencil) and delete (circle-x) rendered as icon-only buttons — inline SVG in Blade, 20×20. Buttons call stub Alpine methods until Story 4 wires them.
+- All sale queries scoped to `$request->user()->sales()` (existing pattern)
+- The `customers` collection for the form dropdown reuses the same query already done in `loadReportsTabData()` — no additional DB call
+- **Parallel implementation note:** Story 1 also modifies `tab-reports-overview.blade.php` (chart section). If implemented in parallel, merge carefully.
+
+**Tests:**
+
+**Feature Tests (in `tests/Feature/CrmSalesHistoryTest.php`):**
+1. `test_reports_tab_shows_sales_history_with_columns` — assert reports overview contains all 6 column headers
+2. `test_sales_history_default_sort_is_sale_date_desc` — assert first sale in table is the most recent
+3. `test_sales_history_sort_by_customer_name` — GET with `sales_sort=customer_name&sales_dir=asc`, assert customer names in alphabetical order
+4. `test_sales_history_sort_by_total_amount` — GET with `sales_sort=total_amount&sales_dir=desc`, assert amounts in descending order
+5. `test_sales_history_sort_by_dozen_count` — GET with `sales_sort=dozen_count&sales_dir=asc`, assert egg counts ascending
+6. `test_sales_history_invalid_sort_defaults_to_sale_date` — GET with `sales_sort=invalid_column`, assert no error and results ordered by `sale_date desc`
+7. `test_sales_history_limited_to_10_rows` — create 15 sales, assert only 10 rendered
+8. `test_sales_history_htmx_sort_returns_partial_only` — GET with HX-Target `crm-sales-history`, assert response does NOT contain full page layout (no `<html>`, no tab nav)
+9. `test_sales_history_shows_record_sale_button` — assert "Record Sale" button present in reports tab
+10. `test_sales_history_empty_state` — user with no sales, assert empty state component rendered
+11. `test_add_sale_via_form_submission` — POST sale with valid data, assert sale created in DB and `crm:changed` dispatched
+
+**Unit Tests (if `CrmReportsService` gains a new sorted-sales method):**
+1. `testSortedSalesReturnsMax10` — assert collection size ≤ 10
+2. `testSortedSalesDefaultOrder` — assert default is `sale_date desc`
+3. `testSortedSalesByCustomerName` — assert join-based sort works correctly with null customer_id
+
+---
+
+### Story 3: Cross-Tab Data Refresh & KPI Parity
+
+**User Story:**
+
+As a user,
+I want CRM report data (KPIs, charts, analytics) to refresh automatically after any sale or customer mutation,
+So that I always see accurate numbers without manually switching tabs or reloading the page.
+
+**Depends On:** Story 1 (weekly revenue cache key `crm_weekly_revenue_{id}` must exist for `clearCacheForUser()` to reference it)
+
+---
+
+**Story Context:**
+
+**Existing System Integration:**
+- Integrates with: `app/Http/Controllers/SaleController.php`, `app/Http/Controllers/CustomerController.php`, `app/Services/CrmReportsService.php`, `resources/views/crm/partials/tab-reports-overview.blade.php`, `resources/views/crm/partials/tab-reports-customer.blade.php`
+- Technology: Laravel 13, HTMX 2, Alpine.js 3, Blade, SCSS
+- Follows pattern: Expenses epic established `HX-Trigger: expenses:changed` → listeners refresh chart + summary. Feed epic uses `HX-Trigger: feed:changed`. Flock epic uses `HX-Trigger: flock:changed`. This story replicates the same pattern with `crm:changed`.
+- Touch points: SaleController (store/update/destroy/togglePayment), CustomerController (store/update/destroy), CrmReportsService (cache invalidation), stat-card component (gradient overlay), reports overview partial (KPI labels), reports customer partial (listener wiring)
+
+**Change Scope:**
+- Add `HX-Trigger: crm:changed` header to all CRM mutation controller responses
+- Add `CrmReportsService::clearCacheForUser(User $user)` to flush stale cache on mutations
+- Wire reports tab partials to listen for `crm:changed from:body` and self-refresh via HTMX
+- Fix KPI card #3 title/label to match React reference ("Sales" / "transactions")
+- Add `.stat-card__gradient-overlay` blur overlay to the `corner-gradient` variant
+- Write feature tests for HX-Trigger header presence and unit test for cache clearing
+
+**Out of Scope (covered by other stories):**
+- Weekly revenue trend area chart (Story 1)
+- Sales History sortable table with add/edit/delete (Story 2)
+- Sales History edit form, delete UX & final visual polish (Story 4)
+- Building new UI components or pages — this story is pure wiring + label fixes
+
+---
+
+**Acceptance Criteria:**
+
+**Cross-Tab Refresh — HX-Trigger Emission:**
+
+1. **`SaleController@store`** response includes `HX-Trigger: crm:changed` header for HTMX requests
+2. **`SaleController@update`** response includes `HX-Trigger: crm:changed` header on the HTMX path
+3. **`SaleController@destroy`** response includes `HX-Trigger: crm:changed` header
+4. **`SaleController@togglePayment`** response includes `HX-Trigger: crm:changed` header (toggling paid status affects revenue KPIs)
+5. **`CustomerController@store`** response includes `HX-Trigger: crm:changed` header on the HTMX path (new customers affect analytics)
+6. **`CustomerController@update`** response includes `HX-Trigger: crm:changed` header on the HTMX path
+7. **`CustomerController@destroy`** response includes `HX-Trigger: crm:changed` header (deactivating a customer affects analytics)
+8. **Quick Sale fetch-based submission** — The Quick Sale tab uses Alpine.js `fetch()` to `POST /app/sales`. Since Quick Sale sends an `HX-Request` header, the HTMX response path applies and `crm:changed` header is returned. The existing Alpine `quickSale()` component dispatches `crm:changed` on the window after a successful fetch. Server-side `SaleController@store` must ALSO emit `HX-Trigger: crm:changed` so that non-Quick-Sale HTMX sale creations (e.g., from Sales History) also trigger refresh.
+
+**Cross-Tab Refresh — HTMX Listener Wiring:**
+
+9. **Reports Overview partial** (`tab-reports-overview.blade.php`) — the outermost wrapper element gains `hx-get`, `hx-trigger="crm:changed from:body"`, `hx-target="this"`, `hx-swap="innerHTML"` attributes. This causes self-refresh when `crm:changed` fires, but only when the partial is in the DOM (reports tab active).
+10. **Reports Per-Customer partial** (`tab-reports-customer.blade.php`) — same listener wiring pattern.
+11. **No loading spinner on refresh** — Omit `hx-indicator` on the listener elements. Data simply swaps in-place when the response arrives (matches React's `silentRefresh()`).
+12. **Tab-switching natural freshness** — When the user switches from Quick Sale → Reports tab, the tab loads fresh data via the existing `hx-get` tab mechanism. No special handling needed.
+
+**KPI Card Parity:**
+
+13. **KPI card #1 — Revenue** (no change needed): title `"Revenue"`, total `'$' . totalRevenue`, label `"total earnings"`, icon `💰`, variant `corner-gradient`
+14. **KPI card #2 — Sales** (title change: "Transactions" → "Sales", label change: "total sales" → "transactions"): title `"Sales"`, total `totalSales`, label `"transactions"`, icon `🧾`, variant `corner-gradient`
+15. **KPI card #3 — Eggs Sold** (no change needed): title `"Eggs Sold"`, total `totalEggsSold`, label `freeEggs . ' free'`, icon `🥚`, variant `corner-gradient`
+16. **KPI card #4 — Avg Sale** (no change needed): title `"Avg Sale"`, total `'$' . avgSaleValue`, label `"per transaction"`, icon `📊`, variant `corner-gradient`
+17. **Final KPI card order in Blade** (must match React): Revenue, Sales, Eggs Sold, Avg Sale (current order is Revenue, Eggs Sold, Transactions, Avg Sale — needs reorder)
+
+**StatCard Corner-Gradient Overlay:**
+
+18. The `<x-ui.stat-card>` component already renders a `.stat-card__gradient-blob` div when `variant="corner-gradient"`. The existing SCSS has `height: 130%`.
+19. React reference uses `height: 30%` and gradient `radial-gradient(circle, #4F39F6 0%, #191656 100%)`.
+20. **Delta to fix:** Change `.stat-card__gradient-blob` from `height: 130%` to `height: 30%` and verify gradient colors match `#4F39F6` / `#191656`.
+21. No Blade component changes needed — this is a SCSS-only fix.
+22. Verify SCSS variable values. If `$color-indigo-700` already maps to `#4F39F6` and `$color-indigo-darkest` to `#191656`, keep the variables. If they differ, use exact hex values.
+
+**Cache Invalidation:**
+
+23. New method `CrmReportsService::clearCacheForUser(User $user)` that forgets known fixed-period cache keys: `crm_revenue_{userId}_month__`, `crm_revenue_{userId}_year__`, `crm_revenue_{userId}_all__`.
+24. Custom-period cache keys (`crm_revenue_{userId}_custom_{from}_{to}`) expire naturally via 5-min TTL — enumerating all date combinations is impractical.
+25. Each mutation controller method calls `clearCacheForUser()` after the database write, before returning the response.
+26. `clearCacheForUser` is a regular public method called via `app(CrmReportsService::class)` resolution.
+27. Cache key verification: when `$from` and `$to` are `null`, PHP interpolates as empty strings, producing keys like `crm_revenue_1_month__` (two trailing underscores). The `clearCacheForUser` method must match this exact pattern.
+28. **Weekly revenue cache** — Also forget `crm_weekly_revenue_{userId}` (from Story 1) so weekly chart refreshes after mutations.
+
+**Integration Requirements:**
+
+29. No changes to route definitions — all affected controllers already have routes.
+30. No changes to CrmController — it already passes fresh data from CrmReportsService.
+31. No changes to database schema — this story is pure wiring.
+32. Standalone pages (`/app/sales`, `/app/customers`) unaffected — `crm:changed` header is additive and harmless.
+33. Dashboard integration — the dashboard already listens for `crm:changed`. Adding `HX-Trigger: crm:changed` to mutations benefits the dashboard's financial overview too.
+
+**Quality Requirements:**
+
+34. No regressions — existing HTMX behaviors on sales and customers pages must continue to work.
+35. Dark mode — no new dark-mode work needed.
+36. Accessibility — no new accessibility concerns.
+37. Performance — cache invalidation adds negligible overhead.
+
+---
+
+**Technical Requirements:**
+
+**File Changes Summary:**
+
+```
+app/Http/Controllers/SaleController.php           (MODIFY - add HX-Trigger + cache clear)
+app/Http/Controllers/CustomerController.php        (MODIFY - add HX-Trigger + cache clear)
+app/Services/CrmReportsService.php                 (MODIFY - add clearCacheForUser())
+resources/views/crm/partials/tab-reports-overview.blade.php   (MODIFY - reorder KPIs, fix labels, add listener)
+resources/views/crm/partials/tab-reports-customer.blade.php   (MODIFY - add listener)
+resources/scss/components/_cards.scss              (MODIFY - fix gradient-blob height/colors)
+tests/Feature/SaleControllerHxTriggerTest.php      (NEW)
+tests/Feature/CustomerControllerHxTriggerTest.php  (NEW)
+tests/Unit/CrmReportsServiceCacheTest.php          (NEW)
+```
+
+**Controller Modification Pattern:**
+
+Each mutation method follows this pattern:
+```php
+// After DB write:
+app(CrmReportsService::class)->clearCacheForUser($request->user());
+
+// HTMX path:
+return response()
+    ->view('...', compact('...'))
+    ->header('HX-Trigger', 'crm:changed');
+```
+
+**CrmReportsService Cache Clear Method:**
+
+```php
+public function clearCacheForUser(User $user): void
+{
+    $userId = $user->id;
+
+    Cache::forget("crm_revenue_{$userId}_month__");
+    Cache::forget("crm_revenue_{$userId}_year__");
+    Cache::forget("crm_revenue_{$userId}_all__");
+    Cache::forget("crm_weekly_revenue_{$userId}");
+}
+```
+
+**HTMX Listener Wiring (Reports Overview):**
+
+```blade
+<div id="crm-reports-overview"
+     hx-get="{{ route('app.crm.index', array_filter(['tab' => 'reports', 'view' => 'overview', 'period' => $period ?? 'month', 'from' => $from ?? null, 'to' => $to ?? null])) }}"
+     hx-trigger="crm:changed from:body"
+     hx-target="this"
+     hx-swap="innerHTML"
+     hx-headers='{"HX-Target": "crm-reports-overview"}'>
+```
+
+**KPI Card Blade Changes:**
+
+Reorder cards: Revenue → Sales → Eggs Sold → Avg Sale. Rename "Transactions" → "Sales" (title) and "total sales" → "transactions" (label).
+
+**SCSS Gradient-Blob Fix:**
+
+```scss
+&__gradient-blob {
+    height: 30%;           // was 130%, React uses 30%
+    background: radial-gradient(circle, #4F39F6 0%, #191656 100%);
+}
+```
+
+---
+
+**Tests:**
+
+**Feature — `tests/Feature/SaleControllerHxTriggerTest.php`:**
+
+1. `test_store_returns_crm_changed_trigger` — POST sale with HX-Request header, assert `HX-Trigger: crm:changed` header present
+2. `test_update_returns_crm_changed_trigger` — PUT sale with HX-Request header, assert header present
+3. `test_destroy_returns_crm_changed_trigger` — DELETE sale with HX-Request header, assert header present
+4. `test_toggle_payment_returns_crm_changed_trigger` — PATCH toggle-payment with HX-Request header, assert header present
+
+**Feature — `tests/Feature/CustomerControllerHxTriggerTest.php`:**
+
+5. `test_store_returns_crm_changed_trigger` — POST customer with HX-Request header, assert header present
+6. `test_update_returns_crm_changed_trigger` — PUT customer with HX-Request header, assert header present
+7. `test_destroy_returns_crm_changed_trigger` — DELETE customer with HX-Request header, assert header present
+
+**Unit — `tests/Unit/CrmReportsServiceCacheTest.php`:**
+
+8. `test_clear_cache_for_user_forgets_revenue_keys` — Populate cache for month/year/all, call `clearCacheForUser`, assert all keys cleared
+9. `test_clear_cache_does_not_affect_other_users` — Clear user 1's cache, assert user 2's cache untouched
+
+**Dev Checklist:**
+
+- [ ] `CrmReportsService::clearCacheForUser(User $user)` method added (includes `crm_weekly_revenue` key)
+- [ ] `SaleController@store` — cache clear + `HX-Trigger: crm:changed` header
+- [ ] `SaleController@update` — cache clear + `HX-Trigger: crm:changed` header
+- [ ] `SaleController@destroy` — cache clear + `HX-Trigger: crm:changed` header
+- [ ] `SaleController@togglePayment` — cache clear + `HX-Trigger: crm:changed` header
+- [ ] `CustomerController@store` — cache clear + `HX-Trigger: crm:changed` header
+- [ ] `CustomerController@update` — cache clear + `HX-Trigger: crm:changed` header
+- [ ] `CustomerController@destroy` — cache clear + `HX-Trigger: crm:changed` header
+- [ ] KPI card #2 renamed: title "Sales", label "transactions"
+- [ ] KPI card order matches React: Revenue, Sales, Eggs Sold, Avg Sale
+- [ ] Reports overview partial has `hx-trigger="crm:changed from:body"` listener
+- [ ] Reports per-customer partial has `hx-trigger="crm:changed from:body"` listener
+- [ ] No `hx-indicator` on listener elements (silent refresh)
+- [ ] `.stat-card__gradient-blob` height corrected to `30%` + gradient hex values verified
+- [ ] Feature tests pass: 4 sale + 3 customer HX-Trigger tests
+- [ ] Unit tests pass: 2 cache clearing tests
+- [ ] `vendor/bin/pint --dirty --format agent` passes
+- [ ] Existing tests still pass (no regressions)
+
+---
+
+### Story 4: Sales History Edit Form, Delete UX & Final Visual Polish
+
+**User Story:**
+
+As a user,
+I want to edit existing sales, delete sales with a safe two-step confirmation, and see polished visual styling across the CRM reports tab,
+So that I can correct mistakes and manage sales history with the same quality I experience in the rest of the application.
+
+**Depends On:** Stories 2 + 3 (sortable Sales History table, `crm:changed` cross-tab refresh)
+
+**Acceptance Criteria:**
+
+#### Edit Form Flow
+
+1. Each Sales History row has an **edit** button (pencil icon, blue) in the Actions column alongside the delete button
+2. Clicking edit populates the add-sale form above the table in **edit mode** with the sale's existing data:
+   - `customer_id` → pre-selected in the Customer dropdown
+   - `sale_date` → pre-filled (ISO `Y-m-d` format)
+   - `eggs_count` → computed from `dozen_count * 12 + individual_count` (display-only convenience; server recalculates)
+   - `total_amount` → pre-filled
+   - `notes` → pre-filled
+   - `price_per_egg` → computed client-side as `total_amount / eggs_count` (displayed read-only, rounded to 2 decimals; shows `0.00` if eggs is 0)
+3. When in edit mode the form title changes from "Record Sale" to **"Edit Sale"**
+4. The form subtitle changes to "Update the sale details below"
+5. The submit button text changes from "Record Sale" to **"Update Sale"**; while submitting shows "Updating Sale..."
+6. A **Cancel** button appears next to the submit button (secondary style, `btn btn--secondary`); clicking it:
+   - Resets the form to blank defaults (today's date, empty fields)
+   - Exits edit mode (title/button revert to add-sale state)
+   - Does NOT collapse the form (form stays open for a new add)
+7. Edit mode sets an `editingSaleId` property in the Alpine component; when non-null the form is in edit mode
+8. Submitting in edit mode issues `fetch` PUT to `/app/sales/{id}` with JSON body containing `sale_date`, `dozen_count`, `individual_count`, `total_amount`, `customer_id`, `notes`, and `paid` fields
+9. Request headers include `X-CSRF-TOKEN`, `Content-Type: application/json`, and `HX-Request: true`
+10. On **success** (HTTP 200):
+    - Green success banner appears: "Sale updated successfully!" — auto-dismiss after 3s
+    - Form resets to add-sale mode
+    - `crm:changed` custom event dispatched on `document.body` (triggers cross-tab refresh from Story 3)
+    - Sales History table re-fetches via HTMX to show updated data
+11. On **validation error** (HTTP 422):
+    - Red error banner appears with error list (same pattern as add-sale errors)
+    - Form remains in edit mode with entered values preserved
+12. On **network error**:
+    - Red error banner: "Network error. Please try again."
+
+#### Armed-Delete UX
+
+1. Each Sales History row has a **delete** button (circle-slash/ban icon, matching customers tab `crm-customers__action-btn--delete` icon)
+2. **Default state**: muted red icon, hover brightens + adds `rgba(239, 68, 68, 0.1)` background
+3. **First click** — arms the delete:
+   - `deleteArmed` property set to the sale ID
+   - Button adds `crm-reports__sales-action--armed` class: bright red icon, `rgba(239, 68, 68, 0.1)` background, `pulse` animation (same keyframe as customers tab)
+   - `aria-label` changes to "Click again to confirm deletion"
+   - `title` tooltip changes to "Click again to confirm deletion"
+   - A 3-second `setTimeout` starts; on expiry `deleteArmed` resets to `null`
+4. **Second click** within 3 seconds — confirms delete:
+   - Clears the timeout
+   - Issues `fetch` DELETE to `/app/sales/{id}` with `X-CSRF-TOKEN` and `HX-Request: true` headers
+   - On success: row fades out (opacity 0, 300ms transition, then `remove()`), `crm:changed` dispatched
+   - On error: red error banner "Failed to delete sale."
+   - `deleteArmed` resets to `null`
+5. If the user clicks a **different** sale's delete button while one is armed:
+   - The previously armed sale disarms (timer cleared)
+   - The newly clicked sale arms with a fresh 3-second timer
+6. If the form is in **edit mode** for the sale being deleted, the form resets to add-sale mode after successful deletion
+
+#### Visual Polish — Revenue Trend
+
+1. Revenue Trend chart section uses class `crm-reports__section crm-reports__section--delay-1` for staggered entry animation
+2. No additional styling changes required (area chart styling from Story 1)
+
+#### Visual Polish — Sales History
+
+**Table Striping:**
+1. Sales History table uses `data-table data-table--striped` classes (already in place from Stories 2–3)
+2. Striped rows alternate background: even rows `rgba(0, 0, 0, 0.02)`, dark mode `rgba(255, 255, 255, 0.03)`
+
+**Sort Headers:**
+1. Sortable column headers (`Customer`, `Date`, `Eggs`, `Amount`) receive class `data-table__header--sortable`
+2. Hover state: subtle indigo underline `border-bottom: 2px solid rgba(79, 70, 229, 0.3)`, cursor pointer
+3. Active sort header receives `data-table__header--sorted` with bold indigo underline `border-bottom: 2px solid #4f46e5`
+4. Sort direction indicator appended as text: ` ↑` (asc) or ` ↓` (desc) after the header text
+5. Non-sortable headers (`Notes`, `Actions`) have no hover/click behavior
+
+**FREE Badge:**
+1. When `total_amount` is `0.00`, display **FREE** instead of `$0.00`
+2. FREE text uses class `crm-reports__free-badge` (already defined: `color: #16a34a; font-weight: 600; font-size: 0.75rem`)
+3. Dark mode: `color: #4ade80` (already defined in `.dark` block)
+
+**Egg Breakdown:**
+1. Eggs column shows total egg count as primary text: e.g., `36`
+2. Below in `<small>` with `crm-reports__egg-breakdown` class (muted color, smaller font): `(3d + 0)` showing dozens and individuals
+3. Breakdown only shown when `dozen_count > 0` (i.e., there are full dozens to break down)
+
+**Notes Truncation:**
+1. Notes column truncates with `Str::limit($sale->notes, 40)` in Blade
+2. Full note text in `title` attribute for native hover tooltip
+3. When empty, show `—` in muted style
+
+**Actions Column:**
+1. Actions cell contains edit + delete buttons side by side, right-aligned
+2. Edit and delete buttons use `crm-reports__sales-action` base class with `--edit` and `--delete` modifiers
+3. Button sizing: `2rem × 2rem`, border-radius `0.375rem`, SVG icon `20 × 20`
+
+#### Visual Polish — Form Cards
+
+1. Sales History add/edit form uses `x-show` + `x-collapse` for animated expand/collapse (same pattern as customers tab `crm-customers__form-wrapper`)
+2. The form wrapper uses class `crm-reports__form-wrapper`
+3. Collapse animation: height `0 → auto`, `300ms ease-out` (provided by Alpine `x-collapse` plugin)
+4. `x-cloak` on the wrapper prevents FOUC
+
+#### Animations
+
+1. All report sections use `crm-reports__section` base class with staggered delay modifiers:
+   - Revenue Trend: `--delay-1` (0.1s)
+   - Revenue Overview: `--delay-2` (0.15s)
+   - Customer Analytics: `--delay-3` (0.2s)
+   - Production vs Sales: `--delay-4` (0.25s)
+   - Sales History: `--delay-5` (0.3s)
+2. Armed-delete `pulse` animation uses existing `@keyframes pulse` (scale 1 → 1.1, infinite alternate)
+3. `prefers-reduced-motion` already disables all CRM animations (existing media query in `_crm.scss` covers `.crm-reports__section` and armed-button classes — **verify** `crm-reports__sales-action--armed` is added to the reduce-motion selector list)
+4. Row deletion fade-out: inline `style.opacity = '0'` + `style.transition = 'opacity 0.3s ease'` → `setTimeout(remove, 300)` (same as customers tab)
+
+#### SCSS Additions
+
+All new SCSS is appended to `resources/scss/features/_crm.scss` inside the existing `.crm-reports` block.
+
+**Sales Actions Block:**
+```scss
+// Inside .crm-reports { ... }
+
+&__sales-actions {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: flex-end;
+}
+
+&__sales-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    background: transparent;
+    transition: all 150ms ease;
+
+    &--edit {
+        color: #3b82f6;
+
+        &:hover {
+            color: #2563eb;
+            background: rgba(59, 130, 246, 0.1);
+        }
+    }
+
+    &--delete {
+        color: #9ca3af;
+
+        &:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+    }
+
+    &--armed {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        animation: pulse 0.5s ease-in-out infinite alternate;
+    }
+}
+
+&__egg-breakdown {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #6b7280);
+}
+
+&__form-wrapper {
+    // Styled by x-collapse; just need spacing
+    margin-bottom: 1rem;
+}
+```
+
+**Sort Header SCSS (outside `.crm-reports`, in data-table scope):**
+```scss
+.data-table__header--sortable {
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 2px solid transparent;
+    transition: border-color 150ms ease;
+
+    &:hover {
+        border-bottom-color: rgba(79, 70, 229, 0.3);
+    }
+}
+
+.data-table__header--sorted {
+    border-bottom: 2px solid #4f46e5;
+    font-weight: 600;
+}
+```
+
+**Dark Mode Additions (inside existing `.dark` block):**
+```scss
+.dark {
+    // ... existing rules ...
+
+    .crm-reports__sales-action--edit {
+        color: #60a5fa;
+
+        &:hover {
+            color: #93bbfd;
+            background: rgba(59, 130, 246, 0.15);
+        }
+    }
+
+    .crm-reports__sales-action--delete:hover {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.15);
+    }
+
+    .crm-reports__sales-action--armed {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.15);
+    }
+
+    .crm-reports__egg-breakdown {
+        color: #9ca3af;
+    }
+
+    .data-table__header--sorted {
+        border-bottom-color: #818cf8;
+    }
+
+    .data-table__header--sortable:hover {
+        border-bottom-color: rgba(129, 140, 248, 0.3);
+    }
+}
+```
+
+**Reduced-Motion Addition:**
+```scss
+@media (prefers-reduced-motion: reduce) {
+    // ... existing selectors ...
+    .crm-reports__sales-action--armed {
+        animation: none !important;
+    }
+}
+```
+
+#### Technical Requirements
+
+**Alpine.js Component (extends `salesHistory()` from Story 2):**
+- Story 2 already defined the state shape with `editing`, `editingSaleId`, `success`, `deleteArmed`, `deleteTimer`, and nested `form` object. This story implements the stub methods:
+- `openEditForm(sale)` sets `editing = true`, `editingSaleId = sale.id`, populates `form.*` with computed `eggs_count` and `price_per_egg`, sets `formOpen = true`, scrolls form into view
+- `cancelEdit()` calls `resetForm()` without closing, sets `editing = false`, `editingSaleId = null`
+- `submitSale()` extended: chooses POST `/app/sales` (add) or PUT `/app/sales/{editingSaleId}` (edit) based on `editing` flag
+- Before PUT, compute `dozen_count = Math.floor(form.eggs_count / 12)` and `individual_count = form.eggs_count % 12` from the `eggs_count` convenience field
+- On successful edit, `resetForm()` + `editing = false` + dispatch `crm:changed`
+- `armDelete(saleId)` implements the 3-second armed-delete pattern (sets `deleteArmed`, starts `deleteTimer`)
+- `confirmDelete(saleId)` fires fetch DELETE, fades row, dispatches `crm:changed`
+
+**Server-Side:**
+- No new routes needed — existing `PUT /app/sales/{sale}` and `DELETE /app/sales/{sale}` with `SalePolicy` authorization are already wired
+- `UpdateSaleRequest` already validates all fields
+- Existing `SaleController@update` returns HTMX-compatible response with `HX-Trigger: crm:changed`
+- Existing `SaleController@destroy` returns HTMX-compatible response with `HX-Trigger: crm:changed`
+- Verify that `SaleController@update` and `@destroy` clear CRM reports cache via `CrmReportsService::clearCacheForUser($user)`
+
+**Blade Partials:**
+- Modify `resources/views/crm/partials/tab-reports-overview.blade.php` Sales History section:
+  - Replace the static table with sortable headers + action buttons
+  - Add `x-collapse` form wrapper above the table
+  - Each row includes edit pencil + delete ban icon in Actions column
+  - Edit button calls `openEditForm({ id, customer_id, sale_date, dozen_count, individual_count, total_amount, notes, paid })`
+  - Delete button calls `armDelete(sale.id)` with `:class` binding for armed state
+
+#### Tests
+
+**Feature Tests (in `tests/Feature/`):**
+
+1. **`test_can_update_sale_via_put`**: Authenticate premium user, create sale, PUT `/app/sales/{id}` with valid data, assert 200, assert database has updated values, assert response has `HX-Trigger` header containing `crm:changed`
+2. **`test_update_sale_validates_required_fields`**: PUT with missing `sale_date` and `total_amount`, assert 422, assert session has validation errors
+3. **`test_update_sale_requires_ownership`**: Create sale for user A, authenticate as user B, PUT to that sale, assert 403
+4. **`test_can_delete_sale`**: Authenticate premium user, create sale, DELETE `/app/sales/{id}`, assert 200, assert `assertModelMissing($sale)`, assert response has `HX-Trigger` header containing `crm:changed`
+5. **`test_delete_sale_requires_ownership`**: Create sale for user A, authenticate as user B, DELETE, assert 403
+6. **`test_delete_clears_crm_reports_cache`**: Create sale, prime cache by calling `CrmReportsService::revenueOverview()`, DELETE the sale, assert cache key is missing (verify `clearCacheForUser` was invoked)
+7. **`test_sales_history_renders_edit_and_delete_buttons`**: GET `/app/crm?tab=reports&view=overview` as premium user with sales, assert response contains `crm-reports__sales-action--edit` and `crm-reports__sales-action--delete` button classes
+8. **`test_sales_history_renders_free_badge_for_zero_amount`**: Create sale with `total_amount = 0`, GET reports tab, assert response contains `crm-reports__free-badge` and text `FREE`
+9. **`test_sales_history_renders_egg_breakdown`**: Create sale with `dozen_count = 3, individual_count = 5`, GET reports tab, assert response contains `41` (total eggs) and `(3d + 5)` breakdown text
+
+**Notes on armed-delete testing:**
+- The armed-delete state (3-second timeout, UI pulse) is a purely client-side Alpine.js interaction and is **not testable via PHPUnit feature tests**
+- The server-side DELETE endpoint is already fully tested; the armed-delete pattern is a UX guard, not a server-side concern
+- If E2E tests are added later (e.g., Laravel Dusk), the armed-delete flow would be a good candidate
+
+---
+
+## Cross-Story Dependencies & Implementation Order
+
+```
+Story 1 (Weekly Chart) ──┐
+                         ├──→ Story 3 (Cross-Tab Refresh + KPI) ──→ Story 4 (Edit/Delete + Polish)
+Story 2 (Table + Add)  ──┘
+```
+
+- **Stories 1 and 2** can be implemented in parallel, but both modify `tab-reports-overview.blade.php` — merge carefully
+- **Story 3** depends on Story 1 (weekly revenue cache key referenced in `clearCacheForUser()`)
+- **Story 4** depends on Stories 2 + 3 (needs the table, Alpine component, and `crm:changed` wiring)
+- **Alpine component**: Story 2 defines the full `salesHistory()` state shape (including stubs for edit/delete). Story 4 implements the stub methods. No refactoring needed between stories.
+- **SCSS naming**: All stories use `crm-reports__sales-action--*` convention for action buttons (no naming conflicts)
+- **Test files**: Story 2 → `CrmSalesHistoryTest.php`, Story 3 → `SaleControllerHxTriggerTest.php` + `CustomerControllerHxTriggerTest.php` + `CrmReportsServiceCacheTest.php`, Story 4 → extends `CrmSalesHistoryTest.php` with edit/delete/visual tests
+
+---
+
+## Compatibility Requirements
+
+- [x] Existing API endpoints (store, update, destroy) remain unchanged in shape; HTMX triggers added additively
+- [x] Database schema: no changes required
+- [x] UI changes are additive only (no breaking changes to existing tabs)
+- [x] Quick Sale and Customers tabs continue to function exactly as before
+- [x] Standalone Sales page (`/app/sales`) and Customers page (`/app/customers`) unaffected
+- [x] Dark mode support: preserved and maintained (chart tooltips, form cards, stat cards)
+- [x] CRM reports caching preserved with proper invalidation on mutations
+
+---
+
+## Risk Mitigation
+
+### Primary Risk
+
+**Chart.js area fill + responsive dual-render.** Chart.js `line` type with `fill: true` is well-supported, but rendering two chart instances (mobile + desktop) requires careful canvas lifecycle management to avoid memory leaks on tab switches.
+
+### Secondary Risk
+
+**Cross-tab refresh complexity.** Using `HX-Trigger: crm:changed` to refresh report sections while the user is on a different tab (Quick Sale or Customers) must not cause visual glitches or redundant requests.
+
+### Mitigation
+
+1. Use existing `<x-ui.chart>` component which already handles canvas destruction on re-init
+2. `hx-trigger="crm:changed from:body"` on report containers — these only fire when the reports tab is active (since the elements don't exist in DOM when another tab is shown). Covered by HTMX's default behavior.
+3. When switching to reports tab, always re-fetch fresh data (current behavior) — this handles the case where mutations occurred while on another tab
+4. For the Quick Sale tab mutation flow: emit `crm:changed` from the fetch-based submission; since report DOM is swapped out, no redundant refresh occurs — the next tab switch will load fresh data naturally
+
+### Rollback Plan
+
+- SCSS additions isolated to `_crm.scss`
+- New partial can be deleted; old inline table restored from git
+- `weeklyRevenueTrend()` method additive; old `revenueTrend()` remains available
+- No database migrations required
+- No new dependencies to remove (Chart.js + Alpine.js already in use)
+- Cache changes are backwards-compatible (just adds invalidation)
+
+---
+
+## Definition of Done
+
+- [ ] All stories completed with acceptance criteria met
+- [ ] Visual parity verified against original React component (light + dark mode)
+- [ ] `CrmReportsService::weeklyRevenueTrend()` has unit tests (12-week generation, empty weeks, Monday start)
+- [ ] Feature tests cover: sales history sorting, sale edit from reports, sale delete from reports, cross-tab refresh trigger, KPI label correctness
+- [ ] Existing functionality regression tested (all current tests passing)
+- [ ] Dark mode verified including chart tooltip theming
+- [ ] Responsive chart verified (6-week mobile, 12-week desktop)
+- [ ] Code follows Laravel Boost guidelines (`laravel-best-practices` skill applied)
+- [ ] Code formatted with `vendor/bin/pint --dirty --format agent`
+- [ ] Per project rule: all changes have programmatic test coverage (unit or feature)
+
+---
+
+## Visual References
+
+**Original Component:**
+- CRM Shell: `d:\Koke\Aplikacija\src\components\features\crm\CRM.tsx`
+- Customer List: `d:\Koke\Aplikacija\src\components\features\crm\CustomerList.tsx`
+- Reports: `d:\Koke\Aplikacija\src\components\features\crm\CRMReports.tsx`
+- Quick Sale: `d:\Koke\Aplikacija\src\components\features\sales\QuickSale.tsx`
+- Sales List: `d:\Koke\Aplikacija\src\components\features\sales\SalesList.tsx`
+- Revenue Trend Chart: `d:\Koke\Aplikacija\src\components\ui\charts\RevenueTrendChart.tsx`
+- Stat Card: `d:\Koke\Aplikacija\src\components\ui\cards\StatCard.tsx`
+- CRM Animation: `d:\Koke\Aplikacija\src\components\landing\animations\AnimatedCRMPNG.tsx`
+- Chart Colors: `d:\Koke\Aplikacija\src\constants\chartColors.ts`
+
+**Current Implementation:**
+- CRM Shell: `E:\ChickenCare\resources\views\crm\index.blade.php`
+- Quick Sale: `E:\ChickenCare\resources\views\crm\partials\tab-quick-sale.blade.php`
+- Customers: `E:\ChickenCare\resources\views\crm\partials\tab-customers.blade.php`
+- Reports Overview: `E:\ChickenCare\resources\views\crm\partials\tab-reports-overview.blade.php`
+- Reports Per-Customer: `E:\ChickenCare\resources\views\crm\partials\tab-reports-customer.blade.php`
+- Styles: `E:\ChickenCare\resources\scss\features\_crm.scss`
+- Controller: `E:\ChickenCare\app\Http\Controllers\CrmController.php`
+- Reports Service: `E:\ChickenCare\app\Services\CrmReportsService.php`
+
+---
+
+## Technical Notes
+
+### Week Calculation (Revenue Trend)
+
+React's `getWeekStart()`:
+```js
+const getWeekStart = (date) => {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=Sun, 1=Mon...
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+```
+
+PHP equivalent using Carbon:
+```php
+$weekStart = Carbon::parse($date)->startOfWeek(Carbon::MONDAY);
+```
+
+### Chart.js Area Fill Configuration
+
+```php
+'datasets' => [[
+    'label' => 'Revenue',
+    'data' => $weeklyData,
+    'borderColor' => '#544CE6',
+    'backgroundColor' => 'rgba(84, 76, 230, 0.3)',
+    'fill' => true,
+    'tension' => 0.4,
+    'borderWidth' => 2,
+]],
+```
+
+### Cross-Tab Refresh via HX-Trigger
+
+Controllers emit:
+```php
+return response()
+    ->view('crm.partials.sales-row', ['sale' => $sale])
+    ->header('HX-Trigger', 'crm:changed');
+```
+
+Report containers listen:
+```html
+<div id="crm-reports-overview"
+     hx-get="/app/crm?tab=reports&view=overview&period=..."
+     hx-trigger="crm:changed from:body"
+     hx-target="this"
+     hx-swap="innerHTML">
+```
+
+### Armed-Delete Pattern (Reuse from Customers Tab)
+
+```js
+armDelete(saleId) {
+    if (this.deleteArmed === saleId) {
+        this.confirmDelete(saleId);
+        return;
+    }
+    this.deleteArmed = saleId;
+    this.deleteTimer = setTimeout(() => { this.deleteArmed = null; }, 3000);
+},
+confirmDelete(saleId) {
+    clearTimeout(this.deleteTimer);
+    this.deleteArmed = null;
+    // fetch DELETE...
+}
+```
+
+### Responsive Chart Wrapper (SCSS)
+
+```scss
+.crm-reports__chart--mobile {
+    display: block;
+    @media (min-width: 1024px) { display: none; }
+}
+.crm-reports__chart--desktop {
+    display: none;
+    @media (min-width: 1024px) { display: block; }
+}
+```
+
+---
+
+## Dependencies
+
+### External Dependencies
+- Chart.js already installed (`chart.js@^4.5.1`); no new external deps
+- Existing Alpine.js, HTMX, and custom SCSS
+
+### Internal Dependencies
+- `Sale` model with columns: `sale_date`, `customer_id`, `dozen_count`, `individual_count`, `total_amount`, `notes`, `paid`
+- `Customer` model with columns: `name`, `phone`, `notes`, `is_active`
+- `SaleController` store/update/destroy actions (existing)
+- `CustomerController` store/update/destroy actions (existing)
+- `CrmReportsService` (extend with `weeklyRevenueTrend()`)
+- `CrmController` (extend reports tab data loading)
+- Existing `<x-ui.chart>` Blade component
+- Existing `<x-ui.stat-card>` Blade component
+- Existing `<x-ui.empty-state>` Blade component
+- Existing `App\Support\Money::usd()` + `@usd` Blade directive
+
+### Story Dependencies
+- Story 1 (Weekly Revenue Trend) is independent — can be implemented first
+- Story 2 (Sales History Sortable Table) depends on Story 1 only for layout integration (both in reports overview)
+- Story 3 (Cross-Tab Refresh & KPI Parity) depends on Story 2 (needs the new Sales History partial to wire up `crm:changed` listeners)
+- Story 4 (Edit Form, Delete UX & Polish) depends on Stories 2 + 3 (builds on the sortable table and refresh mechanism)
+
+---
+
+## Resolved Decisions
+
+1. **Revenue trend granularity — Weekly.** React shows 12 weeks (desktop) / 6 weeks (mobile) of weekly revenue. The Laravel monthly trend will be replaced with weekly data. The monthly `revenueTrend()` method remains for backward compatibility but is no longer called from the CRM reports tab.
+2. **Sales History location — Reports Overview tab.** The sortable Sales History with CRUD replaces the current static table in `tab-reports-overview.blade.php`. It does NOT duplicate the standalone `/app/sales` page — that page continues to exist independently.
+3. **Sort mechanism — Server-side HTMX.** Sort and re-fetch via `hx-get` (same pattern as customers tab and expenses table). 10-item hard limit (no pagination — matches React's `slice(0, 10)`).
+4. **Delete pattern — Armed delete (3-second timeout).** Consistent with the customers tab. React uses `confirm()` dialog, but the Laravel app has already established the armed-delete pattern across expenses and customers, so we use that for consistency.
+5. **Cross-tab refresh — `HX-Trigger: crm:changed` event.** Mutation endpoints emit this header. Report containers listen and re-fetch when visible. When tabs are swapped, stale DOM is replaced naturally on the next tab switch.
+6. **Cache invalidation — Explicit clear on mutation.** `CrmReportsService::clearCacheForUser($user)` called from controllers. Clears all `crm_*_{user_id}_*` cache keys.
+7. **Chart library — Chart.js.** Reuse existing `<x-ui.chart>` component. Area fill via `fill: true` + `backgroundColor` with alpha. Dark-mode tooltip via inline JS. No new dependencies.
 # Epic: CRM - Complete Feature Replication
 
 ## Epic Goal

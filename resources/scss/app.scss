@@ -16,6 +16,7 @@
 @use 'components/pagination';
 @use 'components/timeline';
 @use 'components/flash';
+@use 'components/toast';
 @use 'components/badges';
 @use 'components/showcase';
 
@@ -33,3 +34,6 @@
 @use 'features/viability';
 @use 'features/account';
 @use 'features/import';
+
+// Dark mode overrides (must be last to win specificity)
+@use 'dark-mode';

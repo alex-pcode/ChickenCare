@@ -9,12 +9,17 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const isDark = document.documentElement.classList.contains('dark');
+(function initProductionChart() {
     const ctx = document.getElementById('production-trend');
     if (!ctx) return;
+    if (!window.Chart) {
+        document.addEventListener('DOMContentLoaded', initProductionChart, { once: true });
+        return;
+    }
+    window.Chart.getChart(ctx)?.destroy();
+    const isDark = document.documentElement.classList.contains('dark');
 
-    new Chart(ctx.getContext('2d'), {
+    new window.Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: @json($productionChartData),
         options: {
@@ -54,6 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-});
+})();
 </script>
 @endpush

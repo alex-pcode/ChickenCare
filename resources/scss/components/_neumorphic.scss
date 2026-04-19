@@ -20,7 +20,7 @@
   --neu-1: #1a1a1a;
   --neu-2: rgba(0, 0, 0, 0.5);
   --white: rgba(40, 40, 40, 0.4);
-  --black: #f5f5f5;
+  --black: $color-neutral-100;
 }
 
 // ---------------------------------------------------------------------------
@@ -34,12 +34,12 @@
     -10px -10px 20px var(--white);
   border-radius: 1.5rem;
   padding: 2.5rem;
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
 }
 
 .neu-title {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   color: var(--black);
   margin-bottom: 2rem;
   text-align: center;
@@ -47,15 +47,15 @@
 
 .neu-stat {
   background-color: white;
-  border-radius: 1rem;
+  border-radius: $card-radius;
   padding: 1.5rem;
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.05),
     inset 0 0 0 1px rgba(243, 229, 215, 0.5);
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY($hover-lift-sm);
     box-shadow:
       0 8px 24px rgba(0, 0, 0, 0.05),
       inset 0 0 0 1px rgba(243, 229, 215, 0.5);
@@ -76,11 +76,11 @@
   font-family: var(--font-fraunces);
   font-size: 1rem;
   background-color: var(--neu-1);
-  border-radius: 1rem;
+  border-radius: $card-radius;
   box-shadow:
     inset 2px 2px 4px var(--neu-2),
     inset -2px -2px 4px var(--white);
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
 
   &:focus {
     box-shadow:
@@ -104,11 +104,11 @@ select.neu-input {
   font-family: var(--font-fraunces);
   font-size: 1rem;
   background-color: var(--neu-1);
-  border-radius: 1rem;
+  border-radius: $card-radius;
   box-shadow:
     inset 2px 2px 4px var(--neu-2),
     inset -2px -2px 4px var(--white);
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.75rem center;
@@ -139,19 +139,19 @@ select.neu-input {
   color: var(--white);
   font-family: var(--font-fraunces);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   letter-spacing: 0.025em;
   cursor: pointer;
   box-shadow:
     4px 4px 8px var(--neu-2),
     -4px -4px 8px var(--white);
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
 
   &:hover {
     box-shadow:
       3px 3px 6px var(--neu-2),
       -3px -3px 6px var(--white);
-    transform: translateY(-1px);
+    transform: translateY($hover-lift-xs);
   }
 
   &:active {
@@ -178,19 +178,19 @@ select.neu-input {
   color: var(--primary);
   font-family: var(--font-fraunces);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   letter-spacing: 0.025em;
   cursor: pointer;
   box-shadow:
     4px 4px 8px var(--neu-2),
     -4px -4px 8px var(--white);
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
 
   &:hover {
     box-shadow:
       3px 3px 6px var(--neu-2),
       -3px -3px 6px var(--white);
-    transform: translateY(-1px);
+    transform: translateY($hover-lift-xs);
     background-color: var(--primary);
     color: var(--white);
   }
@@ -214,17 +214,17 @@ select.neu-input {
   justify-content: center;
   padding: 1.5rem 1rem;
   background-color: white;
-  border-radius: 1rem;
+  border-radius: $card-radius;
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.05),
     inset 0 0 0 1px rgba(243, 229, 215, 0.5);
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
   text-decoration: none;
   color: var(--black);
   min-height: 6rem;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY($hover-lift-sm);
     box-shadow:
       0 8px 24px rgba(0, 0, 0, 0.1),
       inset 0 0 0 1px rgba(243, 229, 215, 0.5);
@@ -241,13 +241,13 @@ select.neu-input {
   appearance: none;
   width: 1.5rem;
   height: 1.5rem;
-  border-radius: 0.5rem;
+  border-radius: $radius-base;
   background-color: var(--neu-1);
   box-shadow:
     inset 2px 2px 4px var(--neu-2),
     inset -2px -2px 4px var(--white);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all $transition-duration-slow ease;
   position: relative;
 
   &:checked {
@@ -281,16 +281,16 @@ select.neu-input {
     0 8px 32px rgba(243, 229, 215, 0.1),
     inset 0 0 0 1px rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
+  border-radius: $card-radius;
   padding: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-duration-slow $transition-easing;
 
   &:hover {
     background: rgba(255, 255, 255, 0.98);
     box-shadow:
       0 12px 40px rgba(243, 229, 215, 0.15),
       inset 0 0 0 1px rgba(255, 255, 255, 0.6);
-    transform: translateY(-2px);
+    transform: translateY($hover-lift-sm);
   }
 }
 
@@ -302,16 +302,16 @@ select.neu-input {
     0 4px 16px rgba(243, 229, 215, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0.75rem;
+  border-radius: $radius-lg;
   padding: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-duration-slow $transition-easing;
 
   &:hover {
     background: rgba(255, 255, 255, 0.95);
     box-shadow:
       0 6px 20px rgba(243, 229, 215, 0.12),
       inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-    transform: translateY(-1px);
+    transform: translateY($hover-lift-xs);
   }
 }
 
@@ -326,7 +326,7 @@ select.neu-input {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 1.25rem;
   padding: 2rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-duration-slow $transition-easing;
 
   &:hover {
     background: rgba(255, 255, 255, 0.99);
@@ -334,7 +334,7 @@ select.neu-input {
       0 16px 56px rgba(243, 229, 215, 0.18),
       inset 0 0 0 1px rgba(255, 255, 255, 0.7),
       0 0 0 1px rgba(243, 229, 215, 0.15);
-    transform: translateY(-3px);
+    transform: translateY($hover-lift-md);
   }
 }
 
@@ -346,7 +346,7 @@ select.neu-input {
     0 6px 24px rgba(243, 229, 215, 0.06),
     inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
+  border-radius: $card-radius;
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
@@ -383,7 +383,7 @@ select.neu-input {
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.5rem;
   padding: 2rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-duration-slow $transition-easing;
 }
 
 // ---------------------------------------------------------------------------
@@ -435,7 +435,7 @@ select.neu-input {
       inset -2px -2px 4px rgba(50, 50, 50, 0.3);
 
     &::placeholder {
-      color: #6b7280;
+      color: $color-neutral-500;
     }
 
     &:focus {

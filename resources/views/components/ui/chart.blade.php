@@ -6,15 +6,26 @@
     'height' => 300,
 ])
 
-<div class="chart-container">
-    <canvas id="{{ $id }}" height="{{ $height }}" aria-label="{{ $attributes->get('aria-label', 'Chart') }}"></canvas>
+<div class="chart-container" style="position: relative; height: {{ $height }}px;">
+    <canvas id="{{ $id }}" aria-label="{{ $attributes->get('aria-label', 'Chart') }}"></canvas>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        new window.Chart(document.getElementById('{{ $id }}').getContext('2d'), {
+    (function initChart_{{ preg_replace('/[^A-Za-z0-9_]/', '_', $id) }}() {
+        const ctx = document.getElementById('{{ $id }}');
+        if (!ctx) return;
+        if (!window.Chart) {
+            document.addEventListener('DOMContentLoaded', initChart_{{ preg_replace('/[^A-Za-z0-9_]/', '_', $id) }}, { once: true });
+            return;
+        }
+        window.Chart.getChart(ctx)?.destroy();
+        const userOptions = @json((object) $options);
+        new window.Chart(ctx.getContext('2d'), {
             type: '{{ $type }}',
             data: @json($data),
-            options: @json($options),
+            options: Object.assign({
+                responsive: true,
+                maintainAspectRatio: false,
+            }, userOptions),
         });
-    });
+    })();
 </script>

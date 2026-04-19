@@ -1,3 +1,5 @@
+@use '../variables' as *;
+
 .egg-counter {
     display: flex;
     flex-direction: column;
@@ -53,8 +55,8 @@
         text-align: center;
         padding: 2rem;
         background: var(--color-surface, #fff);
-        border: 1px solid var(--color-border, #e5e7eb);
-        border-radius: 0.5rem;
+        border: 1px solid var(--color-border, $color-neutral-200);
+        border-radius: $radius-base;
         gap: 0.5rem;
     }
 
@@ -63,13 +65,13 @@
     }
 
     &__goal-cta-title {
-        font-size: 1.125rem;
-        font-weight: 600;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
         margin: 0;
     }
 
     &__goal-cta-description {
-        color: var(--color-text-muted, #6b7280);
+        color: var(--color-text-muted, $color-neutral-500);
         margin: 0 0 0.5rem;
     }
 
@@ -81,8 +83,8 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.875rem;
-        color: var(--color-text-muted, #6b7280);
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
         cursor: pointer;
 
         input[type="checkbox"] {
@@ -98,18 +100,18 @@
         padding: 1rem 1.25rem;
         background: var(--color-warning-bg, #fffbeb);
         border: 1px solid var(--color-warning-border, #fbbf24);
-        border-radius: 0.5rem;
+        border-radius: $radius-base;
     }
 
     &__duplicate-confirm-title {
-        font-weight: 600;
+        font-weight: $font-weight-semibold;
         margin-bottom: 0.25rem;
     }
 
     &__duplicate-confirm-desc {
-        color: var(--color-text-muted, #6b7280);
+        color: var(--color-text-muted, $color-neutral-500);
         margin-bottom: 0.75rem;
-        font-size: 0.875rem;
+        font-size: $font-size-sm;
     }
 
     &__duplicate-confirm-actions {
@@ -122,14 +124,14 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-radius: 0.5rem;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        border-radius: $radius-base;
         white-space: nowrap;
         background: linear-gradient(to right, rgb(239 246 255), rgb(224 231 255));
         border: 1px solid rgb(191 219 254);
         color: rgb(29 78 216);
-        transition: all 0.2s;
+        transition: all $transition-duration-base;
 
         &:hover {
             background: linear-gradient(to right, rgb(219 234 254), rgb(191 219 254));
@@ -155,7 +157,7 @@
     &__backfill-modal-content {
         position: relative;
         background: var(--color-surface, #fff);
-        border-radius: 0.5rem;
+        border-radius: $radius-base;
         padding: 1.5rem;
         width: 100%;
         max-width: 32rem;
@@ -172,14 +174,14 @@
     }
 
     &__backfill-modal-title {
-        font-size: 1.125rem;
-        font-weight: 600;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
         margin: 0;
     }
 
     &__backfill-modal-desc {
-        color: var(--color-text-muted, #6b7280);
-        font-size: 0.875rem;
+        color: var(--color-text-muted, $color-neutral-500);
+        font-size: $font-size-sm;
         margin-bottom: 1rem;
     }
 
@@ -227,7 +229,7 @@
             -10px -10px 20px #ffffff;
         border-radius: 1.5rem;
         padding: 2.5rem;
-        transition: all 0.3s ease;
+        transition: all $transition-duration-slow ease;
     }
 
     &__input {
@@ -240,11 +242,11 @@
         font-family: var(--font-fraunces, 'Fraunces', 'Inter', sans-serif);
         font-size: 1rem;
         background-color: #ecf0f3;
-        border-radius: 1rem;
+        border-radius: $card-radius;
         box-shadow:
             inset 2px 2px 4px #d1d9e6,
             inset -2px -2px 4px #ffffff;
-        transition: all 0.3s ease;
+        transition: all $transition-duration-slow ease;
     }
 
     &__input:focus {
@@ -257,13 +259,13 @@
         appearance: none;
         width: 1.5rem;
         height: 1.5rem;
-        border-radius: 0.5rem;
+        border-radius: $radius-base;
         background-color: #ecf0f3;
         box-shadow:
             inset 2px 2px 4px #d1d9e6,
             inset -2px -2px 4px #ffffff;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all $transition-duration-slow ease;
         position: relative;
     }
 
@@ -293,17 +295,17 @@
             0 4px 16px rgba(243, 229, 215, 0.08),
             inset 0 0 0 1px rgba(255, 255, 255, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 0.75rem;
+        border-radius: $radius-lg;
         padding: 1rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all $transition-duration-slow $transition-easing;
     }
 
     // Submit button states
     &__submit {
         min-width: 200px;
         padding: 0.5rem 1.5rem;
-        border-radius: 9999px;
-        font-weight: 500;
+        border-radius: $radius-pill;
+        font-weight: $font-weight-medium;
         transition: all 0.3s;
         position: relative;
         overflow: hidden;
@@ -322,20 +324,20 @@
     // Table enhancements
     &__table {
         &-header-title {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: $font-size-2xl;
+            font-weight: $font-weight-semibold;
             color: var(--text-primary, #1f2937);
             margin-bottom: 1rem;
         }
 
         &-count {
-            font-weight: 500;
+            font-weight: $font-weight-medium;
             color: var(--text-primary, #1f2937);
         }
 
         &-cell-secondary {
-            color: var(--text-secondary, #6b7280);
-            font-size: 0.875rem;
+            color: var(--text-secondary, $color-neutral-500);
+            font-size: $font-size-sm;
         }
 
         &-empty {
@@ -401,9 +403,9 @@
         background: #f97316; // orange-500
         color: white;
         padding: 0.25rem 0.75rem; // px-3 py-1
-        border-radius: 9999px;
-        font-size: 0.875rem;
-        font-weight: 500;
+        border-radius: $radius-pill;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         animation: fade-in-delayed 0.4s ease-out 0.8s both;
     }
@@ -413,7 +415,7 @@
         background: rgba(255, 255, 255, 0.9);
         -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
-        border-radius: 0.5rem;
+        border-radius: $radius-base;
         padding: 0.5rem 1rem;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         animation: slide-in-left 0.5s ease-out 0.5s both;
@@ -463,15 +465,15 @@
     }
 }
 
-// Respect reduced motion preference
+// Accessibility: disable motion for users who prefer reduced motion
 @media (prefers-reduced-motion: reduce) {
     .egg-hero__image,
     .egg-hero__image--animated,
     .egg-hero__badge,
     .egg-hero__welcome {
-        animation: none !important;
-        opacity: 1 !important;
-        transform: none !important;
+        animation: none;
+        opacity: 1;
+        transform: none;
     }
 }
 
@@ -492,9 +494,9 @@
 
 // Neu-button - matches the original React button styling
 .neu-button {
-    transition: all 0.2s;
-    font-weight: 500;
-    border-radius: 0.5rem;
+    transition: all $transition-duration-base;
+    font-weight: $font-weight-medium;
+    border-radius: $radius-base;
     padding: 0.5rem 1.5rem;
     min-width: 200px;
 
@@ -562,7 +564,7 @@
             }
 
             &-empty {
-                color: #6b7280;
+                color: $color-neutral-500;
             }
         }
 

@@ -1,12 +1,9 @@
-<tr id="expense-{{ $expense->id }}" class="expenses__row"
-    x-data="{ armed: false, timer: null }"
-    x-on:mouseenter="armed ? null : null"
->
+<tr id="expense-{{ $expense->id }}" class="expenses__row">
     <td class="data-table__cell">{{ $expense->date->format('Y-m-d') }}</td>
     <td class="data-table__cell">{{ $expense->category instanceof \App\Enums\ExpenseCategory ? $expense->category->label() : ucfirst($expense->category) }}</td>
     <td class="data-table__cell">{{ $expense->description }}</td>
     <td class="data-table__cell expenses__amount">@usd($expense->amount)</td>
-    <td class="data-table__cell expenses__actions">
+    <td class="data-table__cell data-table__actions">
         <button type="button" class="btn btn--sm btn--secondary"
             hx-get="{{ route('app.expenses.edit-form', $expense) }}"
             hx-target="#expense-{{ $expense->id }}"
@@ -15,29 +12,11 @@
             Edit
         </button>
         <button type="button"
-            class="expenses__delete-btn transition-colors"
-            :class="armed
-                ? 'expenses__delete-btn--armed'
-                : 'expenses__delete-btn--default'"
-            :title="armed ? 'Click again to confirm deletion' : 'Delete expense'"
-            :aria-label="armed ? 'Confirm deletion of expense' : 'Delete expense for {{ $expense->date->format('Y-m-d') }}'"
-            x-on:click.prevent="
-                if (armed) {
-                    clearTimeout(timer);
-                    armed = false;
-                    $el.closest('button').setAttribute('hx-delete', '{{ route('app.expenses.destroy', $expense) }}');
-                    htmx.trigger($el.closest('button'), 'confirmed-delete');
-                } else {
-                    armed = true;
-                    timer = setTimeout(() => { armed = false; }, 3000);
-                }
-            "
-            hx-delete="{{ route('app.expenses.destroy', $expense) }}"
-            hx-trigger="confirmed-delete"
-            hx-target="closest tr"
-            hx-swap="outerHTML swap:300ms"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            class="data-table__delete-btn"
+            hx-get="{{ route('app.expenses.delete-confirm', $expense) }}"
+            hx-target="#modal-container"
+            aria-label="Delete expense for {{ $expense->date->format('Y-m-d') }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
             </svg>
         </button>

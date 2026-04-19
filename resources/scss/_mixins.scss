@@ -1,6 +1,7 @@
 @use 'variables' as *;
 
 // Responsive breakpoints
+// Note: mobile mixin targets mobile-only overrides. Base styles should be mobile-first.
 @mixin mobile {
   @media (max-width: #{$breakpoint-mobile - 1px}) { @content; }
 }
@@ -30,12 +31,12 @@
   border-radius: $card-radius;
   padding: $space-6;
   box-shadow: $glass-shadow;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-duration-slow $transition-easing;
 
   &:hover {
     background: $glass-bg-hover;
     box-shadow: $glass-shadow-hover;
-    transform: translateY(-2px);
+    transform: translateY($hover-lift-sm);
   }
 }
 
@@ -45,15 +46,15 @@
   backdrop-filter: blur($glass-blur);
   -webkit-backdrop-filter: blur($glass-blur);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0.75rem;
+  border-radius: $radius-lg;
   padding: $space-4;
   box-shadow: 0 4px 16px rgba(243, 229, 215, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-duration-slow $transition-easing;
 
   &:hover {
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 6px 20px rgba(243, 229, 215, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-    transform: translateY(-1px);
+    transform: translateY($hover-lift-xs);
   }
 }
 
@@ -63,13 +64,13 @@
   backdrop-filter: blur($glass-blur);
   -webkit-backdrop-filter: blur($glass-blur);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 1.25rem;
+  border-radius: $radius-2xl;
   padding: $space-8;
   box-shadow:
     0 12px 48px rgba(243, 229, 215, 0.12),
     inset 0 0 0 1px rgba(255, 255, 255, 0.6),
     0 0 0 1px rgba(243, 229, 215, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-duration-slow $transition-easing;
 
   &:hover {
     background: rgba(255, 255, 255, 0.99);
@@ -77,7 +78,7 @@
       0 16px 56px rgba(243, 229, 215, 0.18),
       inset 0 0 0 1px rgba(255, 255, 255, 0.7),
       0 0 0 1px rgba(243, 229, 215, 0.15);
-    transform: translateY(-3px);
+    transform: translateY($hover-lift-md);
   }
 }
 

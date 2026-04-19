@@ -1,3 +1,5 @@
+@use '../variables' as *;
+
 .sales {
     display: flex;
     flex-direction: column;
@@ -14,7 +16,7 @@
         align-items: center;
         gap: 0.5rem;
         cursor: pointer;
-        font-size: 0.875rem;
+        font-size: $font-size-sm;
         color: var(--color-text-muted);
     }
 
@@ -39,21 +41,21 @@
     }
 
     &__amount {
-        font-weight: 600;
+        font-weight: $font-weight-semibold;
         font-variant-numeric: tabular-nums;
     }
 
     &__customer {
         color: var(--color-text-muted);
-        font-size: 0.875rem;
+        font-size: $font-size-sm;
     }
 
     &__badge {
         display: inline-block;
         padding: 0.2rem 0.6rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        border-radius: $radius-pill;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
         cursor: pointer;
         border: none;
         transition: opacity 0.15s ease;
@@ -63,13 +65,13 @@
         }
 
         &--paid {
-            background-color: #d1fae5;
-            color: #065f46;
+            background-color: $color-success-bg;
+            color: $color-success-text;
         }
 
         &--unpaid {
-            background-color: #fef3c7;
-            color: #92400e;
+            background-color: $color-warning-bg;
+            color: $color-warning-text;
         }
     }
 
@@ -106,8 +108,8 @@
     }
 
     &__period-label {
-        font-size: 0.875rem;
-        color: var(--color-text-muted, #6b7280);
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
         margin: 0;
     }
 
@@ -128,8 +130,8 @@
     }
 
     &__section-title {
-        font-size: 1.125rem;
-        font-weight: 600;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
         margin: 0;
     }
 
@@ -140,7 +142,7 @@
     &__unpaid {
         &--warning {
             color: var(--color-warning-text, #92400e);
-            font-weight: 600;
+            font-weight: $font-weight-semibold;
         }
     }
 }

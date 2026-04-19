@@ -8,8 +8,7 @@
     $premiumLinks = [
         ['route' => 'app.flock.index', 'pattern' => 'app.flock.*', 'label' => 'My Flock', 'emoji' => '🐔'],
         ['route' => 'app.batches.index', 'pattern' => 'app.batches.*', 'label' => 'Batches', 'emoji' => '📦'],
-        ['route' => 'app.sales.index', 'pattern' => 'app.sales.*', 'label' => 'Sales', 'emoji' => '💼'],
-        ['route' => 'app.customers.index', 'pattern' => 'app.customers.*', 'label' => 'Customers', 'emoji' => '👥'],
+        ['route' => 'app.crm.index', 'pattern' => 'app.crm.*', 'label' => 'CRM', 'emoji' => '💼'],
         ['route' => 'app.expenses.index', 'pattern' => 'app.expenses.*', 'label' => 'Expenses', 'emoji' => '💰'],
         ['route' => 'app.feed.index', 'pattern' => 'app.feed.*', 'label' => 'Feed', 'emoji' => '🌾'],
         ['route' => 'app.savings.index', 'pattern' => 'app.savings.*', 'label' => 'Savings', 'emoji' => '📈'],

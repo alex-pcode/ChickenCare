@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../variables' as *;
 
 // Shiny CTA button — ported from original Koke app
@@ -198,5 +199,44 @@
     }
     50% {
         scale: 1.2;
+    }
+}
+
+.submit-button {
+    &:disabled {
+        cursor: not-allowed;
+    }
+
+    &--submitting {
+        opacity: 0.75;
+    }
+
+    &--success {
+        --shiny-cta-bg: #{$color-success};
+        --shiny-cta-bg-subtle: #{color.adjust($color-success, $lightness: -8%)};
+        --shiny-cta-highlight: #{color.adjust($color-success, $lightness: 15%)};
+        --shiny-cta-highlight-subtle: #{color.adjust($color-success, $lightness: 25%)};
+    }
+
+    &__content {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__spinner {
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: submit-button-spin 0.8s linear infinite;
+        display: inline-block;
+    }
+}
+
+@keyframes submit-button-spin {
+    to {
+        transform: rotate(360deg);
     }
 }

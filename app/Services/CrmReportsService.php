@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Models\Customer;
-use App\Models\EggEntry;
 use App\Models\Sale;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class CrmReportsService
 {
@@ -125,17 +125,25 @@ class CrmReportsService
         $sixMonthsAgo = $now->copy()->subMonths(5)->startOfMonth();
 
         // Single query for 6 months of egg production grouped by month
+        $dateExpr = DB::getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', date)"
+            : "DATE_FORMAT(date, '%Y-%m')";
+
         $eggsByMonth = $user->eggEntries()
             ->where('date', '>=', $sixMonthsAgo->toDateString())
-            ->selectRaw("strftime('%Y-%m', date) as month_key, SUM(count) as total")
-            ->groupByRaw("strftime('%Y-%m', date)")
+            ->selectRaw("{$dateExpr} as month_key, SUM(count) as total")
+            ->groupByRaw("{$dateExpr}")
             ->pluck('total', 'month_key');
 
         // Single query for 6 months of sales grouped by month
+        $saleDateExpr = DB::getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', sale_date)"
+            : "DATE_FORMAT(sale_date, '%Y-%m')";
+
         $salesByMonth = $user->sales()
             ->where('sale_date', '>=', $sixMonthsAgo->toDateString())
-            ->selectRaw("strftime('%Y-%m', sale_date) as month_key, SUM(dozen_count * 12 + individual_count) as total_eggs")
-            ->groupByRaw("strftime('%Y-%m', sale_date)")
+            ->selectRaw("{$saleDateExpr} as month_key, SUM(dozen_count * 12 + individual_count) as total_eggs")
+            ->groupByRaw("{$saleDateExpr}")
             ->pluck('total_eggs', 'month_key');
 
         $thisMonthKey = $now->format('Y-m');
@@ -168,10 +176,14 @@ class CrmReportsService
         $startDate = $now->copy()->subMonths(11)->startOfMonth();
 
         // Single query for 12 months of revenue
+        $saleDateExpr = DB::getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', sale_date)"
+            : "DATE_FORMAT(sale_date, '%Y-%m')";
+
         $revenueByMonth = $user->sales()
             ->where('sale_date', '>=', $startDate->toDateString())
-            ->selectRaw("strftime('%Y-%m', sale_date) as month_key, COALESCE(SUM(total_amount), 0) as revenue")
-            ->groupByRaw("strftime('%Y-%m', sale_date)")
+            ->selectRaw("{$saleDateExpr} as month_key, COALESCE(SUM(total_amount), 0) as revenue")
+            ->groupByRaw("{$saleDateExpr}")
             ->pluck('revenue', 'month_key');
 
         $trend = [];
@@ -275,6 +287,19 @@ class CrmReportsService
             'monthlyTrend' => $monthlyTrend,
             'recentTransactions' => $recentTransactions,
         ];
+    }
+
+    /**
+     * Clear cached revenue overview data for a specific user.
+     * Called after sale/customer mutations to ensure fresh report data.
+     */
+    public function clearCacheForUser(User $user): void
+    {
+        $userId = $user->id;
+
+        Cache::forget("crm_revenue_{$userId}_month__");
+        Cache::forget("crm_revenue_{$userId}_year__");
+        Cache::forget("crm_revenue_{$userId}_all__");
     }
 
     private function applyPeriodFilter($query, string $period, ?string $from, ?string $to): void

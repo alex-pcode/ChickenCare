@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseCategory;
 use App\Http\Requests\StoreFeedInventoryRequest;
 use App\Http\Requests\UpdateFeedInventoryRequest;
 use App\Models\FeedInventory;
 use App\Services\FeedStatsService;
 use App\Traits\HandlesHtmx;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -31,7 +33,7 @@ class FeedInventoryController extends Controller
             ->orderBy($sort === 'opened_date' ? DB::raw('COALESCE(opened_date, created_at)') : $sort, $dir)
             ->paginate(5);
 
-        if ($this->isHtmx($request) && !$request->hasHeader('HX-Boosted')) {
+        if ($this->isHtmx($request) && ! $request->hasHeader('HX-Boosted')) {
             return view('feed.partials.records-table', compact('feeds', 'sort', 'dir'));
         }
 
@@ -44,7 +46,7 @@ class FeedInventoryController extends Controller
 
         try {
             $expense = $request->user()->expenses()->create([
-                'category' => \App\Enums\ExpenseCategory::Feed->value,
+                'category' => ExpenseCategory::Feed->value,
                 'description' => "{$feed->brand} {$feed->feed_type->label()} ({$feed->quantity} {$feed->unit})",
                 'amount' => $feed->total_cost,
                 'date' => $feed->opened_date ?? now()->toDateString(),
@@ -108,11 +110,22 @@ class FeedInventoryController extends Controller
         $feed->delete();
 
         if ($this->isHtmx($request)) {
-            return response('', 200);
+            return response('', 200)
+                ->header('HX-Trigger', json_encode([
+                    'closeModal' => true,
+                    'toast:success' => 'Feed entry deleted.',
+                ]));
         }
 
         return redirect()->route('app.feed.index')
             ->with('success', 'Feed entry deleted.');
+    }
+
+    public function deleteConfirm(Request $request, FeedInventory $feed)
+    {
+        Gate::authorize('delete', $feed);
+
+        return view('feed.partials.delete-confirm-modal', compact('feed'));
     }
 
     public function markDepleted(Request $request, FeedInventory $feed)
@@ -128,7 +141,7 @@ class FeedInventoryController extends Controller
             ->with('success', 'Feed marked as depleted.');
     }
 
-    public function stats(Request $request): \Illuminate\Http\JsonResponse
+    public function stats(Request $request): JsonResponse
     {
         $range = $request->query('range', '6months');
         $allowedRanges = ['3months', '6months', '12months', 'all'];

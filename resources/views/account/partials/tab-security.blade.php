@@ -1,32 +1,17 @@
 <div class="account-security">
-    {{-- Security Status Card --}}
-    <div class="account-security__status">
-        <div class="account-security__status-header">
-            <span class="account-security__status-icon">🛡️</span>
-            <div>
-                <h3 class="account-security__status-title">Security Status: Secure</h3>
-                <p class="account-security__status-subtitle">Your account is protected with email verification and secure authentication</p>
-            </div>
-        </div>
-        <div class="account-security__progress" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-            <div class="account-security__progress-fill" style="width: 100%"></div>
-        </div>
-        <p class="account-security__progress-caption">Your account security is fully configured</p>
-    </div>
-
     {{-- Password Reset Card --}}
     <div class="account-security__reset-card">
         <div class="account-security__reset-header">
-            <span class="account-security__reset-icon">🔐</span>
             <div>
                 <h3 class="account-security__reset-title">Password Reset</h3>
                 <p class="account-security__reset-subtitle">Reset your password by receiving a secure link via email</p>
             </div>
         </div>
+        <p class="account-security__reset-hint">We'll email a secure link to {{ $user->email }}.</p>
         <button type="button"
-                class="btn btn--secondary btn--full btn--lg"
+                class="btn btn--secondary btn--lg"
                 @click="$dispatch('open-password-reset-dialog')">
-            🔄 Reset Password
+            Reset Password
         </button>
     </div>
 

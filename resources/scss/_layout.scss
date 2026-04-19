@@ -117,7 +117,7 @@
   }
 
   &__emoji {
-    font-size: 1.25rem;
+    font-size: $font-size-xl;
     line-height: 1;
     flex-shrink: 0;
     width: 1.5rem;
@@ -132,9 +132,9 @@
     color: $color-neutral-600;
     font-size: $font-size-sm;
     text-decoration: none;
-    border-radius: 0.75rem;
+    border-radius: $radius-lg;
     margin-bottom: $space-1;
-    transition: all 0.2s;
+    transition: all $transition-duration-base;
     white-space: nowrap;
 
     &:hover {
@@ -181,7 +181,7 @@
     padding: $space-4;
     background-color: $color-neutral-50;
     border: 1px solid $color-neutral-200;
-    border-radius: 0.75rem;
+    border-radius: $radius-lg;
     margin-bottom: $space-4;
     color: $color-neutral-500;
 
@@ -218,16 +218,16 @@
     background-color: #fee2e2;
     color: #dc2626;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: $radius-lg;
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
     font-family: $font-family-base;
     cursor: pointer;
     text-align: center;
-    transition: background-color 0.2s;
+    transition: background-color $transition-duration-base;
 
     &:hover {
-      background-color: #fecaca;
+      background-color: $color-error-border;
     }
   }
 }
@@ -284,13 +284,13 @@
     min-width: 0;
     min-height: 48px;
     padding: $space-1 $space-2;
-    border-radius: 0.5rem;
+    border-radius: $radius-base;
     color: $color-neutral-500;
     text-decoration: none;
     background: none;
     border: none;
     cursor: pointer;
-    transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: color 200ms ease-in-out, background-color $transition-duration-base ease-in-out;
 
     &:hover {
       color: $color-neutral-700;
@@ -305,7 +305,7 @@
   }
 
   &__emoji {
-    font-size: 1.125rem;
+    font-size: $font-size-lg;
     line-height: 1;
     margin-bottom: 2px;
   }
@@ -366,7 +366,7 @@
     border: none;
     color: $color-neutral-400;
     cursor: pointer;
-    border-radius: 0.5rem;
+    border-radius: $radius-base;
 
     &:hover {
       color: $color-neutral-600;
@@ -386,13 +386,13 @@
     align-items: center;
     gap: $space-3;
     padding: $space-3 $space-4;
-    border-radius: 0.5rem;
+    border-radius: $radius-base;
     border: 1px solid $color-neutral-200;
     color: $color-neutral-700;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
     text-decoration: none;
-    transition: background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, border-color $transition-duration-base ease-in-out;
 
     &:hover {
       background-color: $color-neutral-50;
@@ -407,7 +407,7 @@
   }
 
   &__emoji {
-    font-size: 1.25rem;
+    font-size: $font-size-xl;
     line-height: 1;
     flex-shrink: 0;
     width: 20px;
@@ -457,7 +457,7 @@
     padding: $space-2 $space-3;
     background: none;
     border: 1px solid $color-neutral-200;
-    border-radius: 0.375rem;
+    border-radius: $radius-md;
     font-size: $font-size-sm;
     color: $color-neutral-700;
     @include transition(border-color);
@@ -574,7 +574,7 @@
 .flash {
   padding: $space-3 $space-4;
   margin-bottom: $space-4;
-  border-radius: 0.375rem;
+  border-radius: $radius-md;
   font-size: $font-size-sm;
 
   &--success {

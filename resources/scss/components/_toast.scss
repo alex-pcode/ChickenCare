@@ -1,0 +1,73 @@
+@use 'sass:color';
+@use '../variables' as *;
+
+.toast-container {
+    position: fixed;
+    bottom: $space-6;
+    right: $space-6;
+    z-index: 1100;
+    width: 20rem;
+}
+
+.toast {
+    border-radius: $radius-lg;
+    padding: $space-3 $space-4;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+
+    &--success {
+        background-color: color.adjust($color-success, $lightness: 50%);
+        border: 1px solid color.adjust($color-success, $lightness: 30%);
+        color: color.adjust($color-success, $lightness: -10%);
+    }
+
+    &--error {
+        background-color: color.adjust($color-error, $lightness: 40%);
+        border: 1px solid color.adjust($color-error, $lightness: 20%);
+        color: color.adjust($color-error, $lightness: -10%);
+    }
+
+    &--enter {
+        transition: all $transition-duration-slow ease-out;
+    }
+
+    &--enter-start {
+        opacity: 0;
+        transform: translateY(1rem);
+    }
+
+    &--enter-end {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    &--leave {
+        transition: all $transition-duration-base ease-in;
+    }
+
+    &--leave-start {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    &--leave-end {
+        opacity: 0;
+        transform: translateY(1rem);
+    }
+}
+
+.dark .toast {
+    &--success {
+        background-color: rgba(color.adjust($color-success, $lightness: -20%), 0.3);
+        border-color: color.adjust($color-success, $lightness: -10%);
+        color: color.adjust($color-success, $lightness: 20%);
+    }
+
+    &--error {
+        background-color: rgba(color.adjust($color-error, $lightness: -20%), 0.3);
+        border-color: color.adjust($color-error, $lightness: -10%);
+        color: color.adjust($color-error, $lightness: 20%);
+    }
+}

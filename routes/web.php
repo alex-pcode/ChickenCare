@@ -1,23 +1,23 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EggEntryController;
-use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BatchEventController;
-use App\Http\Controllers\DeathRecordController;
-use App\Http\Controllers\FlockBatchController;
-use App\Http\Controllers\FlockEventController;
-use App\Http\Controllers\FeedInventoryController;
 use App\Http\Controllers\CrmController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DeathRecordController;
+use App\Http\Controllers\EggEntryController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FeedInventoryController;
+use App\Http\Controllers\FlockBatchController;
+use App\Http\Controllers\FlockEventController;
+use App\Http\Controllers\FlockProfileController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SavingsController;
 use App\Http\Controllers\SavingsPreferencesController;
 use App\Http\Controllers\ViabilityController;
-use App\Http\Controllers\AccountController;
-use App\Http\Controllers\FlockProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -57,12 +57,16 @@ Route::middleware(['auth'])->prefix('app')->name('app.')->group(function () {
         Route::resource('expenses', ExpenseController::class)->except(['create', 'edit', 'show']);
         Route::get('expenses/{expense}/edit-form', [ExpenseController::class, 'editForm'])->name('expenses.edit-form');
         Route::get('expenses/{expense}/row', [ExpenseController::class, 'show'])->name('expenses.show-row');
+        Route::get('expenses/{expense}/delete-confirm', [ExpenseController::class, 'deleteConfirm'])->name('expenses.delete-confirm');
         Route::get('expenses/stats', [ExpenseController::class, 'stats'])->name('expenses.stats');
+        Route::get('expenses/cost-per-egg', [ExpenseController::class, 'costPerEgg'])->name('expenses.cost-per-egg');
+        Route::get('expenses/category-items', [ExpenseController::class, 'categoryItems'])->name('expenses.category-items');
 
         Route::get('feed/stats', [FeedInventoryController::class, 'stats'])->name('feed.stats');
         Route::resource('feed', FeedInventoryController::class)->except(['create', 'edit', 'show']);
         Route::get('feed/{feed}/edit-form', [FeedInventoryController::class, 'editForm'])->name('feed.edit-form');
         Route::get('feed/{feed}/row', [FeedInventoryController::class, 'show'])->name('feed.show-row');
+        Route::get('feed/{feed}/delete-confirm', [FeedInventoryController::class, 'deleteConfirm'])->name('feed.delete-confirm');
         Route::patch('feed/{feed}/deplete', [FeedInventoryController::class, 'markDepleted'])->name('feed.deplete');
 
         // Flock Batches detail-page actions (must come BEFORE resource to avoid show-route swallowing)

@@ -15,7 +15,7 @@
     max-width: 400px;
     padding: $space-8;
     background: $color-neutral-50;
-    border-radius: 0.5rem;
+    border-radius: $radius-base;
     @include neumorphic('md');
 
     &__title {

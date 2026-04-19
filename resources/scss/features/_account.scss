@@ -20,12 +20,6 @@
         color: var(--color-text, $color-neutral-900);
     }
 
-    &__subtitle {
-        font-size: $font-size-lg;
-        color: var(--color-text-muted, $color-neutral-500);
-        margin-top: $space-1;
-    }
-
     // Tabs
     &__tabs {
         display: flex;
@@ -51,7 +45,7 @@
         margin-bottom: -2px;
         cursor: pointer;
         white-space: nowrap;
-        transition: color 150ms ease, border-color 150ms ease;
+        transition: color 150ms ease, border-color $transition-duration-fast ease;
 
         &:hover {
             color: var(--color-text, $color-neutral-900);
@@ -67,14 +61,7 @@
     // Tab content areas
     &__tab-content {
         animation: accountTabEnter 0.25s ease-out;
-
-        &--narrow {
-            max-width: 42rem;
-        }
-
-        &--wide {
-            max-width: 64rem;
-        }
+        max-width: 56rem;
     }
 
     // Banners
@@ -83,7 +70,7 @@
         align-items: center;
         gap: $space-3;
         padding: $space-3 $space-4;
-        border-radius: 0.5rem;
+        border-radius: $radius-base;
         font-size: $font-size-sm;
         font-weight: $font-weight-medium;
         margin-bottom: $space-4;
@@ -146,6 +133,25 @@
     &__icon {
         font-size: $font-size-xl;
     }
+
+    &__email-label-row {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        margin-bottom: $space-1;
+    }
+
+    &__verified-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem $space-2;
+        border-radius: $radius-pill;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+        background: rgba($color-success, 0.1);
+        color: $color-success;
+        line-height: 1.4;
+    }
 }
 
 .form-help-text {
@@ -155,87 +161,8 @@
 }
 
 // ============================================================
-// Account Verification
-// ============================================================
-
-.account-verification {
-    padding: $space-4;
-    background: var(--color-surface, $color-neutral-50);
-    border-radius: 0.5rem;
-    margin-bottom: $space-4;
-    border: 1px solid var(--color-border, $color-neutral-200);
-
-    &__title {
-        font-size: $font-size-sm;
-        font-weight: $font-weight-semibold;
-        color: var(--color-text, $color-neutral-900);
-        margin-bottom: $space-3;
-    }
-
-    &__row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: $space-4;
-    }
-
-    &__info {
-        display: flex;
-        align-items: center;
-        gap: $space-3;
-    }
-
-    &__icon {
-        font-size: $font-size-xl;
-    }
-
-    &__label {
-        font-size: $font-size-sm;
-        font-weight: $font-weight-medium;
-        color: var(--color-text, $color-neutral-900);
-    }
-
-    &__sublabel {
-        font-size: $font-size-xs;
-        color: var(--color-text-muted, $color-neutral-500);
-    }
-
-    &__pill {
-        padding: $space-1 $space-3;
-        border-radius: 9999px;
-        font-size: $font-size-xs;
-        font-weight: $font-weight-semibold;
-
-        &--verified {
-            background: rgba($color-success, 0.1);
-            color: $color-success;
-        }
-
-        &--unverified {
-            background: rgba($color-warning, 0.1);
-            color: $color-warning;
-        }
-    }
-}
-
-// ============================================================
 // Theme Toggle
 // ============================================================
-
-.account-theme {
-    &__title {
-        font-size: $font-size-sm;
-        font-weight: $font-weight-semibold;
-        color: var(--color-text, $color-neutral-900);
-        margin-bottom: $space-1;
-    }
-
-    &__description {
-        font-size: $font-size-sm;
-        color: var(--color-text-muted, $color-neutral-500);
-        margin-bottom: $space-4;
-    }
-}
 
 .account-theme-toggle {
     display: flex;
@@ -243,14 +170,14 @@
 
     &__btn {
         padding: $space-2 $space-4;
-        border-radius: 0.5rem;
+        border-radius: $radius-base;
         font-size: $font-size-sm;
         font-weight: $font-weight-medium;
         cursor: pointer;
         border: 1px solid var(--color-border, $color-neutral-200);
         background: var(--color-surface, #fff);
         color: var(--color-text-muted, $color-neutral-500);
-        transition: all 150ms ease;
+        transition: all $transition-duration-fast ease;
 
         &:hover {
             border-color: $color-indigo-600;
@@ -356,87 +283,33 @@
 // ============================================================
 
 .account-security {
-    &__status {
-        background: linear-gradient(to right, #f0fdf4, #ecfdf5);
-        border: 1px solid #bbf7d0;
-        border-radius: 0.75rem;
-        padding: $space-6;
-        margin-bottom: $space-6;
-    }
-
-    &__status-header {
-        display: flex;
-        align-items: flex-start;
-        gap: $space-3;
-        margin-bottom: $space-4;
-    }
-
-    &__status-icon {
-        font-size: $font-size-2xl;
-        line-height: 1;
-    }
-
-    &__status-title {
-        font-size: $font-size-lg;
-        font-weight: $font-weight-bold;
-        color: #166534;
-        margin-bottom: $space-1;
-    }
-
-    &__status-subtitle {
-        font-size: $font-size-sm;
-        color: #15803d;
-    }
-
-    &__progress {
-        height: 0.5rem;
-        background: rgba(#16a34a, 0.15);
-        border-radius: 9999px;
-        overflow: hidden;
-        margin-bottom: $space-2;
-    }
-
-    &__progress-fill {
-        height: 100%;
-        background: linear-gradient(to right, #22c55e, #16a34a);
-        border-radius: 9999px;
-        transition: width 0.3s ease;
-    }
-
-    &__progress-caption {
-        font-size: $font-size-xs;
-        color: #15803d;
-    }
-
     &__reset-card {
-        background: linear-gradient(to right, #eff6ff, #dbeafe);
-        border: 1px solid #93c5fd;
-        border-radius: 0.75rem;
+        background: var(--color-surface, $color-neutral-50);
+        border: 1px solid var(--color-border, $color-neutral-200);
+        border-radius: $radius-lg;
         padding: $space-6;
     }
 
     &__reset-header {
-        display: flex;
-        align-items: flex-start;
-        gap: $space-3;
-        margin-bottom: $space-4;
-    }
-
-    &__reset-icon {
-        font-size: $font-size-2xl;
-        line-height: 1;
+        margin-bottom: $space-3;
     }
 
     &__reset-title {
         font-size: $font-size-lg;
-        font-weight: $font-weight-bold;
-        color: #1e40af;
+        font-weight: $font-weight-semibold;
+        color: var(--color-text, $color-neutral-900);
         margin-bottom: $space-1;
     }
 
     &__reset-subtitle {
         font-size: $font-size-sm;
-        color: #1d4ed8;
+        color: var(--color-text-muted, $color-neutral-500);
+    }
+
+    &__reset-hint {
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
+        margin-bottom: $space-4;
     }
 }
 
@@ -446,7 +319,7 @@
 
 .account-billing {
     &__plan-card {
-        border-radius: 0.75rem;
+        border-radius: $radius-lg;
         padding: $space-6;
         border: 1px solid transparent;
 
@@ -456,7 +329,7 @@
         }
 
         &--free {
-            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            background: linear-gradient(135deg, #ecfdf5, $color-success-bg);
             border-color: #6ee7b7;
         }
     }
@@ -514,6 +387,17 @@
             cursor: not-allowed;
         }
     }
+
+    &__access-confirm {
+        font-size: $font-size-sm;
+        color: var(--color-text, $color-neutral-700);
+        margin-bottom: $space-2;
+    }
+
+    &__support-hint {
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
+    }
 }
 
 // ============================================================
@@ -521,75 +405,28 @@
 // ============================================================
 
 .account-goals {
-    &__grid {
-        display: grid;
-        gap: 2rem;
-
-        @media (min-width: 1024px) {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    &__full-width {
-        @media (min-width: 1024px) {
-            grid-column: 1 / -1;
-        }
-    }
-
     &__form {
         width: 100%;
     }
 
-    &__context {
-        border-radius: 0.75rem;
-        padding: $space-4;
-        margin-top: $space-4;
+    &__prefs-grid {
+        display: grid;
+        gap: $space-4;
 
-        &--hobby {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border: 1px solid #bbf7d0;
-        }
-
-        &--business {
-            background: linear-gradient(135deg, #faf5ff, #f3e8ff);
-            border: 1px solid #d8b4fe;
+        @media (min-width: 768px) {
+            grid-template-columns: 1fr 1fr;
         }
     }
 
-    &__context-header {
-        display: flex;
-        align-items: center;
-        gap: $space-2;
-        margin-bottom: $space-3;
-
-        span {
-            font-size: $font-size-xl;
-        }
-
-        h4 {
-            font-size: $font-size-base;
-            font-weight: $font-weight-semibold;
-            color: var(--color-text, $color-neutral-900);
-        }
+    &__progress-section {
+        margin-top: 2rem;
     }
 
-    &__context-list {
-        padding-left: $space-4;
+    &__progress-heading {
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        color: var(--color-text, $color-neutral-900);
         margin-bottom: $space-4;
-        font-size: $font-size-sm;
-        color: var(--color-text, $color-neutral-700);
-
-        li {
-            padding: $space-1 0;
-        }
-    }
-
-    &__subcard {
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 0.5rem;
-        padding: $space-3 $space-4;
-        font-size: $font-size-sm;
-        color: var(--color-text, $color-neutral-700);
     }
 }
 
@@ -601,7 +438,7 @@
     &__progress-panel {
         background: linear-gradient(135deg, #eef2ff, #e0e7ff);
         border: 1px solid #c7d2fe;
-        border-radius: 0.75rem;
+        border-radius: $radius-lg;
         padding: $space-4;
         margin-top: $space-4;
     }
@@ -627,20 +464,33 @@
         font-size: $font-size-sm;
         color: var(--color-text, $color-neutral-700);
         margin-bottom: $space-2;
+
+        &--over {
+            color: $color-success;
+            font-weight: $font-weight-medium;
+        }
     }
 
     &__progress-bar {
         height: 0.5rem;
         background: rgba($color-indigo-600, 0.15);
-        border-radius: 9999px;
+        border-radius: $radius-pill;
         overflow: hidden;
+
+        &--over {
+            background: rgba($color-success, 0.15);
+        }
     }
 
     &__progress-fill {
         height: 100%;
         background: linear-gradient(to right, $color-indigo-600, #818cf8);
-        border-radius: 9999px;
-        transition: width 0.3s ease;
+        border-radius: $radius-pill;
+        transition: width $transition-duration-slow ease;
+
+        .account-production__progress-bar--over & {
+            background: linear-gradient(to right, $color-success, #4ade80);
+        }
     }
 
     &__mini-stats {
@@ -654,9 +504,9 @@
         display: flex;
         align-items: flex-start;
         gap: $space-3;
-        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        background: linear-gradient(135deg, $color-info-bg, #dbeafe);
         border: 1px solid #93c5fd;
-        border-radius: 0.75rem;
+        border-radius: $radius-lg;
         padding: $space-4;
         margin-top: $space-4;
 
@@ -688,9 +538,9 @@
         display: flex;
         align-items: flex-start;
         gap: $space-3;
-        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        background: linear-gradient(135deg, $color-info-bg, #dbeafe);
         border: 1px solid #93c5fd;
-        border-radius: 0.75rem;
+        border-radius: $radius-lg;
         padding: $space-4;
         margin-bottom: $space-4;
 
@@ -736,7 +586,7 @@
     &__panel {
         position: relative;
         background: #fff;
-        border-radius: 0.75rem;
+        border-radius: $radius-lg;
         padding: $space-6;
         max-width: 28rem;
         width: 100%;
@@ -803,10 +653,6 @@
             color: $color-neutral-100;
         }
 
-        &__subtitle {
-            color: $color-neutral-400;
-        }
-
         &__tab {
             color: $color-neutral-400;
 
@@ -822,23 +668,6 @@
 
         &__tabs {
             border-bottom-color: $color-neutral-700;
-        }
-    }
-
-    .account-verification {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: $color-neutral-700;
-
-        &__title {
-            color: $color-neutral-200;
-        }
-
-        &__label {
-            color: $color-neutral-200;
-        }
-
-        &__sublabel {
-            color: $color-neutral-400;
         }
     }
 
@@ -889,44 +718,30 @@
         color: $color-neutral-500;
     }
 
-    .account-profile__icon {
-        // Emoji icons render in color, no override needed
+    .account-profile {
+        &__verified-badge {
+            background: rgba($color-success, 0.15);
+            color: #4ade80;
+        }
     }
 
     // Security tab dark mode
     .account-security {
-        &__status {
-            background: linear-gradient(to right, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
-            border-color: rgba(34, 197, 94, 0.3);
-        }
-
-        &__status-title {
-            color: #86efac;
-        }
-
-        &__status-subtitle {
-            color: #4ade80;
-        }
-
-        &__progress {
-            background: rgba(34, 197, 94, 0.1);
-        }
-
-        &__progress-caption {
-            color: #4ade80;
-        }
-
         &__reset-card {
-            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
-            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: $color-neutral-700;
         }
 
         &__reset-title {
-            color: #93c5fd;
+            color: $color-neutral-100;
         }
 
         &__reset-subtitle {
-            color: #60a5fa;
+            color: $color-neutral-400;
+        }
+
+        &__reset-hint {
+            color: $color-neutral-400;
         }
     }
 
@@ -960,31 +775,20 @@
             color: $color-neutral-300;
             border-bottom-color: $color-neutral-700;
         }
+
+        &__access-confirm {
+            color: $color-neutral-200;
+        }
+
+        &__support-hint {
+            color: $color-neutral-400;
+        }
     }
 
     // Goals tab dark mode
     .account-goals {
-        &__context--hobby {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
-            border-color: rgba(34, 197, 94, 0.3);
-        }
-
-        &__context--business {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.1));
-            border-color: rgba(168, 85, 247, 0.3);
-        }
-
-        &__context-header h4 {
+        &__progress-heading {
             color: $color-neutral-200;
-        }
-
-        &__context-list {
-            color: $color-neutral-300;
-        }
-
-        &__subcard {
-            background: rgba(255, 255, 255, 0.05);
-            color: $color-neutral-300;
         }
     }
 

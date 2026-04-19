@@ -11,17 +11,16 @@
 
     <div class="account-page__header">
         <h1 class="account-page__title">Account Settings</h1>
-        <p class="account-page__subtitle">Manage your personal information, security, and preferences</p>
     </div>
 
     <div class="account-page__tabs" role="tablist" aria-label="Account settings tabs"
          x-data="{ activeTab: '{{ $tab }}' }">
         @php
             $tabs = [
-                'profile' => '👤 Profile',
-                'security' => '🔒 Security',
-                'billing' => '💳 Billing',
-                'goals' => '🎯 Goals & Preferences',
+                'profile' => 'Profile',
+                'security' => 'Security',
+                'billing' => 'Billing',
+                'goals' => 'Goals & Preferences',
             ];
         @endphp
         @foreach($tabs as $id => $label)
@@ -60,7 +59,7 @@
         </template>
     </div>
 
-    <div id="account-tab-content" class="account-page__tab-content {{ $tab === 'goals' ? 'account-page__tab-content--wide' : 'account-page__tab-content--narrow' }}">
+    <div id="account-tab-content" class="account-page__tab-content">
         @include("account.partials.tab-{$tab}")
     </div>
 </div>
