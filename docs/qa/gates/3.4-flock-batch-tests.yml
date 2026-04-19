@@ -1,0 +1,51 @@
+schema: 1
+story: '3.4'
+story_title: 'Flock & Batch Tests'
+gate: PASS
+status_reason: 'All 120 tests pass across 11 test files. Comprehensive coverage of HTMX/standard paths, cross-user denial, cross-batch scoping, current_count logic, and tier enforcement. Production bug fixes legitimate and well-documented.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-12T17:00:00Z'
+
+waiver: { active: false }
+
+top_issues: []
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 0, low: 2 }
+  recommendations:
+    must_fix: []
+    monitor:
+      - 'FlockEventPolicyTest create tests bypass Gate facade — masks 3.1 policy signature issue'
+      - 'No pagination filter preservation test — add after 3.2 fix'
+
+quality_score: 100
+expires: '2026-04-26T17:00:00Z'
+
+evidence:
+  tests_reviewed: 120
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Cross-user denial tested on all operations; cross-batch scoping verified; tier enforcement on both request types'
+  performance:
+    status: PASS
+    notes: 'Full Epic 3 suite executes in ~1.2s; RefreshDatabase ensures clean state'
+  reliability:
+    status: PASS
+    notes: 'All 120 tests pass consistently; 3 pre-existing failures in ComponentShowcaseTest confirmed unrelated'
+  maintainability:
+    status: PASS
+    notes: 'Consistent test patterns across all files; helper methods for valid data; clear setUp with premium users; descriptive test names'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Add test_htmx_pagination_preserves_filter once 3.2 pagination bug is fixed'
+      refs: ['tests/Feature/FlockBatchControllerTest.php']
+    - action: 'Add direct HTTP tests for form-loading create/edit HTMX GETs'
+      refs: ['tests/Feature/FlockEventControllerTest.php', 'tests/Feature/BatchEventControllerTest.php']

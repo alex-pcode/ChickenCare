@@ -1,0 +1,66 @@
+schema: 1
+story: '3.3'
+story_title: 'Batch Events & Death Records'
+gate: CONCERNS
+status_reason: 'Death record CRUD operations lack DB::transaction wrapping — record creation/update/deletion and count adjustment are not atomic, risking current_count inconsistency. Seeder also doesn not adjust batch counts.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-12T16:00:00Z'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'DATA-001'
+    severity: medium
+    finding: 'DeathRecordController store/update/destroy perform record CRUD and current_count adjustment as separate non-transactional operations — if either fails, batch count diverges from actual death records'
+    suggested_action: 'Wrap each mutating action in DB::transaction() — store (create + decrement), update (increment + decrement + update), destroy (increment + delete)'
+    suggested_owner: dev
+  - id: 'SEED-001'
+    severity: medium
+    finding: 'DeathRecordSeeder creates death records but never decrements FlockBatch.current_count — seeded data has incorrect bird counts'
+    suggested_action: 'Add $batch->decrement("current_count", $totalDeaths) after the inner seeding loop'
+    suggested_owner: dev
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 2, low: 2 }
+  recommendations:
+    must_fix:
+      - 'Wrap death record CRUD operations in DB::transaction()'
+      - 'Fix DeathRecordSeeder to decrement batch current_count'
+    monitor:
+      - 'N+1 lazy loads in dual-ownership policy checks'
+
+quality_score: 80
+expires: '2026-04-26T16:00:00Z'
+
+evidence:
+  tests_reviewed: 0
+  risks_identified: 4
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 9]
+    ac_gaps: [8]
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Dual ownership enforcement in policies; nested resource scoping via abort_unless; form request authorization; death count validation against current_count'
+  performance:
+    status: PASS
+    notes: 'Conditional eager loading on tabs; atomic increment/decrement; no unnecessary queries'
+  reliability:
+    status: CONCERNS
+    notes: 'Death record CRUD lacks transactional wrapping — count and record operations can diverge on failure; seeded data has inconsistent counts'
+  maintainability:
+    status: PASS
+    notes: 'Clean separation of concerns; consistent HTMX patterns; well-structured factories with type-specific states; good inline form reuse'
+
+recommendations:
+  immediate:
+    - action: 'Wrap DeathRecordController store/update/destroy in DB::transaction()'
+      refs: ['app/Http/Controllers/DeathRecordController.php:26-41', 'app/Http/Controllers/DeathRecordController.php:52-69', 'app/Http/Controllers/DeathRecordController.php:72-86']
+    - action: 'Add $batch->decrement("current_count", $totalDeaths) to DeathRecordSeeder after inner loop'
+      refs: ['database/seeders/DeathRecordSeeder.php:39']
+  future:
+    - action: 'Eager-load flockBatch relationship before policy checks to avoid N+1'
+      refs: ['app/Policies/BatchEventPolicy.php:18', 'app/Policies/DeathRecordPolicy.php:18']
+    - action: 'Use response() helper instead of new \Illuminate\Http\Response'
+      refs: ['app/Http/Controllers/BatchEventController.php:73', 'app/Http/Controllers/DeathRecordController.php:82']

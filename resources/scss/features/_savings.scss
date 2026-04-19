@@ -1,0 +1,253 @@
+// ==========================================================================
+// Savings Page
+// ==========================================================================
+
+.savings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    // ---------- Hero ----------
+    &__hero {
+        position: relative;
+        height: 256px;
+        overflow: hidden;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: savingsHeroEnter 0.8s forwards;
+    }
+
+    &__hero-image {
+        width: auto;
+        height: 100%;
+        object-fit: contain;
+        transform-origin: center bottom;
+        animation: savingsImageSpring 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    &__badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #10b981;
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        animation: savingsBadgePop 0.4s 0.8s backwards;
+    }
+
+    &__welcome {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        font-weight: 600;
+        animation: savingsWelcomeEnter 0.5s 0.5s backwards;
+
+        .dark & {
+            background: rgba(31, 41, 55, 0.9);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+    }
+
+    // ---------- Sections ----------
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        &--animated {
+            animation: savingsSectionEnter 0.5s 0.2s backwards;
+        }
+    }
+
+    &__section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    &__section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-text, #111827);
+        margin: 0;
+    }
+
+    // ---------- Period Select ----------
+    &__period-select {
+        width: 12rem;
+    }
+
+    // ---------- Custom Period ----------
+    &__custom-period {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1rem;
+
+        @media (max-width: 480px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    // ---------- KPI Grid ----------
+    &__kpi-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        animation: savingsSectionEnter 0.5s 0.2s backwards;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (min-width: 1024px) {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    // ---------- Lifetime Impact Grid ----------
+    &__lifetime-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        animation: savingsSectionEnter 0.5s 0.25s backwards;
+
+        @media (min-width: 1024px) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    // ---------- Analysis Grid ----------
+    &__analysis-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        animation: savingsSectionEnter 0.5s 0.3s backwards;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    &__analysis-empty {
+        padding: 1.5rem;
+        text-align: center;
+        font-size: 0.875rem;
+        color: var(--color-text-muted, #6b7280);
+    }
+
+    // ---------- Stat Grid (legacy compat) ----------
+    &__stat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    &__category-table {
+        overflow-x: auto;
+    }
+
+    &__metric {
+        &--positive {
+            color: var(--color-success, #2d7d46);
+        }
+
+        &--negative {
+            color: var(--color-error, #c53030);
+        }
+    }
+
+    &__empty {
+        padding: 2rem 0;
+    }
+}
+
+// ==========================================================================
+// Keyframe Animations
+// ==========================================================================
+
+@keyframes savingsHeroEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes savingsImageSpring {
+    from {
+        transform: scale(0.8) translateY(20px);
+    }
+
+    to {
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes savingsBadgePop {
+    from {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes savingsWelcomeEnter {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes savingsSectionEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ==========================================================================
+// Reduced Motion
+// ==========================================================================
+
+@media (prefers-reduced-motion: reduce) {
+    .savings,
+    .savings * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

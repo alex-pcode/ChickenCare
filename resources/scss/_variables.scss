@@ -1,0 +1,90 @@
+// Colors
+$color-primary: #4a7c59;        // Farm green
+$color-primary-light: #6b9e7a;
+$color-primary-dark: #2d5a3a;
+$color-secondary: #8b6914;      // Warm amber
+$color-success: #2d7d46;
+$color-error: #c53030;
+$color-warning: #d69e2e;
+$color-info: #2b6cb0;
+
+// Indigo/Purple palette (component showcase & accent)
+$color-indigo-600: #4F46E5;
+$color-indigo-700: #4F39F6;
+$color-purple-600: #7C3AED;
+$color-indigo-deep: #2A2580;
+$color-indigo-darkest: #191656;
+$color-indigo-light: #544CE6;
+$color-indigo-lighter: #6B5CE6;
+$color-indigo-bg: #E8E5FF;
+
+// Neutrals
+$color-neutral-50: #fafafa;
+$color-neutral-100: #f5f5f5;
+$color-neutral-200: #e5e5e5;
+$color-neutral-300: #d4d4d4;
+$color-neutral-400: #a3a3a3;
+$color-neutral-500: #737373;
+$color-neutral-600: #525252;
+$color-neutral-700: #404040;
+$color-neutral-800: #262626;
+$color-neutral-900: #171717;
+
+// Spacing scale
+$space-1: 0.25rem;   // 4px
+$space-2: 0.5rem;    // 8px
+$space-3: 0.75rem;   // 12px
+$space-4: 1rem;      // 16px
+$space-6: 1.5rem;    // 24px
+$space-8: 2rem;      // 32px
+$space-12: 3rem;     // 48px
+$space-16: 4rem;     // 64px
+
+// Typography
+$font-family-base: 'Fraunces', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Neumorphic base colors
+$neu-bg: #ecf0f3;
+$neu-shadow-dark: #d1d9e6;
+$neu-shadow-light: #ffffff;
+
+// Shadows (neumorphic)
+$shadow-sm: 2px 2px 4px rgba($neu-shadow-dark, 0.5), -2px -2px 4px rgba($neu-shadow-light, 0.8);
+$shadow-md: 4px 4px 8px rgba($neu-shadow-dark, 0.5), -4px -4px 8px rgba($neu-shadow-light, 0.8);
+$shadow-lg: 8px 8px 16px rgba($neu-shadow-dark, 0.5), -8px -8px 16px rgba($neu-shadow-light, 0.85);
+$shadow-inset: inset 2px 2px 4px rgba($neu-shadow-dark, 0.5), inset -2px -2px 4px rgba($neu-shadow-light, 0.8);
+$shadow-inset-deep: inset 4px 4px 6px rgba($neu-shadow-dark, 0.5), inset -4px -4px 6px rgba($neu-shadow-light, 0.8);
+
+// Glass card
+$glass-bg: rgba(255, 255, 255, 0.95);
+$glass-bg-hover: rgba(255, 255, 255, 0.98);
+$glass-border: rgba(255, 255, 255, 0.2);
+$glass-shadow: 0 8px 32px rgba(243, 229, 215, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+$glass-shadow-hover: 0 12px 40px rgba(243, 229, 215, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+$glass-blur: 12px;
+$card-radius: 1rem;
+
+// Stat card (dark variant)
+$stat-card-gradient: linear-gradient(135deg, $color-indigo-600, $color-purple-600);
+$stat-card-shadow: 0 4px 20px rgba(79, 70, 229, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+// Breakpoints
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 1024px;
+
+// Sidebar
+$sidebar-width: 250px;
+$sidebar-width-collapsed: 60px;

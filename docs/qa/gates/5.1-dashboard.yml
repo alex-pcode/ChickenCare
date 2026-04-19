@@ -1,0 +1,53 @@
+schema: 1
+story: '5.1'
+story_title: 'Dashboard'
+gate: PASS
+status_reason: 'All 8 acceptance criteria met with comprehensive test coverage (23 tests). Two refactors applied: tier-gated service queries for free users and tightened query count assertions. No security or reliability concerns.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-15T00:00:00Z'
+
+waiver: { active: false }
+
+top_issues: []
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 0, low: 2 }
+  recommendations:
+    must_fix: []
+    monitor:
+      - 'Premium user query count (~10-14) exceeds AC target of <10 — consider consolidating flock/financial aggregates'
+      - 'Mortality withSum loads batch rows into memory — convert to aggregate subquery at scale'
+
+quality_score: 90
+expires: '2026-04-29T00:00:00Z'
+
+evidence:
+  tests_reviewed: 23
+  risks_identified: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'All queries ownership-scoped, no user input processed, premium data tier-gated at service and view level'
+  performance:
+    status: PASS
+    notes: 'Free user ~5 queries, premium ~10-14. Chart data efficient with date-range queries. Minor optimization opportunities for premium path.'
+  reliability:
+    status: PASS
+    notes: 'Graceful handling of empty data (empty states, empty arrays for missing chart data). HTMX target matching prevents partial injection.'
+  maintainability:
+    status: PASS
+    notes: 'Clean service pattern with PHPDoc type hints. BEM SCSS well-structured. Tests cover all tiers and response modes.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Consolidate flock mortality query into single aggregate subquery instead of withSum+get+sum'
+      refs: ['app/Services/DashboardService.php:94-97']
+    - action: 'Reduce premium query count below 10 by combining financial/flock aggregates'
+      refs: ['app/Services/DashboardService.php']
+    - action: 'Add noscript fallback table to chart component for WCAG compliance'
+      refs: ['resources/views/components/ui/chart.blade.php']

@@ -1,0 +1,403 @@
+@use '../variables' as *;
+
+.expenses {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    &__filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    &__filter {
+        padding: 0.375rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        color: var(--color-text-muted, #6b7280);
+        background: var(--color-surface, #f3f4f6);
+        border: 1px solid var(--color-border, #e5e7eb);
+        transition: all 150ms ease;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--color-text, #111827);
+            border-color: var(--color-primary, #6366f1);
+        }
+
+        &--active {
+            color: #fff;
+            background: var(--color-primary, #6366f1);
+            border-color: var(--color-primary, #6366f1);
+
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    &__submit-wrapper {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    &__table {
+        width: 100%;
+    }
+
+    &__breakdown {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: expensesFadeInUp 0.5s ease-out 0.3s forwards;
+
+        @media (min-width: $breakpoint-tablet) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    &__summary-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    &__summary-title {
+        font-size: $font-size-lg;
+        font-weight: 600;
+        color: $color-neutral-800;
+
+        .dark & { color: #f9fafb; }
+    }
+
+    &__summary-total {
+        text-align: right;
+    }
+
+    &__summary-total-amount {
+        font-size: $font-size-lg;
+        font-weight: 700;
+        color: $color-neutral-800;
+
+        .dark & { color: #f9fafb; }
+    }
+
+    &__summary-total-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+
+        .dark & { color: #9ca3af; }
+    }
+
+    &__summary-subtitle {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+
+        .dark & { color: #9ca3af; }
+    }
+
+    &__summary-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    &__summary-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background: #f9fafb;
+        transition: background-color 150ms ease;
+
+        &:hover {
+            background: #f3f4f6;
+        }
+
+        .dark & {
+            background: rgba(55, 65, 81, 0.5);
+
+            &:hover {
+                background: #374151;
+            }
+        }
+    }
+
+    &__summary-row-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    &__summary-dot {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 9999px;
+        flex-shrink: 0;
+    }
+
+    &__summary-category {
+        font-weight: 500;
+        color: $color-neutral-800;
+
+        .dark & { color: #f9fafb; }
+    }
+
+    &__summary-percentage {
+        font-size: 0.875rem;
+        color: #6b7280;
+
+        .dark & { color: #9ca3af; }
+    }
+
+    &__summary-row-right {
+        text-align: right;
+    }
+
+    &__summary-amount {
+        font-weight: 600;
+        color: $color-neutral-800;
+
+        .dark & { color: #f9fafb; }
+    }
+
+    &__summary-count {
+        font-size: 0.875rem;
+        color: #6b7280;
+
+        .dark & { color: #9ca3af; }
+    }
+
+    &__summary-empty {
+        text-align: center;
+        padding: 2rem 0;
+        color: #6b7280;
+
+        .dark & { color: #9ca3af; }
+    }
+
+    &__chart-wrapper {
+        height: 320px;
+        position: relative;
+    }
+
+    &__chart-loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    &__records {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: expensesFadeInUp 0.5s ease-out 0.4s forwards;
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    &__records-heading {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $color-neutral-800;
+        margin-bottom: 1rem;
+
+        .dark & { color: #f9fafb; }
+    }
+
+    &__records-spinner {
+        display: flex;
+        justify-content: center;
+        padding: 1rem 0;
+    }
+
+    &__sort-link {
+        color: inherit;
+        text-decoration: none;
+        cursor: pointer;
+        white-space: nowrap;
+
+        &:hover {
+            color: var(--color-primary, #6366f1);
+        }
+
+        &--active {
+            font-weight: 600;
+            color: var(--color-primary, #6366f1);
+        }
+    }
+
+    &__delete-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem;
+        border-radius: 9999px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+
+        &--default {
+            color: #9ca3af;
+
+            &:hover {
+                color: #6b7280;
+                background: #f3f4f6;
+            }
+        }
+
+        &--armed {
+            color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .dark &--default {
+            color: #6b7280;
+
+            &:hover {
+                color: #d1d5db;
+                background: #374151;
+            }
+        }
+
+        .dark &--armed {
+            color: #ef4444;
+            background: rgba(127, 29, 29, 0.3);
+        }
+    }
+
+    &__row {
+        transition: opacity 500ms ease;
+
+        &--editing {
+            background: var(--color-surface, #f9fafb);
+        }
+    }
+
+    &__actions {
+        display: flex;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+
+    &__amount {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.expenses-hero {
+    position: relative;
+    width: 100%;
+    height: 16rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 0;
+
+    &__image {
+        width: auto;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    &__image--animated {
+        animation:
+            hero-coin-entrance 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+            hero-coin-wobble 4s ease-in-out 1s infinite;
+    }
+
+    &__badge {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        background: #3b82f6;
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        animation: hero-badge-pop 0.4s ease-out 0.8s both;
+    }
+
+    &__welcome {
+        background: rgba(255, 255, 255, 0.9);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        animation: hero-welcome-slide-in 0.5s ease-out 0.5s both;
+    }
+
+    .dark &__welcome {
+        background: rgba(17, 24, 39, 0.9);
+        border-color: #374151;
+        color: #e5e7eb;
+    }
+}
+
+@keyframes hero-coin-entrance {
+    from { opacity: 0; transform: scale(0.8) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes hero-coin-wobble {
+    0%, 100% { transform: rotate(0deg); }
+    25%      { transform: rotate(2deg); }
+    50%      { transform: rotate(0deg); }
+    75%      { transform: rotate(-2deg); }
+}
+
+@keyframes hero-badge-pop {
+    from { opacity: 0; transform: scale(0); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes hero-welcome-slide-in {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .expenses-hero__image--animated,
+    .expenses-hero__badge,
+    .expenses-hero__welcome {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+@keyframes expensesFadeInUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+

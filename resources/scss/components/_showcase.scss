@@ -1,0 +1,105 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.showcase-header {
+    font-size: $font-size-3xl + 0.125rem;
+    font-weight: $font-weight-bold;
+    color: $color-neutral-900;
+    text-align: center;
+    margin-bottom: $space-8;
+}
+
+.showcase-tabs-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: $space-8;
+}
+
+.showcase-tabs {
+    @include card;
+    display: flex;
+    gap: $space-2;
+    padding: $space-2;
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+
+    &:hover {
+        transform: none;
+    }
+
+    &__tab {
+        padding: $space-3 $space-6;
+        border-radius: $space-2;
+        font-family: $font-family-base;
+        font-size: $font-size-base;
+        font-weight: $font-weight-medium;
+        border: none;
+        background: transparent;
+        color: $color-neutral-600;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 200ms ease;
+
+        &:hover {
+            color: $color-neutral-900;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        &--active {
+            background: $color-indigo-600;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+
+            &:hover {
+                background: $color-indigo-600;
+                color: #fff;
+            }
+        }
+    }
+}
+
+.showcase-section {
+    margin-bottom: $space-12;
+
+    &__header {
+        text-align: center;
+        margin-bottom: $space-6;
+    }
+
+    &__title {
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-bold;
+        color: $color-neutral-900;
+        margin-bottom: $space-2;
+    }
+
+    &__subtitle {
+        font-size: $font-size-base;
+        color: $color-neutral-600;
+    }
+}
+
+// Grid utilities for showcase
+.showcase-grid {
+    display: grid;
+    gap: $space-3;
+
+    &--2 { grid-template-columns: repeat(2, 1fr); }
+    &--3 { grid-template-columns: repeat(1, 1fr); }
+    &--4 { grid-template-columns: repeat(2, 1fr); }
+
+    @include desktop {
+        &--3 { grid-template-columns: repeat(3, 1fr); }
+        &--4 { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    &--gap-6 { gap: $space-6; }
+}
+
+// Content container for non-full-width tabs
+.showcase-content {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0;
+}

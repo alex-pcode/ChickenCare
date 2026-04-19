@@ -1,0 +1,8 @@
+schema: 1
+story: "1.1"
+gate: PASS
+status_reason: "All three medium-severity issues (ENV-001, PKG-001, PKG-002) have been resolved. Remaining CLEANUP-001 is deferred to Story 1.3 by design."
+reviewer: "Quinn"
+updated: "2026-04-09T00:00:00Z"
+top_issues: []
+waiver: { active: false }

@@ -1,0 +1,75 @@
+schema: 1
+story: '3.1'
+story_title: 'Flock Profile & Events'
+gate: CONCERNS
+status_reason: 'Variable name mismatch causes runtime bug in HTMX update path; FlockEventController::create lacks authorization check; FlockEventPolicy::create has incorrect method signature.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-12T14:00:00Z'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'BUG-001'
+    severity: medium
+    finding: 'FlockProfileController::update HTMX branch passes $flockProfile but flock-overview.blade.php expects $profile — migration notice never renders after HTMX update'
+    suggested_action: 'Rename variable in compact() or assign $profile = $flockProfile before the view call'
+    suggested_owner: dev
+  - id: 'AUTH-001'
+    severity: medium
+    finding: 'FlockEventController::create returns event form without verifying user owns the FlockProfile — any premium user can load form for another users profile'
+    suggested_action: 'Add Gate::authorize("view", $flockProfile) to the create method'
+    suggested_owner: dev
+  - id: 'POLICY-001'
+    severity: medium
+    finding: 'FlockEventPolicy::create(User, FlockEvent) has wrong signature — Laravel create gate is invoked before model exists; second parameter should be FlockProfile or removed'
+    suggested_action: 'Change to create(User $user) or create(User $user, FlockProfile $flockProfile) and wire up accordingly'
+    suggested_owner: dev
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 3, low: 2 }
+  recommendations:
+    must_fix:
+      - 'Fix variable name mismatch in FlockProfileController::update HTMX path'
+      - 'Add authorization to FlockEventController::create'
+      - 'Fix FlockEventPolicy::create method signature'
+    monitor:
+      - 'N+1 lazy load in FlockEventPolicy ownership checks'
+      - 'Duplicated batch stats computation in controller'
+
+quality_score: 70
+expires: '2026-04-26T14:00:00Z'
+
+evidence:
+  tests_reviewed: 0
+  risks_identified: 5
+  trace:
+    ac_covered: [1, 2, 5, 6, 7, 8, 9, 10, 11]
+    ac_gaps: [3, 4]
+
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: 'FlockEventController::create lacks ownership check; FlockEventPolicy::create signature prevents proper gate usage'
+  performance:
+    status: PASS
+    notes: 'Acceptable at expected scale; minor N+1 in policy checks noted for monitoring'
+  reliability:
+    status: CONCERNS
+    notes: 'Variable name mismatch causes silent rendering failure in HTMX update path'
+  maintainability:
+    status: PASS
+    notes: 'Clean BEM SCSS, thin models, consistent patterns; minor duplication in batch stats computation'
+
+recommendations:
+  immediate:
+    - action: 'Fix $flockProfile -> $profile variable name in FlockProfileController::update HTMX view call'
+      refs: ['app/Http/Controllers/FlockProfileController.php:65']
+    - action: 'Add authorization check to FlockEventController::create'
+      refs: ['app/Http/Controllers/FlockEventController.php:16-21']
+    - action: 'Fix FlockEventPolicy::create method signature'
+      refs: ['app/Policies/FlockEventPolicy.php:10-13']
+  future:
+    - action: 'Extract batch stats computation to private method to eliminate duplication'
+      refs: ['app/Http/Controllers/FlockProfileController.php:28-37', 'app/Http/Controllers/FlockProfileController.php:54-63']
+    - action: 'Remove unnecessary method_exists check for flockBatches relationship'
+      refs: ['app/Http/Controllers/FlockProfileController.php:24', 'app/Http/Controllers/FlockProfileController.php:50']

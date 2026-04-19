@@ -1,0 +1,30 @@
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.flash {
+    padding: $space-3 $space-4;
+    border-radius: 0.375rem;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    margin-bottom: $space-4;
+    @include neumorphic('sm');
+
+    &--success {
+        background-color: color.adjust($color-success, $lightness: 50%);
+        color: color.adjust($color-success, $lightness: -10%);
+        border-left: 4px solid $color-success;
+    }
+
+    &--error {
+        background-color: color.adjust($color-error, $lightness: 40%);
+        color: color.adjust($color-error, $lightness: -10%);
+        border-left: 4px solid $color-error;
+    }
+
+    &--warning {
+        background-color: color.adjust($color-warning, $lightness: 40%);
+        color: color.adjust($color-warning, $lightness: -20%);
+        border-left: 4px solid $color-warning;
+    }
+}

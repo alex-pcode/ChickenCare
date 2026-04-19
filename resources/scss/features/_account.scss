@@ -1,0 +1,1060 @@
+@use '../variables' as *;
+
+// ============================================================
+// Account Settings Page
+// ============================================================
+
+.account-page {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: $space-6;
+
+    &__header {
+        margin-bottom: $space-6;
+        animation: accountTabEnter 0.3s ease-out;
+    }
+
+    &__title {
+        font-size: $font-size-3xl;
+        font-weight: $font-weight-bold;
+        color: var(--color-text, $color-neutral-900);
+    }
+
+    &__subtitle {
+        font-size: $font-size-lg;
+        color: var(--color-text-muted, $color-neutral-500);
+        margin-top: $space-1;
+    }
+
+    // Tabs
+    &__tabs {
+        display: flex;
+        gap: $space-1;
+        border-bottom: 2px solid var(--color-border, $color-neutral-200);
+        margin-bottom: $space-6;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    &__tab {
+        padding: $space-3 $space-4;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: var(--color-text-muted, $color-neutral-500);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: color 150ms ease, border-color 150ms ease;
+
+        &:hover {
+            color: var(--color-text, $color-neutral-900);
+        }
+
+        &--active {
+            color: $color-indigo-600;
+            border-bottom-color: $color-indigo-600;
+            font-weight: $font-weight-semibold;
+        }
+    }
+
+    // Tab content areas
+    &__tab-content {
+        animation: accountTabEnter 0.25s ease-out;
+
+        &--narrow {
+            max-width: 42rem;
+        }
+
+        &--wide {
+            max-width: 64rem;
+        }
+    }
+
+    // Banners
+    &__banner {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+        padding: $space-3 $space-4;
+        border-radius: 0.5rem;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        margin-bottom: $space-4;
+        animation: bannerEnter 0.3s ease-out;
+
+        &--success {
+            background: rgba($color-success, 0.1);
+            color: $color-success;
+            border: 1px solid rgba($color-success, 0.2);
+        }
+
+        &--error {
+            background: rgba($color-error, 0.1);
+            color: $color-error;
+            border: 1px solid rgba($color-error, 0.2);
+        }
+    }
+
+    &__banner-close {
+        margin-left: auto;
+        background: none;
+        border: none;
+        font-size: $font-size-xl;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.6;
+        line-height: 1;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &__banner-enter {
+        transition: all 0.3s ease-out;
+    }
+
+    &__banner-enter-start {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+
+    &__banner-enter-end {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ============================================================
+// Profile Tab
+// ============================================================
+
+.account-profile {
+    &__header-row {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+    }
+
+    &__icon {
+        font-size: $font-size-xl;
+    }
+}
+
+.form-help-text {
+    font-size: $font-size-xs;
+    color: var(--color-text-muted, $color-neutral-400);
+    margin-top: -$space-2;
+}
+
+// ============================================================
+// Account Verification
+// ============================================================
+
+.account-verification {
+    padding: $space-4;
+    background: var(--color-surface, $color-neutral-50);
+    border-radius: 0.5rem;
+    margin-bottom: $space-4;
+    border: 1px solid var(--color-border, $color-neutral-200);
+
+    &__title {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: var(--color-text, $color-neutral-900);
+        margin-bottom: $space-3;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: $space-4;
+    }
+
+    &__info {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+    }
+
+    &__icon {
+        font-size: $font-size-xl;
+    }
+
+    &__label {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: var(--color-text, $color-neutral-900);
+    }
+
+    &__sublabel {
+        font-size: $font-size-xs;
+        color: var(--color-text-muted, $color-neutral-500);
+    }
+
+    &__pill {
+        padding: $space-1 $space-3;
+        border-radius: 9999px;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+
+        &--verified {
+            background: rgba($color-success, 0.1);
+            color: $color-success;
+        }
+
+        &--unverified {
+            background: rgba($color-warning, 0.1);
+            color: $color-warning;
+        }
+    }
+}
+
+// ============================================================
+// Theme Toggle
+// ============================================================
+
+.account-theme {
+    &__title {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: var(--color-text, $color-neutral-900);
+        margin-bottom: $space-1;
+    }
+
+    &__description {
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
+        margin-bottom: $space-4;
+    }
+}
+
+.account-theme-toggle {
+    display: flex;
+    gap: $space-2;
+
+    &__btn {
+        padding: $space-2 $space-4;
+        border-radius: 0.5rem;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        border: 1px solid var(--color-border, $color-neutral-200);
+        background: var(--color-surface, #fff);
+        color: var(--color-text-muted, $color-neutral-500);
+        transition: all 150ms ease;
+
+        &:hover {
+            border-color: $color-indigo-600;
+            color: var(--color-text, $color-neutral-900);
+        }
+
+        &--active {
+            background: rgba($color-indigo-600, 0.1);
+            border-color: $color-indigo-600;
+            color: $color-indigo-600;
+            font-weight: $font-weight-semibold;
+        }
+    }
+}
+
+// ============================================================
+// Breadcrumbs
+// ============================================================
+
+.breadcrumbs {
+    margin-bottom: $space-4;
+
+    &__list {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        font-size: $font-size-sm;
+    }
+
+    &__link {
+        color: var(--color-text-muted, $color-neutral-500);
+        text-decoration: none;
+
+        &:hover {
+            color: $color-indigo-600;
+            text-decoration: underline;
+        }
+    }
+
+    &__current {
+        color: var(--color-text, $color-neutral-900);
+        font-weight: $font-weight-medium;
+    }
+
+    &__separator {
+        color: var(--color-text-muted, $color-neutral-400);
+    }
+}
+
+// ============================================================
+// Animations
+// ============================================================
+
+@keyframes accountTabEnter {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bannerEnter {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-0.25rem);
+    }
+
+    to {
+        opacity: 1;
+        max-height: 20rem;
+        transform: translateY(0);
+    }
+}
+
+// ============================================================
+// Security Tab
+// ============================================================
+
+.account-security {
+    &__status {
+        background: linear-gradient(to right, #f0fdf4, #ecfdf5);
+        border: 1px solid #bbf7d0;
+        border-radius: 0.75rem;
+        padding: $space-6;
+        margin-bottom: $space-6;
+    }
+
+    &__status-header {
+        display: flex;
+        align-items: flex-start;
+        gap: $space-3;
+        margin-bottom: $space-4;
+    }
+
+    &__status-icon {
+        font-size: $font-size-2xl;
+        line-height: 1;
+    }
+
+    &__status-title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-bold;
+        color: #166534;
+        margin-bottom: $space-1;
+    }
+
+    &__status-subtitle {
+        font-size: $font-size-sm;
+        color: #15803d;
+    }
+
+    &__progress {
+        height: 0.5rem;
+        background: rgba(#16a34a, 0.15);
+        border-radius: 9999px;
+        overflow: hidden;
+        margin-bottom: $space-2;
+    }
+
+    &__progress-fill {
+        height: 100%;
+        background: linear-gradient(to right, #22c55e, #16a34a);
+        border-radius: 9999px;
+        transition: width 0.3s ease;
+    }
+
+    &__progress-caption {
+        font-size: $font-size-xs;
+        color: #15803d;
+    }
+
+    &__reset-card {
+        background: linear-gradient(to right, #eff6ff, #dbeafe);
+        border: 1px solid #93c5fd;
+        border-radius: 0.75rem;
+        padding: $space-6;
+    }
+
+    &__reset-header {
+        display: flex;
+        align-items: flex-start;
+        gap: $space-3;
+        margin-bottom: $space-4;
+    }
+
+    &__reset-icon {
+        font-size: $font-size-2xl;
+        line-height: 1;
+    }
+
+    &__reset-title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-bold;
+        color: #1e40af;
+        margin-bottom: $space-1;
+    }
+
+    &__reset-subtitle {
+        font-size: $font-size-sm;
+        color: #1d4ed8;
+    }
+}
+
+// ============================================================
+// Billing Tab
+// ============================================================
+
+.account-billing {
+    &__plan-card {
+        border-radius: 0.75rem;
+        padding: $space-6;
+        border: 1px solid transparent;
+
+        &--premium {
+            background: linear-gradient(135deg, #e0e7ff, #ede9fe);
+            border-color: #a78bfa;
+        }
+
+        &--free {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-color: #6ee7b7;
+        }
+    }
+
+    &__plan-inner {
+        display: flex;
+        align-items: flex-start;
+        gap: $space-4;
+    }
+
+    &__plan-icon {
+        font-size: $font-size-3xl;
+        line-height: 1;
+    }
+
+    &__plan-label {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: var(--color-text-muted, $color-neutral-500);
+        margin-bottom: $space-1;
+    }
+
+    &__plan-tier {
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-bold;
+        color: var(--color-text, $color-neutral-900);
+        margin-bottom: $space-1;
+    }
+
+    &__plan-description {
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
+    }
+
+    &__features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            padding: $space-2 0;
+            font-size: $font-size-sm;
+            color: var(--color-text, $color-neutral-700);
+            border-bottom: 1px solid var(--color-border, $color-neutral-100);
+
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+    }
+
+    &__upgrade-btn {
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}
+
+// ============================================================
+// Goals Tab
+// ============================================================
+
+.account-goals {
+    &__grid {
+        display: grid;
+        gap: 2rem;
+
+        @media (min-width: 1024px) {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    &__full-width {
+        @media (min-width: 1024px) {
+            grid-column: 1 / -1;
+        }
+    }
+
+    &__form {
+        width: 100%;
+    }
+
+    &__context {
+        border-radius: 0.75rem;
+        padding: $space-4;
+        margin-top: $space-4;
+
+        &--hobby {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #bbf7d0;
+        }
+
+        &--business {
+            background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+            border: 1px solid #d8b4fe;
+        }
+    }
+
+    &__context-header {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        margin-bottom: $space-3;
+
+        span {
+            font-size: $font-size-xl;
+        }
+
+        h4 {
+            font-size: $font-size-base;
+            font-weight: $font-weight-semibold;
+            color: var(--color-text, $color-neutral-900);
+        }
+    }
+
+    &__context-list {
+        padding-left: $space-4;
+        margin-bottom: $space-4;
+        font-size: $font-size-sm;
+        color: var(--color-text, $color-neutral-700);
+
+        li {
+            padding: $space-1 0;
+        }
+    }
+
+    &__subcard {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 0.5rem;
+        padding: $space-3 $space-4;
+        font-size: $font-size-sm;
+        color: var(--color-text, $color-neutral-700);
+    }
+}
+
+// ============================================================
+// Production Progress
+// ============================================================
+
+.account-production {
+    &__progress-panel {
+        background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+        border: 1px solid #c7d2fe;
+        border-radius: 0.75rem;
+        padding: $space-4;
+        margin-top: $space-4;
+    }
+
+    &__progress-header {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        margin-bottom: $space-3;
+
+        span {
+            font-size: $font-size-xl;
+        }
+
+        h4 {
+            font-size: $font-size-base;
+            font-weight: $font-weight-semibold;
+            color: $color-indigo-600;
+        }
+    }
+
+    &__progress-label {
+        font-size: $font-size-sm;
+        color: var(--color-text, $color-neutral-700);
+        margin-bottom: $space-2;
+    }
+
+    &__progress-bar {
+        height: 0.5rem;
+        background: rgba($color-indigo-600, 0.15);
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+
+    &__progress-fill {
+        height: 100%;
+        background: linear-gradient(to right, $color-indigo-600, #818cf8);
+        border-radius: 9999px;
+        transition: width 0.3s ease;
+    }
+
+    &__mini-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $space-3;
+        margin-top: $space-4;
+    }
+
+    &__keep-going {
+        display: flex;
+        align-items: flex-start;
+        gap: $space-3;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        border: 1px solid #93c5fd;
+        border-radius: 0.75rem;
+        padding: $space-4;
+        margin-top: $space-4;
+
+        span {
+            font-size: $font-size-xl;
+            line-height: 1;
+        }
+
+        h3 {
+            font-size: $font-size-base;
+            font-weight: $font-weight-bold;
+            color: #1e40af;
+            margin-bottom: $space-1;
+        }
+
+        p {
+            font-size: $font-size-sm;
+            color: #1d4ed8;
+        }
+    }
+}
+
+// ============================================================
+// Historical Data
+// ============================================================
+
+.account-historical {
+    &__info {
+        display: flex;
+        align-items: flex-start;
+        gap: $space-3;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        border: 1px solid #93c5fd;
+        border-radius: 0.75rem;
+        padding: $space-4;
+        margin-bottom: $space-4;
+
+        span {
+            font-size: $font-size-xl;
+            line-height: 1;
+        }
+
+        strong {
+            display: block;
+            font-size: $font-size-sm;
+            font-weight: $font-weight-semibold;
+            color: #1e40af;
+            margin-bottom: $space-1;
+        }
+
+        p {
+            font-size: $font-size-sm;
+            color: #1d4ed8;
+        }
+    }
+}
+
+// ============================================================
+// Confirm Dialog
+// ============================================================
+
+.confirm-dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-4;
+
+    &__overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    &__panel {
+        position: relative;
+        background: #fff;
+        border-radius: 0.75rem;
+        padding: $space-6;
+        max-width: 28rem;
+        width: 100%;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+        &--warning {
+            border-top: 3px solid #f59e0b;
+        }
+
+        &--danger {
+            border-top: 3px solid #ef4444;
+        }
+
+        &--success {
+            border-top: 3px solid #22c55e;
+        }
+    }
+
+    &__title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-bold;
+        color: var(--color-text, $color-neutral-900);
+        margin-bottom: $space-2;
+    }
+
+    &__message {
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
+        margin-bottom: $space-6;
+        line-height: 1.5;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: $space-3;
+    }
+}
+
+// ============================================================
+// Reduced motion
+// ============================================================
+
+@media (prefers-reduced-motion: reduce) {
+    .account-page__header,
+    .account-page__tab-content,
+    .account-page__banner {
+        animation: none;
+    }
+
+    .account-page__tab,
+    .account-theme-toggle__btn {
+        transition: none;
+    }
+}
+
+// ============================================================
+// Dark mode
+// ============================================================
+
+.dark {
+    .account-page {
+        &__title {
+            color: $color-neutral-100;
+        }
+
+        &__subtitle {
+            color: $color-neutral-400;
+        }
+
+        &__tab {
+            color: $color-neutral-400;
+
+            &:hover {
+                color: $color-neutral-200;
+            }
+
+            &--active {
+                color: $color-indigo-lighter;
+                border-bottom-color: $color-indigo-lighter;
+            }
+        }
+
+        &__tabs {
+            border-bottom-color: $color-neutral-700;
+        }
+    }
+
+    .account-verification {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: $color-neutral-700;
+
+        &__title {
+            color: $color-neutral-200;
+        }
+
+        &__label {
+            color: $color-neutral-200;
+        }
+
+        &__sublabel {
+            color: $color-neutral-400;
+        }
+    }
+
+    .account-theme-toggle__btn {
+        background: $color-neutral-800;
+        border-color: $color-neutral-700;
+        color: $color-neutral-400;
+
+        &:hover {
+            color: $color-neutral-200;
+            border-color: $color-indigo-lighter;
+        }
+
+        &--active {
+            background: rgba($color-indigo-600, 0.2);
+            border-color: $color-indigo-lighter;
+            color: $color-indigo-lighter;
+        }
+    }
+
+    .account-theme__title {
+        color: $color-neutral-200;
+    }
+
+    .account-theme__description {
+        color: $color-neutral-400;
+    }
+
+    .breadcrumbs {
+        &__link {
+            color: $color-neutral-400;
+
+            &:hover {
+                color: $color-indigo-lighter;
+            }
+        }
+
+        &__current {
+            color: $color-neutral-200;
+        }
+
+        &__separator {
+            color: $color-neutral-600;
+        }
+    }
+
+    .form-help-text {
+        color: $color-neutral-500;
+    }
+
+    .account-profile__icon {
+        // Emoji icons render in color, no override needed
+    }
+
+    // Security tab dark mode
+    .account-security {
+        &__status {
+            background: linear-gradient(to right, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        &__status-title {
+            color: #86efac;
+        }
+
+        &__status-subtitle {
+            color: #4ade80;
+        }
+
+        &__progress {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        &__progress-caption {
+            color: #4ade80;
+        }
+
+        &__reset-card {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        &__reset-title {
+            color: #93c5fd;
+        }
+
+        &__reset-subtitle {
+            color: #60a5fa;
+        }
+    }
+
+    // Billing tab dark mode
+    .account-billing {
+        &__plan-card {
+            &--premium {
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+                border-color: rgba(167, 139, 250, 0.4);
+            }
+
+            &--free {
+                background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
+                border-color: rgba(110, 231, 183, 0.4);
+            }
+        }
+
+        &__plan-label {
+            color: $color-neutral-400;
+        }
+
+        &__plan-tier {
+            color: $color-neutral-100;
+        }
+
+        &__plan-description {
+            color: $color-neutral-400;
+        }
+
+        &__features li {
+            color: $color-neutral-300;
+            border-bottom-color: $color-neutral-700;
+        }
+    }
+
+    // Goals tab dark mode
+    .account-goals {
+        &__context--hobby {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        &__context--business {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.1));
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        &__context-header h4 {
+            color: $color-neutral-200;
+        }
+
+        &__context-list {
+            color: $color-neutral-300;
+        }
+
+        &__subcard {
+            background: rgba(255, 255, 255, 0.05);
+            color: $color-neutral-300;
+        }
+    }
+
+    .account-production {
+        &__progress-panel {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1));
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        &__progress-header h4 {
+            color: $color-indigo-lighter;
+        }
+
+        &__progress-label {
+            color: $color-neutral-300;
+        }
+
+        &__progress-bar {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        &__keep-going {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+            border-color: rgba(59, 130, 246, 0.3);
+
+            h3 {
+                color: #93c5fd;
+            }
+
+            p {
+                color: #60a5fa;
+            }
+        }
+    }
+
+    .account-historical__info {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+        border-color: rgba(59, 130, 246, 0.3);
+
+        strong {
+            color: #93c5fd;
+        }
+
+        p {
+            color: #60a5fa;
+        }
+    }
+
+    // Confirm dialog dark mode
+    .confirm-dialog__panel {
+        background: $color-neutral-800;
+
+        &--warning {
+            border-top-color: #f59e0b;
+        }
+
+        &--danger {
+            border-top-color: #ef4444;
+        }
+
+        &--success {
+            border-top-color: #22c55e;
+        }
+    }
+
+    .confirm-dialog__title {
+        color: $color-neutral-100;
+    }
+
+    .confirm-dialog__message {
+        color: $color-neutral-400;
+    }
+}

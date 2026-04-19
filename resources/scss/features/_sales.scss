@@ -1,0 +1,146 @@
+.sales {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    &__paid-field {
+        display: flex;
+        align-items: center;
+        padding-top: 1.5rem;
+    }
+
+    &__paid-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+    }
+
+    &__form {
+        // handled by x-forms.form-card
+    }
+
+    &__table {
+        width: 100%;
+    }
+
+    &__row {
+        // base row
+    }
+
+    &__row--editing {
+        background-color: var(--color-surface);
+
+        td {
+            padding: 0.5rem;
+        }
+    }
+
+    &__amount {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__customer {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+    }
+
+    &__badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: opacity 0.15s ease;
+
+        &:hover {
+            opacity: 0.8;
+        }
+
+        &--paid {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        &--unpaid {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+    }
+
+    &__toggle {
+        // alias for badge — toggle button styling handled by &__badge
+    }
+
+    &__actions {
+        white-space: nowrap;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+}
+
+.sales-reports {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    &__filter {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    &__filter-form {
+        // layout handled by form-row component
+    }
+
+    &__filter-action {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    &__period-label {
+        font-size: 0.875rem;
+        color: var(--color-text-muted, #6b7280);
+        margin: 0;
+    }
+
+    &__summary {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    &__section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    &__table {
+        width: 100%;
+    }
+
+    &__unpaid {
+        &--warning {
+            color: var(--color-warning-text, #92400e);
+            font-weight: 600;
+        }
+    }
+}

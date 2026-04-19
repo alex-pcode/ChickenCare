@@ -1,0 +1,45 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-1;
+    padding: $space-4 0;
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2rem;
+        height: 2rem;
+        padding: $space-1 $space-2;
+        font-size: $font-size-sm;
+        color: $color-neutral-600;
+        text-decoration: none;
+        border-radius: 0.25rem;
+        @include transition;
+
+        &:hover {
+            background-color: $color-neutral-200;
+            color: $color-neutral-800;
+        }
+
+        &--active {
+            background-color: $color-primary;
+            color: #fff;
+            font-weight: $font-weight-medium;
+
+            &:hover {
+                background-color: $color-primary-dark;
+                color: #fff;
+            }
+        }
+    }
+
+    &__ellipsis {
+        color: $color-neutral-400;
+        padding: $space-1;
+    }
+}

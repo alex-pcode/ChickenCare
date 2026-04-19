@@ -1,0 +1,47 @@
+schema: 1
+story: "2.5"
+story_title: "Egg Entry UX Enhancements"
+gate: PASS
+status_reason: "All 10 ACs met. Duplicate detection correctly handles NULL size/color with whereNull(), backfill is properly scoped and validated, advanced toggle uses Alpine.js with accessibility attributes. 14 new tests added, 59 total EggEntry tests pass."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-04-11T00:00:00Z"
+
+waiver: { active: false }
+
+top_issues: []
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 0, low: 0 }
+  recommendations:
+    must_fix: []
+    monitor: []
+
+quality_score: 100
+expires: "2026-04-25T00:00:00Z"
+
+evidence:
+  tests_reviewed: 14
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Duplicate detection scoped to auth user. Backfill creates via $request->user()->eggEntries()->create(). Confirm-update re-validates all data on round-trip. hx-vals uses @json() for safe serialization."
+  performance:
+    status: PASS
+    notes: "Duplicate check adds 1 query per store — uses composite index. Backfill iterates entries array sequentially (acceptable for small batches). No N+1 patterns."
+  reliability:
+    status: PASS
+    notes: "Null handling in duplicate detection uses whereNull() correctly (not where('size', null)). SQLite date comparison handled via whereDate(). Backfill validates 90-day range server-side."
+  maintainability:
+    status: PASS
+    notes: "Clean separation: BackfillEggEntriesRequest for validation, Alpine.js for client-side interactions, BEM SCSS for styling. form-card fix benefits all future form-card usages."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Backfill could batch-insert entries instead of individual creates for better performance at scale"
+      refs: ["app/Http/Controllers/EggEntryController.php:137-146"]

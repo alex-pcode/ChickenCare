@@ -1,0 +1,606 @@
+// Neumorphic & Glass-card component system
+// Ported faithfully from d:\Koke\Aplikacija\src\index.css (React reference).
+// Defines soft-shadow "neumorphic" surfaces and frosted "glass" cards with
+// dark-mode variants. CSS custom properties are declared at :root so both
+// SCSS @use consumers and raw var() references work.
+
+@use '../variables' as *;
+
+:root {
+  --neu-1: #{$neu-bg};
+  --neu-2: #{$neu-shadow-dark};
+  --white: #f9f9f9;
+  --black: #181818;
+  --primary: oklch(0.205 0 0);
+  --font-fraunces: 'Fraunces';
+}
+
+.dark {
+  --primary: oklch(0.922 0 0);
+  --neu-1: #1a1a1a;
+  --neu-2: rgba(0, 0, 0, 0.5);
+  --white: rgba(40, 40, 40, 0.4);
+  --black: #f5f5f5;
+}
+
+// ---------------------------------------------------------------------------
+// Neumorphic surfaces
+// ---------------------------------------------------------------------------
+
+.neu-form {
+  background-color: var(--neu-1);
+  box-shadow:
+    10px 10px 20px var(--neu-2),
+    -10px -10px 20px var(--white);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  transition: all 0.3s ease;
+}
+
+.neu-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.neu-stat {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1px rgba(243, 229, 215, 0.5);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.05),
+      inset 0 0 0 1px rgba(243, 229, 215, 0.5);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Neumorphic inputs
+// ---------------------------------------------------------------------------
+
+.neu-input {
+  width: 100%;
+  height: 3rem;
+  margin: 0.5rem 0;
+  padding: 0 1.5rem;
+  border: none;
+  outline: none;
+  font-family: var(--font-fraunces);
+  font-size: 1rem;
+  background-color: var(--neu-1);
+  border-radius: 1rem;
+  box-shadow:
+    inset 2px 2px 4px var(--neu-2),
+    inset -2px -2px 4px var(--white);
+  transition: all 0.3s ease;
+
+  &:focus {
+    box-shadow:
+      inset 4px 4px 4px var(--neu-2),
+      inset -4px -4px 4px var(--white);
+  }
+}
+
+.relative > .neu-input {
+  margin: 0;
+}
+
+.neu-input select,
+select.neu-input {
+  width: 100%;
+  height: 3rem;
+  margin: 0.5rem 0;
+  padding: 0 1.5rem;
+  border: none;
+  outline: none;
+  font-family: var(--font-fraunces);
+  font-size: 1rem;
+  background-color: var(--neu-1);
+  border-radius: 1rem;
+  box-shadow:
+    inset 2px 2px 4px var(--neu-2),
+    inset -2px -2px 4px var(--white);
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+
+  &:focus {
+    box-shadow:
+      inset 4px 4px 4px var(--neu-2),
+      inset -4px -4px 4px var(--white);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Neumorphic buttons
+// ---------------------------------------------------------------------------
+
+.neu-button {
+  width: auto;
+  min-width: 120px;
+  height: 2.75rem;
+  padding: 0 1.5rem;
+  border: none;
+  outline: none;
+  border-radius: 1.375rem;
+  background-color: var(--primary);
+  color: var(--white);
+  font-family: var(--font-fraunces);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  cursor: pointer;
+  box-shadow:
+    4px 4px 8px var(--neu-2),
+    -4px -4px 8px var(--white);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow:
+      3px 3px 6px var(--neu-2),
+      -3px -3px 6px var(--white);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    box-shadow:
+      2px 2px 4px var(--neu-2),
+      -2px -2px 4px var(--white);
+    transform: translateY(0);
+  }
+
+  &.full-width {
+    width: 100%;
+  }
+}
+
+.neu-button-secondary {
+  width: auto;
+  min-width: 120px;
+  height: 2.75rem;
+  padding: 0 1.5rem;
+  border: 2px solid var(--primary);
+  outline: none;
+  border-radius: 1.375rem;
+  background-color: var(--white);
+  color: var(--primary);
+  font-family: var(--font-fraunces);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  cursor: pointer;
+  box-shadow:
+    4px 4px 8px var(--neu-2),
+    -4px -4px 8px var(--white);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow:
+      3px 3px 6px var(--neu-2),
+      -3px -3px 6px var(--white);
+    transform: translateY(-1px);
+    background-color: var(--primary);
+    color: var(--white);
+  }
+
+  &:active {
+    box-shadow:
+      2px 2px 4px var(--neu-2),
+      -2px -2px 4px var(--white);
+    transform: translateY(0);
+  }
+
+  &.full-width {
+    width: 100%;
+  }
+}
+
+.neu-button-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1px rgba(243, 229, 215, 0.5);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: var(--black);
+  min-height: 6rem;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      inset 0 0 0 1px rgba(243, 229, 215, 0.5);
+    text-decoration: none;
+    color: var(--black);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Neumorphic checkbox
+// ---------------------------------------------------------------------------
+
+.neu-checkbox {
+  appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--neu-1);
+  box-shadow:
+    inset 2px 2px 4px var(--neu-2),
+    inset -2px -2px 4px var(--white);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:checked {
+    background-color: var(--primary);
+    box-shadow:
+      inset 2px 2px 4px rgba(0, 0, 0, 0.2),
+      inset -2px -2px 4px rgba(255, 255, 255, 0.1);
+
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 1rem;
+      line-height: 1;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Glass-card system
+// ---------------------------------------------------------------------------
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 32px rgba(243, 229, 215, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow:
+      0 12px 40px rgba(243, 229, 215, 0.15),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+  }
+}
+
+.glass-card-compact {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 4px 16px rgba(243, 229, 215, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 6px 20px rgba(243, 229, 215, 0.12),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+  }
+}
+
+.glass-card-detailed {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 12px 48px rgba(243, 229, 215, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 0 0 1px rgba(243, 229, 215, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.99);
+    box-shadow:
+      0 16px 56px rgba(243, 229, 215, 0.18),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+      0 0 0 1px rgba(243, 229, 215, 0.15);
+    transform: translateY(-3px);
+  }
+}
+
+.glass-card-loading {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 6px 24px rgba(243, 229, 215, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0%   { left: -100%; }
+  100% { left: 100%; }
+}
+
+.glass-card-elevated {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 20px 64px rgba(243, 229, 215, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ---------------------------------------------------------------------------
+// Gradient text
+// ---------------------------------------------------------------------------
+
+.gradient-text {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #4F46E5;
+}
+
+// ---------------------------------------------------------------------------
+// Dark mode overrides
+// ---------------------------------------------------------------------------
+
+.dark {
+  .neu-form {
+    background-color: #1e1e1e;
+    box-shadow:
+      10px 10px 20px rgba(0, 0, 0, 0.5),
+      -10px -10px 20px rgba(40, 40, 40, 0.4);
+  }
+
+  .neu-title {
+    color: #fff;
+  }
+
+  .neu-stat {
+    background-color: #1a1a1a;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .neu-input {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    box-shadow:
+      inset 2px 2px 4px rgba(0, 0, 0, 0.5),
+      inset -2px -2px 4px rgba(50, 50, 50, 0.3);
+
+    &::placeholder {
+      color: #6b7280;
+    }
+
+    &:focus {
+      box-shadow:
+        inset 4px 4px 4px rgba(0, 0, 0, 0.5),
+        inset -4px -4px 4px rgba(50, 50, 50, 0.3);
+    }
+  }
+
+  select.neu-input,
+  .neu-input select {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    box-shadow:
+      inset 2px 2px 4px rgba(0, 0, 0, 0.5),
+      inset -2px -2px 4px rgba(50, 50, 50, 0.3);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+
+    &:focus {
+      box-shadow:
+        inset 4px 4px 4px rgba(0, 0, 0, 0.5),
+        inset -4px -4px 4px rgba(50, 50, 50, 0.3);
+    }
+  }
+
+  .neu-button {
+    box-shadow:
+      4px 4px 8px rgba(0, 0, 0, 0.4),
+      -4px -4px 8px rgba(50, 50, 50, 0.3);
+
+    &:hover {
+      box-shadow:
+        3px 3px 6px rgba(0, 0, 0, 0.4),
+        -3px -3px 6px rgba(50, 50, 50, 0.3);
+    }
+
+    &:active {
+      box-shadow:
+        2px 2px 4px rgba(0, 0, 0, 0.4),
+        -2px -2px 4px rgba(50, 50, 50, 0.3);
+    }
+
+    &.bg-red-100 {
+      background-color: rgba(127, 29, 29, 0.3);
+      color: #f87171;
+
+      &:hover {
+        background-color: rgba(127, 29, 29, 0.5);
+      }
+    }
+  }
+
+  .neu-button-secondary {
+    background-color: #1a1a1a;
+    border-color: var(--primary);
+    box-shadow:
+      4px 4px 8px rgba(0, 0, 0, 0.4),
+      -4px -4px 8px rgba(50, 50, 50, 0.3);
+
+    &:hover {
+      box-shadow:
+        3px 3px 6px rgba(0, 0, 0, 0.4),
+        -3px -3px 6px rgba(50, 50, 50, 0.3);
+    }
+
+    &:active {
+      box-shadow:
+        2px 2px 4px rgba(0, 0, 0, 0.4),
+        -2px -2px 4px rgba(50, 50, 50, 0.3);
+    }
+  }
+
+  .neu-button-action {
+    background-color: #1a1a1a;
+    color: #fff;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+  }
+
+  .neu-checkbox {
+    background-color: #2a2a2a;
+    box-shadow:
+      inset 2px 2px 4px rgba(0, 0, 0, 0.5),
+      inset -2px -2px 4px rgba(50, 50, 50, 0.3);
+
+    &:checked {
+      background-color: var(--primary);
+      box-shadow:
+        inset 2px 2px 4px rgba(0, 0, 0, 0.3),
+        inset -2px -2px 4px rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .glass-card {
+    background: rgba(30, 30, 30, 0.9);
+    border-color: rgba(64, 64, 64, 0.6);
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.95);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  .glass-card-compact {
+    background: rgba(30, 30, 30, 0.85);
+    border-color: rgba(64, 64, 64, 0.5);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.9);
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  .glass-card-detailed {
+    background: rgba(30, 30, 30, 0.95);
+    border-color: rgba(64, 64, 64, 0.7);
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.4),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.98);
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  .glass-card-elevated {
+    background: rgba(30, 30, 30, 0.98);
+    border-color: rgba(64, 64, 64, 0.8);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-card-loading {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(64, 64, 64, 0.4);
+
+    &::before {
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.06),
+        transparent
+      );
+    }
+  }
+}

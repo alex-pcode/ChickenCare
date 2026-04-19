@@ -1,0 +1,72 @@
+schema: 1
+story: '3.2'
+story_title: 'Flock Batch CRUD'
+gate: CONCERNS
+status_reason: 'Pagination drops filter query param breaking archived/all views on page 2+; HTMX tab switching does not update the visually active tab state.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-12T15:00:00Z'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'BUG-001'
+    severity: high
+    finding: 'Pagination loses filter state — paginate(15) without appends() drops ?filter= param on page navigation, reverting archived/all views to active'
+    suggested_action: 'Add ->appends(["filter" => $filter]) to the paginate call in FlockBatchController::index'
+    suggested_owner: dev
+  - id: 'UX-001'
+    severity: medium
+    finding: 'HTMX tab switch only swaps #tab-content — tab navigation bar retains old active class and aria-selected state, showing wrong tab as active'
+    suggested_action: 'Add client-side active state toggle via hx-on:click, or use hx-swap-oob, or wrap tabs + content in a common HTMX target'
+    suggested_owner: dev
+  - id: 'SCOPE-001'
+    severity: low
+    finding: 'Events-tab and deaths-tab partials are fully functional instead of placeholder empty states per Task 15 spec — creates dependency on Story 3.3 content'
+    suggested_action: 'Verify end-to-end or revert to placeholder empty states per story spec'
+    suggested_owner: dev
+
+risk_summary:
+  totals: { critical: 0, high: 1, medium: 1, low: 3 }
+  recommendations:
+    must_fix:
+      - 'Add filter appends to pagination in FlockBatchController::index'
+      - 'Fix tab active state on HTMX tab switching in show.blade.php'
+    monitor:
+      - 'Verify tab partials work end-to-end with BatchEvent/DeathRecord controllers'
+      - 'Dead current_count fallback code in store action'
+
+quality_score: 70
+expires: '2026-04-26T15:00:00Z'
+
+evidence:
+  tests_reviewed: 0
+  risks_identified: 5
+  trace:
+    ac_covered: [1, 2, 3, 6, 7, 9]
+    ac_gaps: [4, 5, 8]
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Tab parameter sanitized against allowlist; all CRUD actions policy-authorized; ownership scoping correct throughout'
+  performance:
+    status: PASS
+    notes: 'Pagination at 15/page; conditional eager loading on tabs; no N+1 in batch list'
+  reliability:
+    status: CONCERNS
+    notes: 'Pagination filter loss causes wrong data display; tab visual state mismatch on HTMX navigation'
+  maintainability:
+    status: PASS
+    notes: 'Clean model with scopes; BEM SCSS well-structured; factory has appropriate states; consistent HTMX dual-response pattern'
+
+recommendations:
+  immediate:
+    - action: 'Add ->appends(["filter" => $filter]) to paginate call'
+      refs: ['app/Http/Controllers/FlockBatchController.php:25']
+    - action: 'Fix tab active state on HTMX switch — add client-side toggle or swap-oob'
+      refs: ['resources/views/batches/show.blade.php:30-49']
+  future:
+    - action: 'Remove dead current_count ?? fallback or make current_count nullable in StoreFlockBatchRequest'
+      refs: ['app/Http/Controllers/FlockBatchController.php:42']
+    - action: 'Use response() helper instead of new \Illuminate\Http\Response'
+      refs: ['app/Http/Controllers/FlockBatchController.php:103']

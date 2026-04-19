@@ -1,0 +1,102 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modal-fade-in 200ms ease-out;
+
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.4);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+    }
+
+    &__content {
+        position: relative;
+        background: $glass-bg;
+        -webkit-backdrop-filter: blur($glass-blur);
+        backdrop-filter: blur($glass-blur);
+        border: 1px solid $glass-border;
+        border-radius: $card-radius;
+        box-shadow: $shadow-lg, 0 12px 48px rgba(0, 0, 0, 0.12);
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: modal-slide-up 200ms ease-out;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: $space-4 $space-6;
+        border-bottom: 1px solid $color-neutral-200;
+    }
+
+    &__title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: $color-neutral-800;
+        margin: 0;
+    }
+
+    &__close {
+        background: none;
+        border: none;
+        font-size: $font-size-2xl;
+        color: $color-neutral-500;
+        cursor: pointer;
+        padding: $space-1;
+        line-height: 1;
+
+        &:hover {
+            color: $color-neutral-800;
+        }
+    }
+
+    &__body {
+        padding: $space-6;
+    }
+
+    &--sm .modal__content {
+        max-width: 400px;
+    }
+
+    &--md .modal__content {
+        max-width: 600px;
+    }
+
+    &--lg .modal__content {
+        max-width: 800px;
+    }
+}
+
+.confirm-delete {
+    &__message {
+        color: $color-neutral-600;
+        margin: 0 0 $space-6;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: $space-3;
+    }
+}
+
+@keyframes modal-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modal-slide-up {
+    from { transform: translateY(1rem); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

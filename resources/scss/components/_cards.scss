@@ -1,0 +1,709 @@
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ============================================
+// Form Card
+// ============================================
+.form-card {
+    background-color: $neu-bg;
+    box-shadow:
+        10px 10px 20px rgba($neu-shadow-dark, 0.5),
+        -10px -10px 20px rgba($neu-shadow-light, 0.8);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: none;
+    }
+
+    &__header {
+        margin-bottom: $space-6;
+        padding-bottom: $space-4;
+        border-bottom: 1px solid $color-neutral-200;
+    }
+
+    &__title {
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-bold;
+        color: $color-neutral-900;
+        margin: 0;
+    }
+
+    &__subtitle {
+        font-size: $font-size-sm;
+        color: $color-neutral-600;
+        margin: $space-2 0 0;
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: $space-4;
+    }
+}
+
+// ============================================
+// Stat Card
+// ============================================
+.stat-card {
+    @include card;
+    padding: $space-2;
+    position: relative;
+    overflow: hidden;
+
+    @include desktop {
+        padding: $space-3;
+    }
+
+    &__gradient-blob {
+        position: absolute;
+        top: -25%;
+        right: -15%;
+        width: 35%;
+        height: 130%;
+        border-radius: 70%;
+        background: radial-gradient(circle, $color-indigo-700 0%, $color-indigo-darkest 100%);
+        filter: blur(60px);
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    &__inner {
+        position: relative;
+        z-index: 1;
+    }
+
+    &__icon {
+        position: absolute;
+        top: -0.25rem;
+        right: -0.25rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $color-neutral-400;
+        font-size: $font-size-base;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__title {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-base;
+        margin-bottom: $space-2;
+        color: $color-neutral-900;
+
+        @include desktop {
+            font-size: $font-size-lg;
+        }
+    }
+
+    &__value {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-2xl;
+        color: $color-neutral-900;
+    }
+
+    &__meta {
+        font-size: $font-size-xs;
+        color: $color-neutral-500;
+        margin-top: $space-1;
+
+        @include desktop {
+            font-size: $font-size-sm;
+        }
+    }
+
+    &__change {
+        font-weight: $font-weight-medium;
+
+        &--increase {
+            color: $color-success;
+        }
+
+        &--decrease {
+            color: $color-error;
+        }
+
+        &--neutral {
+            color: $color-neutral-500;
+        }
+    }
+
+    // Variants
+    &--compact {
+        &:hover {
+            transform: none;
+        }
+    }
+
+    &--gradient {
+        background: linear-gradient(to right, rgba(239, 246, 255, 0.95), rgba(238, 242, 255, 0.95));
+        border-color: rgba(191, 219, 254, 0.5);
+    }
+
+    &--dark {
+        background: $stat-card-gradient;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: $stat-card-shadow;
+        padding: $space-6;
+
+        &:hover {
+            box-shadow: 0 8px 30px rgba(79, 70, 229, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-card__title,
+        .stat-card__value {
+            color: #fff;
+        }
+
+        .stat-card__meta {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-card__icon {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stat-card__icon-circle {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: $font-size-lg;
+        }
+
+        .stat-card__change {
+            &--increase {
+                color: #4ade80;
+            }
+
+            &--decrease {
+                color: #f87171;
+            }
+        }
+    }
+
+    &--loading {
+        @include card-loading;
+        min-height: 100px;
+    }
+}
+
+// ============================================
+// Progress Card
+// ============================================
+.progress-card {
+    @include card;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $space-3;
+    }
+
+    &__title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: $color-neutral-900;
+    }
+
+    &__percentage {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: $color-neutral-600;
+    }
+
+    &__bar {
+        width: 100%;
+        height: 0.75rem;
+        background-color: $color-indigo-bg;
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+
+    &__fill {
+        height: 100%;
+        border-radius: 9999px;
+        background: $color-indigo-700;
+        transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &__label {
+        font-size: $font-size-xs;
+        color: $color-neutral-500;
+        margin: $space-1 0 0;
+    }
+
+    &__values {
+        font-size: $font-size-sm;
+        color: $color-neutral-500;
+        margin: $space-1 0 0;
+        text-align: right;
+    }
+
+    // Variants
+    &--detailed {
+        .progress-card__values {
+            display: block;
+        }
+    }
+
+    &--compact {
+        padding: $space-4;
+
+        .progress-card__label,
+        .progress-card__values {
+            display: none;
+        }
+    }
+
+    &--loading {
+        @include card-loading;
+        min-height: 80px;
+    }
+}
+
+// ============================================
+// Metric Display
+// ============================================
+.metric-display {
+    @include card;
+    padding: $space-4;
+    text-align: center;
+
+    &__label {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-medium;
+        color: $color-neutral-800;
+        margin-bottom: $space-2;
+    }
+
+    &__value {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-2xl;
+        color: $color-indigo-deep;
+
+        @include desktop {
+            font-size: $font-size-3xl + 0.125rem;
+        }
+    }
+
+    &__unit {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-normal;
+        color: $color-neutral-500;
+    }
+
+    // Size variants
+    &--large {
+        .metric-display__value {
+            font-size: $font-size-3xl;
+
+            @include desktop {
+                font-size: 3.75rem;
+            }
+        }
+    }
+
+    &--compact {
+        @include card-compact;
+        text-align: center;
+
+        .metric-display__value {
+            font-size: $font-size-xl;
+
+            @include desktop {
+                font-size: $font-size-2xl;
+            }
+        }
+
+        .metric-display__label {
+            font-size: $font-size-sm;
+        }
+    }
+
+    // Color variants
+    &--success .metric-display__value { color: color.adjust($color-success, $lightness: -5%); }
+    &--warning .metric-display__value { color: color.adjust($color-warning, $lightness: -10%); }
+    &--danger .metric-display__value { color: $color-error; }
+    &--info .metric-display__value { color: $color-info; }
+
+    &--loading {
+        @include card-loading;
+        min-height: 80px;
+    }
+}
+
+// ============================================
+// Comparison Card
+// ============================================
+.comparison-card {
+    @include card;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $space-4;
+    }
+
+    &__title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: $color-neutral-900;
+    }
+
+    &__change {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        display: flex;
+        align-items: center;
+        gap: $space-1;
+
+        &--increase { color: $color-success; }
+        &--decrease { color: $color-error; }
+    }
+
+    &__change-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: $font-size-xs;
+
+        &--increase {
+            background: rgba($color-success, 0.1);
+            color: $color-success;
+        }
+
+        &--decrease {
+            background: rgba($color-error, 0.1);
+            color: $color-error;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: $space-4;
+        align-items: center;
+    }
+
+    &__column {
+        text-align: center;
+    }
+
+    &__column-value {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-2xl;
+
+        &--before {
+            color: $color-neutral-500;
+        }
+
+        &--after {
+            color: $color-neutral-900;
+        }
+    }
+
+    &__column-label {
+        font-size: $font-size-sm;
+        margin-top: $space-1;
+
+        &--before {
+            color: $color-neutral-400;
+        }
+
+        &--after {
+            color: $color-neutral-600;
+        }
+    }
+
+    &__arrow {
+        font-size: $font-size-2xl;
+        color: $color-neutral-400;
+        display: flex;
+        justify-content: center;
+    }
+
+    &--loading {
+        @include card-loading;
+        min-height: 120px;
+    }
+}
+
+// ============================================
+// Summary Card
+// ============================================
+.summary-card {
+    @include card;
+
+    &__title {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: $color-neutral-900;
+        margin-bottom: $space-4;
+    }
+
+    &__items {
+        display: flex;
+        flex-direction: column;
+        gap: $space-3;
+    }
+
+    &__item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__item-label {
+        font-size: $font-size-sm;
+        color: $color-neutral-600;
+    }
+
+    &__item-value {
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        color: $color-neutral-900;
+
+        &--success { color: $color-success; }
+        &--warning { color: $color-warning; }
+        &--danger { color: $color-error; }
+    }
+
+    &__divider {
+        border: none;
+        border-top: 1px solid $color-neutral-200;
+        margin: 0;
+    }
+
+    &__total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: $space-3;
+        border-top: 2px solid $color-neutral-200;
+        margin-top: $space-3;
+    }
+
+    &__total-label {
+        font-weight: $font-weight-semibold;
+        color: $color-neutral-900;
+    }
+
+    &__total-value {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-lg;
+        color: $color-indigo-600;
+    }
+
+    // Variants
+    &--detailed {
+        @include card-detailed;
+    }
+
+    &--compact {
+        @include card-compact;
+
+        .summary-card__title {
+            font-size: $font-size-base;
+            margin-bottom: $space-2;
+        }
+
+        .summary-card__items {
+            gap: $space-2;
+        }
+
+        .summary-card__item-label,
+        .summary-card__item-value {
+            font-size: $font-size-sm;
+        }
+    }
+
+    &--loading {
+        @include card-loading;
+        min-height: 120px;
+    }
+}
+
+// ============================================
+// Dark mode overrides
+// ============================================
+.dark {
+  // Glass card base (used by stat-card, progress-card, metric-display, comparison-card, summary-card)
+  .stat-card,
+  .progress-card,
+  .metric-display,
+  .comparison-card,
+  .summary-card {
+    background: rgba(30, 30, 30, 0.9);
+    border-color: $color-neutral-700;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    &:hover {
+      background: rgba(35, 35, 35, 0.95);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  // Form card
+  .form-card {
+    background-color: #1e1e1e;
+    box-shadow:
+      10px 10px 20px rgba(0, 0, 0, 0.5),
+      -10px -10px 20px rgba(40, 40, 40, 0.4);
+
+    &__header {
+      border-bottom-color: $color-neutral-700;
+    }
+
+    &__title {
+      color: $color-neutral-100;
+    }
+
+    &__subtitle {
+      color: $color-neutral-400;
+    }
+  }
+
+  // Stat card
+  .stat-card {
+    &__title {
+      color: $color-neutral-100;
+    }
+
+    &__value {
+      color: $color-neutral-100;
+    }
+
+    &__meta {
+      color: $color-neutral-400;
+    }
+
+    &__icon {
+      color: $color-neutral-500;
+    }
+
+    &--gradient {
+      background: linear-gradient(to right, rgba(30, 58, 95, 0.9), rgba(30, 30, 60, 0.9));
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+  }
+
+  // Progress card
+  .progress-card {
+    &__title {
+      color: $color-neutral-100;
+    }
+
+    &__percentage {
+      color: $color-neutral-400;
+    }
+
+    &__bar {
+      background-color: rgba($color-indigo-600, 0.2);
+    }
+
+    &__label {
+      color: $color-neutral-400;
+    }
+  }
+
+  // Metric display
+  .metric-display {
+    &__label {
+      color: $color-neutral-200;
+    }
+
+    &__value {
+      color: $color-indigo-lighter;
+    }
+
+    &__unit {
+      color: $color-neutral-400;
+    }
+  }
+
+  // Comparison card
+  .comparison-card {
+    &__title {
+      color: $color-neutral-100;
+    }
+
+    &__column-value {
+      &--before {
+        color: $color-neutral-400;
+      }
+
+      &--after {
+        color: $color-neutral-100;
+      }
+    }
+
+    &__column-label {
+      &--before {
+        color: $color-neutral-500;
+      }
+
+      &--after {
+        color: $color-neutral-400;
+      }
+    }
+
+    &__arrow {
+      color: $color-neutral-500;
+    }
+  }
+
+  // Summary card
+  .summary-card {
+    &__title {
+      color: $color-neutral-100;
+    }
+
+    &__item-label {
+      color: $color-neutral-400;
+    }
+
+    &__item-value {
+      color: $color-neutral-100;
+    }
+
+    &__divider {
+      border-top-color: $color-neutral-700;
+    }
+
+    &__total {
+      border-top-color: $color-neutral-700;
+    }
+
+    &__total-label {
+      color: $color-neutral-100;
+    }
+
+    &__total-value {
+      color: $color-indigo-lighter;
+    }
+  }
+}

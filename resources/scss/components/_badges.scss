@@ -1,0 +1,49 @@
+@use 'sass:color';
+@use '../variables' as *;
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: $space-1 $space-2;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    border-radius: 9999px;
+    line-height: 1;
+    background-color: $color-neutral-200;
+    color: $color-neutral-700;
+
+    &--success {
+        background-color: color.adjust($color-success, $lightness: 50%);
+        color: color.adjust($color-success, $lightness: -10%);
+    }
+
+    &--warning {
+        background-color: color.adjust($color-warning, $lightness: 40%);
+        color: color.adjust($color-warning, $lightness: -20%);
+    }
+
+    &--error {
+        background-color: color.adjust($color-error, $lightness: 40%);
+        color: color.adjust($color-error, $lightness: -10%);
+    }
+
+    &--premium {
+        background-color: color.adjust($color-secondary, $lightness: 45%);
+        color: $color-secondary;
+    }
+
+    &--indigo {
+        background-color: $color-indigo-light;
+        color: #fff;
+    }
+
+    &--indigo-dark {
+        background-color: $color-indigo-deep;
+        color: #fff;
+    }
+
+    &--indigo-darkest {
+        background-color: $color-indigo-darkest;
+        color: #fff;
+    }
+}

@@ -1,0 +1,54 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.data-table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: $glass-bg;
+    -webkit-backdrop-filter: blur($glass-blur);
+    backdrop-filter: blur($glass-blur);
+    border: 1px solid $glass-border;
+    border-radius: $card-radius;
+    box-shadow: $glass-shadow;
+    overflow: hidden;
+
+    &__head {
+        background-color: rgba($neu-bg, 0.8);
+    }
+
+    &__header {
+        padding: $space-3 $space-4;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: $color-neutral-600;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    &__body {
+        .data-table__row {
+            border-top: 1px solid $color-neutral-200;
+            @include transition(background-color);
+
+            &:hover {
+                background-color: rgba($color-primary, 0.04);
+            }
+        }
+    }
+
+    &__cell {
+        padding: $space-3 $space-4;
+        font-size: $font-size-sm;
+        color: $color-neutral-700;
+    }
+
+    &--striped {
+        .data-table__body .data-table__row:nth-child(even) {
+            background-color: rgba($neu-bg, 0.5);
+        }
+    }
+}

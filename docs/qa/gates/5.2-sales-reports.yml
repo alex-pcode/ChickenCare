@@ -1,0 +1,57 @@
+schema: 1
+story: '5.2'
+story_title: 'Sales Reports'
+gate: PASS
+status_reason: 'All 5 acceptance criteria met. One sorting bug fixed (number_format string comparison). Clean single-query design with comprehensive test coverage (23 tests).'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-15T00:00:00Z'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'BUG-001'
+    severity: high
+    finding: 'Customer breakdown sortByDesc used number_format string — "$1,000.00" sorted below "$50.00"'
+    suggested_action: 'Fixed during review: added total_revenue_raw float field for numeric sorting'
+    suggested_owner: dev
+    status: resolved
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 0, low: 2 }
+  recommendations:
+    must_fix: []
+    monitor:
+      - 'startOfWeek() mutates Sale model Carbon attribute in getWeeklyTotals — use copy()'
+      - 'In-memory grouping may not scale for high-volume users (thousands of sales/month)'
+
+quality_score: 90
+expires: '2026-04-29T00:00:00Z'
+
+evidence:
+  tests_reviewed: 23
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'All queries ownership-scoped via $user->sales(). Premium middleware enforces tier. Date params safely parsed with try-catch fallback.'
+  performance:
+    status: PASS
+    notes: 'Single DB query with eager-loaded customers. All breakdowns computed in-memory. Excellent for expected data volumes.'
+  reliability:
+    status: PASS
+    notes: 'Graceful fallback for invalid dates. Empty state handled. No mutations on read-only endpoint.'
+  maintainability:
+    status: PASS
+    notes: 'Clean service pattern with single responsibility. PHPDoc type hints on return values. SCSS properly scoped to .sales-reports BEM block.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Use ->copy()->startOfWeek() instead of ->startOfWeek() to avoid mutating Sale model attribute'
+      refs: ['app/Services/ReportService.php:73']
+    - action: 'Add HX-Target check in controller for consistency with DashboardController pattern'
+      refs: ['app/Http/Controllers/SalesReportController.php:22']

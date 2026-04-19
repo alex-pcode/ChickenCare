@@ -1,0 +1,76 @@
+schema: 1
+story: '4.4'
+story_title: 'Sales Tracking'
+gate: PASS
+status_reason: >
+  Implementation is complete and well-tested. Two issues were refactored in-place
+  (togglePayment missing load('customer'); scopeForDateRange unsafe with null bounds).
+  All three post-QA concerns resolved by Dev: SaleRequest base class extracted (rules+withValidator);
+  SaleFactory dozen_count lower bound raised to 1; test count reconciled to 62. 62 tests pass.
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-14T00:00:00Z'
+
+top_issues:
+  - id: concerns-1
+    severity: low
+    title: 'StoreSaleRequest / UpdateSaleRequest are identical'
+    description: >
+      Both form request classes contain byte-for-byte duplicate rules() and withValidator().
+      A base SaleRequest class would eliminate the duplication.
+    suggested_owner: dev
+    status: fixed
+  - id: concerns-2
+    severity: low
+    title: 'SaleFactory can produce 0 + 0 count records'
+    description: >
+      dozen_count and individual_count both default to numberBetween(0, x),
+      making ~0.76% of factory records invalid per the custom validation rule.
+      Low probability but worth guarding against for deterministic test data.
+    suggested_owner: dev
+    status: fixed
+
+waiver:
+  active: false
+
+quality_score: 90
+expires: '2026-04-28T00:00:00Z'
+
+evidence:
+  tests_reviewed: 62
+  risks_identified: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >
+      Ownership enforced at route (premium middleware), controller (Gate::authorize),
+      and validation (scoped Rule::exists). user_id excluded from $fillable.
+  performance:
+    status: PASS
+    notes: >
+      Eager load with('customer') confirmed via query log test (≤ 2 customer queries).
+      togglePayment lazy-load issue fixed during review. paginate(15) appropriate.
+  reliability:
+    status: PASS
+    notes: >
+      scopeForDateRange null-bound bug fixed. HTMX dual-response paths tested.
+      Customer nullable FK and withDefault prevents null-pointer on $sale->customer->name.
+  maintainability:
+    status: PASS
+    notes: >
+      SaleRequest abstract base class extracted with shared rules() and withValidator().
+      SaleFactory dozen_count lower bound raised to 1 — factory can no longer produce
+      invalid 0+0 records. Test count reconciled to 62.
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Extract shared validation to a base SaleRequest class'
+      refs: ['app/Http/Requests/StoreSaleRequest.php', 'app/Http/Requests/UpdateSaleRequest.php']
+    - action: 'Guard SaleFactory against 0+0 count records in default state'
+      refs: ['database/factories/SaleFactory.php']
+    - action: 'Reconcile test count: table shows 46 but Task 24 notes 47 passed'
+      refs: ['docs/stories/4.4.story.md']

@@ -1,0 +1,85 @@
+schema: 1
+story: '4.1'
+story_title: 'Expense Tracking'
+gate: PASS
+status_reason: >
+  One high-priority HTMX bug was found and fixed during review: category filter returned
+  full page HTML instead of table partial, violating AC13. Both low-priority concerns
+  resolved by Dev: shared ExpenseRequest base class extracted; 5 update-path validation
+  tests added. 57 Expense tests pass.
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-14T00:00:00Z'
+
+top_issues:
+  - id: fixed-1
+    severity: high
+    title: 'HTMX category filter returned full page HTML (fixed)'
+    description: >
+      ExpenseController::index only returned the table partial when $request->has('page').
+      Category filter HTMX requests (no page param) received the full expenses.index view,
+      which was injected as innerHTML of #expenses-table-container — broken DOM nesting.
+      Fixed by removing the has('page') guard so all HTMX index requests get the partial.
+    suggested_owner: dev
+    status: fixed
+  - id: concerns-1
+    severity: low
+    title: 'StoreExpenseRequest / UpdateExpenseRequest are identical'
+    description: >
+      Both form request classes contain duplicate rules(). A base ExpenseRequest class
+      would eliminate the duplication. Low risk as both are small and static.
+    suggested_owner: dev
+    status: fixed
+  - id: concerns-2
+    severity: low
+    title: 'Update path not covered by validation tests'
+    description: >
+      All validation tests target POST /app/expenses (store). The PUT update path
+      has no validation tests. Risk is low given identical rules, but adds symmetry.
+    suggested_owner: dev
+    status: fixed
+
+waiver:
+  active: false
+
+quality_score: 88
+expires: '2026-04-28T00:00:00Z'
+
+evidence:
+  tests_reviewed: 52
+  risks_identified: 3
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >
+      Ownership enforced via premium middleware, Gate::authorize(), and
+      $request->user()->expenses() scoping. user_id excluded from $fillable.
+      Category filter uses parameterized Eloquent query — no injection risk.
+  performance:
+    status: PASS
+    notes: >
+      paginate(15)->withQueryString() preserves category param through pagination.
+      idx_expenses_user_date index covers the primary query pattern.
+      No relationships needed at display time — no N+1 risk.
+  reliability:
+    status: PASS
+    notes: >
+      HTMX dual-response bug fixed. Empty-state guard added to table partial for
+      filtered zero-result views. Standard navigation fallback works correctly.
+  maintainability:
+    status: PASS
+    notes: >
+      Shared ExpenseRequest base class extracted; StoreExpenseRequest and
+      UpdateExpenseRequest now delegate to it. Five update-path validation tests
+      added for full symmetry with store validation coverage.
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Extract shared validation to a base ExpenseRequest class'
+      refs: ['app/Http/Requests/StoreExpenseRequest.php', 'app/Http/Requests/UpdateExpenseRequest.php']
+    - action: 'Add validation test for the update (PUT) path'
+      refs: ['tests/Feature/ExpenseControllerTest.php']

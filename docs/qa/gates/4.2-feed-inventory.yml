@@ -1,0 +1,83 @@
+schema: 1
+story: '4.2'
+story_title: 'Feed Inventory'
+gate: PASS
+status_reason: >
+  Clean implementation with correct expiry logic and WCAG 1.4.1 compliant indicators.
+  Two minor consistency issues fixed in-place (HTMX guard pattern, table empty-state).
+  No high-severity bugs. All 53 tests pass.
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-14T00:00:00Z'
+
+top_issues:
+  - id: concerns-1
+    severity: low
+    title: 'StoreFeedInventoryRequest / UpdateFeedInventoryRequest are identical'
+    description: >
+      Both form request classes share duplicate rules(). A base FeedInventoryRequest
+      class would eliminate the duplication. Same pattern noted across Epic 4.
+    suggested_owner: dev
+  - id: concerns-2
+    severity: low
+    title: 'isExpired() treats today as expired (Carbon isPast() behaviour)'
+    description: >
+      Carbon date at midnight is considered "past" from the first second of the day.
+      A feed entry expiring today shows as "Expired" rather than "Expiring soon".
+      Arguably correct but worth documenting in the model.
+    suggested_owner: dev
+  - id: concerns-3
+    severity: low
+    title: 'nearExpiry() 7-day boundary not explicitly tested'
+    description: >
+      Factory uses +1 to +6 days. The exact 7-day boundary (the <= 7 condition) has
+      no dedicated test. Low risk but worth a boundary test for completeness.
+    suggested_owner: dev
+
+waiver:
+  active: false
+
+quality_score: 95
+expires: '2026-04-28T00:00:00Z'
+
+evidence:
+  tests_reviewed: 53
+  risks_identified: 3
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >
+      Ownership enforced via premium middleware, Gate::authorize(), and
+      $request->user()->feedInventory() scoping. user_id excluded from $fillable.
+      expiry_date after_or_equal:purchase_date validation verified correct when
+      purchase_date is absent (passes, does not block the scenario).
+  performance:
+    status: PASS
+    notes: >
+      COALESCE(purchase_date, created_at) DESC ordering appropriate for nullable
+      purchase_date. index partially covers; acceptable for 5-8 entries per user.
+      No eager loading needed — no relationships at display time.
+  reliability:
+    status: PASS
+    notes: >
+      HTMX guard simplified to match Epic 4 corrected standard. Empty-state guard
+      added to table partial. isNearExpiry() signed-diff fix confirmed correct.
+      Expiry badge uses both color and text for WCAG 1.4.1 compliance.
+  maintainability:
+    status: PASS
+    notes: >
+      Duplicate Store/Update request classes is a low-priority DRY concern shared
+      across Epic 4. isExpired() today-is-expired edge case warrants a code comment.
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Extract shared validation to a base FeedInventoryRequest class'
+      refs: ['app/Http/Requests/StoreFeedInventoryRequest.php', 'app/Http/Requests/UpdateFeedInventoryRequest.php']
+    - action: 'Add code comment to isExpired() explaining isPast() midnight semantics'
+      refs: ['app/Models/FeedInventory.php']
+    - action: 'Add boundary test for isNearExpiry() at exactly 7 days'
+      refs: ['tests/Unit/FeedInventoryModelTest.php']

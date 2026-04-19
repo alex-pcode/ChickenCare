@@ -1,0 +1,70 @@
+// HTMX swap transitions
+.htmx-swapping {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.htmx-settling {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.htmx-added {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}
+
+// Fade in
+.fade-in {
+  animation: fadeIn 200ms ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Slide in from right
+.slide-in {
+  animation: slideIn 200ms ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(10px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+// Modal open/close
+.modal-enter {
+  animation: modalIn 200ms ease-out forwards;
+}
+
+.modal-leave {
+  animation: modalOut 150ms ease-in forwards;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modalOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+// Flash auto-dismiss
+.flash-dismiss {
+  animation: flashDismiss 300ms ease-out 4700ms forwards;
+}
+
+@keyframes flashDismiss {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+// Skeleton loading shimmer
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}

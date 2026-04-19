@@ -1,0 +1,91 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.timeline {
+    position: relative;
+    padding-left: $space-8;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 11px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: $color-neutral-200;
+    }
+
+    &__item {
+        position: relative;
+        padding-bottom: $space-6;
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    &__marker {
+        position: absolute;
+        left: -#{$space-8};
+        top: $space-1;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid $color-neutral-300;
+        background-color: $color-neutral-50;
+
+        &--success {
+            border-color: $color-success;
+            background-color: $color-success;
+        }
+
+        &--warning {
+            border-color: $color-warning;
+            background-color: $color-warning;
+        }
+
+        &--error {
+            border-color: $color-error;
+            background-color: $color-error;
+        }
+
+        &--info {
+            border-color: $color-info;
+            background-color: $color-info;
+        }
+    }
+
+    &__content {
+        // Content block
+    }
+
+    &__date {
+        font-size: $font-size-xs;
+        color: $color-neutral-500;
+        margin: 0;
+    }
+
+    &__description {
+        font-size: $font-size-sm;
+        color: $color-neutral-700;
+        margin: $space-1 0 0;
+    }
+
+    &--compact {
+        padding-left: $space-6;
+
+        &::before {
+            left: 7px;
+        }
+
+        .timeline__marker {
+            left: -#{$space-6};
+            width: 8px;
+            height: 8px;
+        }
+
+        .timeline__item {
+            padding-bottom: $space-3;
+        }
+    }
+}
