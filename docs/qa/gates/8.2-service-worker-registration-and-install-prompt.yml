@@ -1,0 +1,40 @@
+schema: 1
+story: "8.2"
+story_title: "Service Worker Registration and Install Prompt Handling"
+gate: PASS
+status_reason: "Service worker registration, versioned cache cleanup, wait-for-reload update lifecycle, and install-prompt handling are correct. Dark mode + prefers-reduced-motion overrides added to _pwa-banner.scss closing the prior CONCERNS finding."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-04-26T00:00:00Z"
+
+waiver: { active: false }
+top_issues: []
+
+quality_score: 100
+expires: "2026-05-10T00:00:00Z"
+
+evidence:
+  tests_reviewed: 8
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Registration gated to https/localhost only; SKIP_WAITING is the only mutating message."
+  performance:
+    status: PASS
+    notes: "Registration deferred to window.load; this story's worker has no fetch interception cost."
+  reliability:
+    status: PASS
+    notes: "Failures are logged via console.warn; never throw uncaught."
+  maintainability:
+    status: PASS
+    notes: "Explicit SW_VERSION, prefixed cache namespace, dark/reduced-motion banner styles."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Operator: bump SW_VERSION on next release and verify update banner activation on a built environment"
+      refs: ["public/sw.js"]

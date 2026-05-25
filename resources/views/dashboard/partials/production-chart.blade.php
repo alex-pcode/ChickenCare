@@ -1,12 +1,24 @@
+@php($skel = $skel ?? false)
 <section class="dashboard__section dashboard__section--animate" style="animation-delay: 0.2s">
     <div class="dashboard__chart dashboard__chart--production glass-card">
-        <h2 class="dashboard__section-title">📊 30-Day Production Trend</h2>
+        <h2 class="dashboard__section-title">
+            @if ($skel)
+                <x-ui.skel block="title" />
+            @else
+                {{ __('dashboard.production_chart.title') }}
+            @endif
+        </h2>
         <div class="dashboard__chart-canvas-wrap">
-            <canvas id="production-trend" aria-label="30-day egg production bar chart" role="img"></canvas>
+            @if ($skel)
+                <x-ui.skel block="block" style="width:100%;height:100%;" />
+            @else
+                <canvas id="production-trend" aria-label="{{ __('dashboard.production_chart.aria_label') }}" role="img"></canvas>
+            @endif
         </div>
     </div>
 </section>
 
+@if (! $skel)
 @push('scripts')
 <script>
 (function initProductionChart() {
@@ -16,6 +28,7 @@
         document.addEventListener('DOMContentLoaded', initProductionChart, { once: true });
         return;
     }
+    const tooltipSuffix = @js(__('dashboard.production_chart.tooltip_suffix'));
     window.Chart.getChart(ctx)?.destroy();
     const isDark = document.documentElement.classList.contains('dark');
 
@@ -36,7 +49,7 @@
                     cornerRadius: 12,
                     callbacks: {
                         label: function(context) {
-                            return context.parsed.y + ' eggs';
+                            return context.parsed.y + ' ' + tooltipSuffix;
                         }
                     }
                 }
@@ -62,3 +75,4 @@
 })();
 </script>
 @endpush
+@endif

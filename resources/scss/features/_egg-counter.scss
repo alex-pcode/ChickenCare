@@ -26,6 +26,11 @@
     &__stats-grid {
         display: grid;
         gap: 1rem;
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            gap: 0.75rem;
+        }
 
         &--comparison {
             grid-template-columns: 1fr;
@@ -36,11 +41,7 @@
         }
 
         &--stat-cards {
-            grid-template-columns: 1fr;
-
-            @media (min-width: 576px) {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            grid-template-columns: repeat(2, 1fr);
 
             @media (min-width: 992px) {
                 grid-template-columns: repeat(4, 1fr);
@@ -230,6 +231,36 @@
         border-radius: 1.5rem;
         padding: 2.5rem;
         transition: all $transition-duration-slow ease;
+
+        @media (max-width: 768px) {
+            padding: 1.25rem 1rem;
+            border-radius: 1rem;
+
+            h3 {
+                margin-bottom: 0.75rem;
+                font-size: 1.1rem;
+            }
+
+            .grid {
+                gap: 0.5rem;
+            }
+
+            .mb-4 {
+                margin-bottom: 0.75rem;
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+            }
+
+            .mt-4 {
+                margin-top: 0.75rem;
+            }
+        }
+    }
+
+    &__submit {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
     }
 
     &__input {
@@ -259,6 +290,7 @@
         appearance: none;
         width: 1.5rem;
         height: 1.5rem;
+        margin: 0;
         border-radius: $radius-base;
         background-color: #ecf0f3;
         box-shadow:
@@ -378,12 +410,61 @@
 .egg-hero {
     position: relative;
     width: 100%;
-    height: 16rem; // h-64
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+    max-width: 1200px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    align-items: stretch;
+    gap: 1.5rem;
     margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+    overflow: visible;
+
+    // Unified hero card background (applies to both viewports)
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 0;
+
+        .dark & {
+            background: rgba(30, 30, 30, 0.9);
+        }
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 3fr 2fr;
+        grid-template-rows: auto auto;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem 0.75rem 0.5rem;
+        align-items: center;
+    }
+
+    &__media {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 16rem;
+        overflow: hidden;
+
+        @media (max-width: 768px) {
+            order: 2;
+            grid-row: 1;
+            grid-column: 2;
+            height: 7rem;
+            overflow: visible;
+        }
+    }
 
     &__image {
         width: auto;
@@ -394,31 +475,174 @@
         &--animated {
             animation: hero-entrance 1s ease-out forwards, rotate-gentle 6s ease-in-out infinite 1.5s;
         }
+
+        @media (max-width: 768px) {
+            height: 140%;
+            max-width: none;
+        }
     }
 
     &__badge {
+        $curve: 1.25rem;
+        $btn-size: 4.375rem; // 70px
+
+        display: grid;
         position: absolute;
-        top: 3.5rem; // top-14
-        right: 1rem; // right-4
-        background: #f97316; // orange-500
-        color: white;
-        padding: 0.25rem 0.75rem; // px-3 py-1
-        border-radius: $radius-pill;
-        font-size: $font-size-sm;
-        font-weight: $font-weight-medium;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        top: 0;
+        left: 0;
+        height: $btn-size;
+        width: $btn-size;
+        place-items: center;
+        background: $neu-bg;
+        // outer top-left matches the hero card edge; bottom-right is the inner concave
+        border-radius: $curve 0 $curve 0;
+        z-index: 3;
+
+        .dark & {
+            background: #1a1a1a;
+        }
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        // vertical fillet — sits below the badge on its left edge, paints upward
+        &::before {
+            top: 100%;
+            left: 0;
+            width: $curve;
+            height: $curve * 3;
+            border-radius: $curve 0 0 0;
+            box-shadow: 0 (-$curve * 2) 0 $neu-bg;
+
+            .dark & {
+                box-shadow: 0 (-$curve * 2) 0 #1a1a1a;
+            }
+        }
+
+        // horizontal fillet — sits right of the badge on its top edge, paints leftward
+        &::after {
+            top: 0;
+            left: 100%;
+            width: $curve * 3;
+            height: $curve;
+            border-radius: $curve 0 0 0;
+            box-shadow: (-$curve * 2) 0 0 $neu-bg;
+
+            .dark & {
+                box-shadow: (-$curve * 2) 0 0 #1a1a1a;
+            }
+        }
+    }
+
+    &__badge-icon {
+        height: 3.125rem;
+        width: 3.125rem;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        border-radius: $radius-base;
+        font-size: 1.5rem;
+        line-height: 1;
+        transition: background-color 0.3s ease;
         animation: fade-in-delayed 0.4s ease-out 0.8s both;
     }
 
-    &__welcome {
-        margin-top: 1rem;
+    &__side {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            order: 1;
+            display: contents;
+        }
+    }
+
+    &__status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: $radius-base;
         background: rgba(255, 255, 255, 0.9);
         -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
-        border-radius: $radius-base;
-        padding: 0.5rem 1rem;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid transparent;
         animation: slide-in-left 0.5s ease-out 0.5s both;
+
+        @media (max-width: 768px) {
+            padding: 3.25rem 0 0 0.5rem;
+            background: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            border-left: none;
+            grid-row: 1;
+            grid-column: 1;
+        }
+
+        &--success {
+            border-left-color: #10b981;
+        }
+
+        &--warning {
+            border-left-color: #f97316;
+        }
+
+        &--neutral {
+            border-left-color: #9ca3af;
+        }
+    }
+
+    &__status-text {
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            flex: 1;
+        }
+    }
+
+    &__status-title {
+        margin: 0 0 0.25rem;
+        padding-top: 1rem;
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        color: #1f2937;
+
+        .dark & {
+            color: #f3f4f6;
+        }
+    }
+
+    &__status-detail {
+        margin: 0;
+        font-size: $font-size-sm;
+        color: #6b7280;
+
+        .dark & {
+            color: #9ca3af;
+        }
+    }
+
+    .comparison-card {
+        @media (max-width: 768px) {
+            grid-row: 2;
+            grid-column: 1 / -1;
+        }
+
+        .comparison-card__title {
+            text-align: left;
+            width: 100%;
+        }
     }
 }
 
@@ -470,7 +694,7 @@
     .egg-hero__image,
     .egg-hero__image--animated,
     .egg-hero__badge,
-    .egg-hero__welcome {
+    .egg-hero__status {
         animation: none;
         opacity: 1;
         transform: none;

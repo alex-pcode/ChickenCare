@@ -1,7 +1,7 @@
 @if($expenses->isEmpty())
     <x-ui.empty-state
-        title="No expenses found"
-        description="No expenses match the selected filter."
+        :title="__('expenses.records.filtered_empty_title')"
+        :description="__('expenses.records.filtered_empty_description')"
         icon="💰"
     />
 @else
@@ -9,11 +9,11 @@
         <table class="data-table data-table--striped">
             <thead class="data-table__head">
                 <tr>
-                    <th scope="col" class="data-table__header">Date</th>
-                    <th scope="col" class="data-table__header">Category</th>
-                    <th scope="col" class="data-table__header">Description</th>
-                    <th scope="col" class="data-table__header">Amount</th>
-                    <th scope="col" class="data-table__header">Actions</th>
+                    <th scope="col" class="data-table__header">{{ __('expenses.records.columns.date') }}</th>
+                    <th scope="col" class="data-table__header">{{ __('expenses.records.columns.category') }}</th>
+                    <th scope="col" class="data-table__header">{{ __('expenses.records.columns.description') }}</th>
+                    <th scope="col" class="data-table__header">{{ __('expenses.records.columns.amount') }}</th>
+                    <th scope="col" class="data-table__header">{{ __('expenses.records.columns.actions') }}</th>
                 </tr>
             </thead>
             <tbody id="expense-entries-body" class="data-table__body">

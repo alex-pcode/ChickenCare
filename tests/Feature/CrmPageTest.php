@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Customer;
-use App\Models\EggEntry;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -24,6 +23,7 @@ class CrmPageTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('crm.index');
         $response->assertSee('CRM System');
+        $response->assertSee('data-loading-skeleton="crm-tab"', false);
     }
 
     public function test_default_tab_is_quick_sale(): void

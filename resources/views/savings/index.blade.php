@@ -1,12 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Savings Analysis')
+@section('title', __('savings.page.title'))
 
 @section('content')
 <div class="savings">
     @include('savings.partials.hero')
-
-    @include('savings.partials.preferences')
 
     <div id="savings-financial-summary">
         @include('savings.partials.financial-summary')

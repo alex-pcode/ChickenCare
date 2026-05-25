@@ -23,9 +23,9 @@
     </td>
     <td class="data-table__cell">
         @if($feed->isActive())
-            <span class="feed__duration-active">Active</span>
+            <span class="feed__duration-active">{{ __('feed.status.active') }}</span>
         @else
-            {{ $feed->durationInDays() }} days
+            {{ trans_choice('feed.status.days', $feed->durationInDays(), ['count' => $feed->durationInDays()]) }}
         @endif
     </td>
     <td class="data-table__cell feed__actions">
@@ -34,15 +34,15 @@
             hx-include="closest tr"
             hx-target="closest tr"
             hx-swap="outerHTML"
-            aria-label="Save feed entry">
-            Save
+            aria-label="{{ __('feed.actions.save_aria') }}">
+            {{ __('feed.actions.save') }}
         </button>
         <button type="button" class="btn btn--sm btn--secondary"
             hx-get="{{ route('app.feed.show-row', $feed) }}"
             hx-target="closest tr"
             hx-swap="outerHTML"
-            aria-label="Cancel editing">
-            Cancel
+            aria-label="{{ __('feed.actions.cancel_aria') }}">
+            {{ __('feed.actions.cancel') }}
         </button>
     </td>
 </tr>

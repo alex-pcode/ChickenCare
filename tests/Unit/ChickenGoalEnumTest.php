@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Enums\ChickenGoal;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class ChickenGoalEnumTest extends TestCase
 {

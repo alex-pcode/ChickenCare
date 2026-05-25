@@ -8,18 +8,19 @@ use App\Models\FlockBatch;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class DeathRecordController extends Controller
 {
     use HandlesHtmx;
 
-    public function index(Request $request, FlockBatch $batch): \Illuminate\View\View
+    public function index(Request $request, FlockBatch $batch): View
     {
         $this->authorize('view', $batch);
 
         $sortAllow = ['date', 'count'];
         $sort = in_array($request->query('sort'), $sortAllow, true) ? $request->query('sort') : 'date';
-        $dir  = $request->query('dir') === 'asc' ? 'asc' : 'desc';
+        $dir = $request->query('dir') === 'asc' ? 'asc' : 'desc';
 
         $records = $batch->deathRecords()
             ->orderBy($sort, $dir)
@@ -55,16 +56,16 @@ class DeathRecordController extends Controller
 
             return response()
                 ->view('batches.partials.deaths-form', [
-                    'batch'          => $batch,
-                    'successMessage' => 'Loss logged successfully',
+                    'batch' => $batch,
+                    'successMessage' => __('batches.messages.loss_logged'),
                 ])
                 ->header('HX-Trigger', json_encode([
                     'flock:changed' => true,
-                    'flock:success' => 'Loss logged successfully',
+                    'flock:success' => __('batches.messages.loss_logged'),
                 ]));
         }
 
-        return redirect()->back()->with('success', 'Death record added successfully.');
+        return redirect()->back()->with('success', __('batches.messages.death_added'));
     }
 
     public function edit(FlockBatch $batch, DeathRecord $death)
@@ -91,16 +92,16 @@ class DeathRecordController extends Controller
 
             return response()
                 ->view('batches.partials.deaths-form', [
-                    'batch'          => $batch,
-                    'successMessage' => 'Loss updated',
+                    'batch' => $batch,
+                    'successMessage' => __('batches.messages.loss_updated'),
                 ])
                 ->header('HX-Trigger', json_encode([
                     'flock:changed' => true,
-                    'flock:success' => 'Loss updated',
+                    'flock:success' => __('batches.messages.loss_updated'),
                 ]));
         }
 
-        return redirect()->back()->with('success', 'Death record updated successfully.');
+        return redirect()->back()->with('success', __('batches.messages.death_updated'));
     }
 
     public function destroy(Request $request, FlockBatch $batch, DeathRecord $death)
@@ -118,6 +119,6 @@ class DeathRecordController extends Controller
                 ->header('HX-Trigger', json_encode(['flock:changed' => true]));
         }
 
-        return redirect()->back()->with('success', 'Death record deleted successfully.');
+        return redirect()->back()->with('success', __('batches.messages.death_deleted'));
     }
 }

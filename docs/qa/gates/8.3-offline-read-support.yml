@@ -1,0 +1,40 @@
+schema: 1
+story: "8.3"
+story_title: "Offline Read Support via Service Worker Caching"
+gate: PASS
+status_reason: "Offline-read matrix fully implemented in public/sw.js: precache (offline page, manifest, favicon, PWA icons, fonts), cache-first /build/assets/*, 2.5s timeout network-first authenticated HTML with last-seen and /offline fallback, HTMX fragment safe minimal-fragment fallback, JSON bypass, origin-scoped cache buckets. /offline route covered by feature test."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-04-26T00:00:00Z"
+
+waiver: { active: false }
+top_issues: []
+
+quality_score: 100
+expires: "2026-05-10T00:00:00Z"
+
+evidence:
+  tests_reviewed: 8
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "shouldPersistHtmlFallback rejects redirects and cross-pathname responses, preventing login-page poisoning of last-seen HTML cache. Cross-origin requests bypassed."
+  performance:
+    status: PASS
+    notes: "Narrow precache list; HTML network-first with 2.5s timeout keeps perceived latency bounded; cache-first /build/assets/* aligns with Epic 7."
+  reliability:
+    status: PASS
+    notes: "Three-bucket separation (precache/assets/html) and explicit fallback chain prevent stale-state confusion."
+  maintainability:
+    status: PASS
+    notes: "Strategy dispatch is small and readable; cache names tied to SW_VERSION."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Operator: re-verify offline read matrix in DevTools on the live host post-deploy"
+      refs: ["public/sw.js"]

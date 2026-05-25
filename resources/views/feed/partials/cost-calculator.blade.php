@@ -4,8 +4,8 @@
     
     <div class="feed__calculator-header">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Feed Cost Analysis</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Analyze your feed spending efficiency</p>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('feed.calculator.title') }}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('feed.calculator.subtitle') }}</p>
         </div>
         <div class="feed__range-selector">
             <template x-for="r in ranges" :key="r.value">
@@ -25,8 +25,8 @@
 
     <template x-if="!loading && stats.feedCycles === 0">
         <x-ui.empty-state
-            title="No Feed Periods Found"
-            description="Complete feed cycles in Feed Tracker to see cost analysis here."
+            :title="__('feed.calculator.empty_title')"
+            :description="__('feed.calculator.empty_description')"
             icon="📊"
         />
     </template>
@@ -36,6 +36,4 @@
     </div>
 
     @include('feed.partials.cost-trends-chart')
-
-    @include('feed.partials.period-breakdown')
 </section>

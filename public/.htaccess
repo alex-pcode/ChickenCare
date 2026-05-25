@@ -1,9 +1,36 @@
+<IfModule mod_headers.c>
+    Header always set Cache-Control "public, max-age=31536000, immutable" env=cc_immutable_asset
+    Header always set Cache-Control "public, max-age=3600, must-revalidate" env=cc_public_media
+    Header always set Cache-Control "public, max-age=300, must-revalidate" env=cc_root_public_file
+
+    <Files "sw.js">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </Files>
+</IfModule>
+
+AddType application/manifest+json .webmanifest
+AddType application/javascript .js
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
+
+    RewriteRule ^sw\.js$ - [L]
+    RewriteRule ^manifest\.webmanifest$ - [L]
+
+    # Fingerprinted Vite build assets are safe to cache immutably for one year.
+    RewriteCond %{REQUEST_URI} ^/build/assets/.+-[A-Za-z0-9_-]{8,}\.[A-Za-z0-9]+$ [NC]
+    RewriteRule ^ - [E=cc_immutable_asset:1]
+
+    # Unhashed public assets stay on a short, revalidated browser cache.
+    RewriteCond %{REQUEST_URI} ^/(?:images|screenshots|fonts)/.+$ [NC]
+    RewriteRule ^ - [E=cc_public_media:1]
+
+    RewriteCond %{REQUEST_URI} ^/(?:favicon\.ico|robots\.txt|manifest\.webmanifest)$ [NC]
+    RewriteRule ^ - [E=cc_root_public_file:1]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

@@ -15,7 +15,7 @@ class StoreFlockEventRequest extends FormRequest
     {
         return [
             'date' => ['required', 'date'],
-            'type' => ['required', 'in:acquisition,laying_start,broody,hatching,other'],
+            'type' => ['required', 'in:acquisition,laying_start,broody,hatching,recount,other'],
             'description' => ['required', 'string', 'max:500'],
             'affected_birds' => ['nullable', 'integer', 'min:0'],
             'notes' => ['nullable', 'string'],

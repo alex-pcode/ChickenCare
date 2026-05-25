@@ -16,9 +16,11 @@
 @use 'components/pagination';
 @use 'components/timeline';
 @use 'components/flash';
+@use 'components/pwa-banner';
 @use 'components/toast';
 @use 'components/badges';
 @use 'components/showcase';
+@use 'components/skeleton';
 
 // Features
 @use 'features/auth';
@@ -34,6 +36,9 @@
 @use 'features/viability';
 @use 'features/account';
 @use 'features/import';
+
+// Pages
+@use 'pages/landing';
 
 // Dark mode overrides (must be last to win specificity)
 @use 'dark-mode';

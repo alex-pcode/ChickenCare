@@ -11,9 +11,9 @@ enum BatchAgeAtAcquisition: string
     public function label(): string
     {
         return match ($this) {
-            self::Chick    => 'Chick (0–8 weeks)',
-            self::Juvenile => 'Juvenile (8–18 weeks)',
-            self::Adult    => 'Adult (18+ weeks)',
+            self::Chick => __('batches.age.chick'),
+            self::Juvenile => __('batches.age.juvenile'),
+            self::Adult => __('batches.age.adult'),
         };
     }
 }

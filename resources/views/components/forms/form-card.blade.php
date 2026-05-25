@@ -6,7 +6,7 @@
     'method' => 'POST',
 ])
 
-<div class="form-card" {{ $attributes }}>
+<div class="form-card">
     @if($title)
         <div class="form-card__header">
             <div class="flex items-center gap-3">

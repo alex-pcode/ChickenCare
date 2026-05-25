@@ -34,6 +34,27 @@ class EggStatsService
             ? round($totalEggs / $distinctDays, 1)
             : 0;
 
+        $last7DaysStart = $now->copy()->subDays(6)->startOfDay()->toDateString();
+        $last7DaysEnd = $now->copy()->startOfDay()->toDateString();
+
+        $dailyTotals = $user->eggEntries()
+            ->whereBetween('date', [$last7DaysStart, $last7DaysEnd])
+            ->selectRaw('date, SUM(count) as daily_total')
+            ->groupBy('date')
+            ->pluck('daily_total', 'date')
+            ->all();
+
+        $last7Days = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $day = $now->copy()->subDays($i)->startOfDay();
+            $key = $day->toDateString();
+            $last7Days[] = [
+                'label' => $day->format('D'),
+                'date' => $key,
+                'count' => (int) ($dailyTotals[$key] ?? 0),
+            ];
+        }
+
         return [
             'totalEggs' => $totalEggs,
             'averageDaily' => $averageDaily,
@@ -44,6 +65,7 @@ class EggStatsService
             'proteinLbs' => round($totalEggs * 0.125),
             'layRate' => null,
             'layingHens' => null,
+            'last7Days' => $last7Days,
         ];
     }
 }

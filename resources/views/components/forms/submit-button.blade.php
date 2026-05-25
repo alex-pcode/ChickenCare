@@ -1,5 +1,14 @@
-@props(['label' => 'Save', 'variant' => 'primary'])
+@props([
+    'label' => 'Save',
+    'variant' => 'primary',
+    'savingLabel' => 'Saving…',
+    'savedLabel' => 'Saved!',
+    'loading' => false,
+])
 
+@if ($loading)
+    <x-ui.skel block="button" />
+@else
 <button type="submit"
     x-data="{ submitting: false, success: false }"
     x-init="
@@ -24,16 +33,17 @@
     <template x-if="submitting">
         <span class="submit-button__content">
             <span class="submit-button__spinner" aria-hidden="true"></span>
-            <span>Saving…</span>
+            <span>{{ $savingLabel }}</span>
         </span>
     </template>
     <template x-if="!submitting && success">
         <span class="submit-button__content">
             <span aria-hidden="true">✓</span>
-            <span>Saved!</span>
+            <span>{{ $savedLabel }}</span>
         </span>
     </template>
     <template x-if="!submitting && !success">
         <span>{{ $label }}</span>
     </template>
 </button>
+@endif

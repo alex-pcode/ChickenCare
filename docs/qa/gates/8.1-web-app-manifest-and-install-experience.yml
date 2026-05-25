@@ -1,0 +1,41 @@
+schema: 1
+story: "8.1"
+story_title: "Web App Manifest and Install Experience"
+gate: PASS
+status_reason: "All automatable ACs satisfied. Token contract documented in docs/architecture/pwa.md, coupled test split, manifest/icons/Blade wiring intact, 8 PHPUnit tests / 39 assertions passing. Manual install verification (ACs 5-6) remains an operator step."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-04-26T00:00:00Z"
+
+waiver: { active: false }
+top_issues: []
+
+quality_score: 100
+expires: "2026-05-10T00:00:00Z"
+
+evidence:
+  tests_reviewed: 8
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 7]
+    ac_manual: [5, 6]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Static manifest/icons; start_url=/app behind auth middleware."
+  performance:
+    status: PASS
+    notes: "Tiny JSON manifest, standard PNG icons, non-blocking head links."
+  reliability:
+    status: PASS
+    notes: "Cache contract aligned with Epic 7."
+  maintainability:
+    status: PASS
+    notes: "Color-token contract documented at docs/architecture/pwa.md."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Operator: confirm Add to Home Screen on Android Chrome and iOS Safari from /app"
+      refs: ["public/manifest.webmanifest"]

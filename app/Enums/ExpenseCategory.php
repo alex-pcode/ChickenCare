@@ -16,14 +16,14 @@ enum ExpenseCategory: string
     public function label(): string
     {
         return match ($this) {
-            self::Birds => 'Birds',
-            self::Feed => 'Feed',
-            self::Equipment => 'Equipment',
-            self::Veterinary => 'Veterinary',
-            self::Maintenance => 'Maintenance',
-            self::Supplies => 'Supplies',
-            self::StartUp => 'Start-up',
-            self::Other => 'Other',
+            self::Birds => __('expenses.categories.birds'),
+            self::Feed => __('expenses.categories.feed'),
+            self::Equipment => __('expenses.categories.equipment'),
+            self::Veterinary => __('expenses.categories.veterinary'),
+            self::Maintenance => __('expenses.categories.maintenance'),
+            self::Supplies => __('expenses.categories.supplies'),
+            self::StartUp => __('expenses.categories.start_up'),
+            self::Other => __('expenses.categories.other'),
         };
     }
 

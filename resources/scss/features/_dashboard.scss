@@ -55,6 +55,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
+        margin-bottom: 0.75rem;
     }
 
     &__activity-list {
@@ -73,19 +74,6 @@
         padding: 0.75rem 1rem;
         border-radius: 8px;
         background: var(--color-surface, $color-neutral-50);
-        border-left: 3px solid transparent;
-
-        &--egg {
-            border-left-color: var(--color-success, #22c55e);
-        }
-
-        &--sale {
-            border-left-color: var(--color-info, #3b82f6);
-        }
-
-        &--batch-event {
-            border-left-color: var(--color-warning, #f59e0b);
-        }
     }
 
     &__activity-badge {
@@ -95,21 +83,8 @@
         font-size: $font-size-xs;
         font-weight: $font-weight-semibold;
         text-transform: uppercase;
-
-        &--egg {
-            color: var(--color-success-text, #065f46);
-            background: var(--color-success-bg, #d1fae5);
-        }
-
-        &--sale {
-            color: var(--color-info-text, #1e40af);
-            background: var(--color-info-bg, #dbeafe);
-        }
-
-        &--batch-event {
-            color: var(--color-warning-text, #92400e);
-            background: var(--color-warning-bg, #fef3c7);
-        }
+        color: $color-neutral-600;
+        background: $color-neutral-100;
     }
 
     &__activity-description {
@@ -130,14 +105,10 @@
     // Production metrics grid
     &__metrics-grid {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
 
-        @media (min-width: 768px) {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        @media (min-width: 1024px) {
+        @media (min-width: 992px) {
             grid-template-columns: repeat(4, 1fr);
         }
     }
@@ -361,6 +332,289 @@
         animation: none;
         opacity: 1;
     }
+
+    .dashboard-hero__image,
+    .dashboard-hero__image--animated,
+    .dashboard-hero__status {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+// Dashboard Hero
+.dashboard-hero {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    align-items: stretch;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+    overflow: visible;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 0;
+
+        .dark & {
+            background: rgba(30, 30, 30, 0.9);
+        }
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 3fr 2fr;
+        grid-template-rows: auto auto;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem 0.75rem 0.5rem;
+        align-items: center;
+    }
+
+    &__corner-badge {
+        $curve: 1.25rem;
+        $btn-size: 4.375rem;
+
+        display: grid;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: $btn-size;
+        width: $btn-size;
+        place-items: center;
+        background: $neu-bg;
+        border-radius: $curve 0 $curve 0;
+        z-index: 3;
+
+        .dark & {
+            background: #1a1a1a;
+        }
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        &::before {
+            top: 100%;
+            left: 0;
+            width: $curve;
+            height: $curve * 3;
+            border-radius: $curve 0 0 0;
+            box-shadow: 0 (-$curve * 2) 0 $neu-bg;
+
+            .dark & {
+                box-shadow: 0 (-$curve * 2) 0 #1a1a1a;
+            }
+        }
+
+        &::after {
+            top: 0;
+            left: 100%;
+            width: $curve * 3;
+            height: $curve;
+            border-radius: $curve 0 0 0;
+            box-shadow: (-$curve * 2) 0 0 $neu-bg;
+
+            .dark & {
+                box-shadow: (-$curve * 2) 0 0 #1a1a1a;
+            }
+        }
+    }
+
+    &__corner-badge-icon {
+        height: 3.125rem;
+        width: 3.125rem;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        border-radius: $radius-base;
+        font-size: 1.5rem;
+        line-height: 1;
+        animation: dashboard-hero-entrance 0.4s ease-out 0.8s both;
+    }
+
+    &__media {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 16rem;
+        overflow: hidden;
+
+        @media (max-width: 768px) {
+            order: 2;
+            grid-row: 1;
+            grid-column: 2;
+            height: 7rem;
+            overflow: visible;
+        }
+    }
+
+    &__image {
+        width: auto;
+        height: 100%;
+        object-fit: contain;
+        animation: dashboard-hero-entrance 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+        &--animated {
+            animation: dashboard-hero-entrance 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @media (max-width: 768px) {
+            height: 140%;
+            max-width: none;
+        }
+    }
+
+    &__side {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 1rem;
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            order: 1;
+            display: contents;
+        }
+    }
+
+    &__status {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0 0;
+        border-radius: $radius-base;
+        animation: dashboard-slide-in 0.5s ease-out 0.5s both;
+
+        @media (max-width: 768px) {
+            padding: 3.25rem 0 0 0.5rem;
+            grid-row: 1;
+            grid-column: 1;
+        }
+    }
+
+    &__status-text {
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            flex: 1;
+        }
+    }
+
+    &__activity {
+        @media (max-width: 768px) {
+            display: none;
+        }
+    }
+
+    &__activity-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__activity-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        border: 1px solid $color-neutral-200;
+        border-radius: $radius-base;
+        background: transparent;
+        font-size: 1.25rem;
+        line-height: 1;
+        cursor: pointer;
+        color: $color-neutral-600;
+        transition: all $transition-duration-fast ease;
+
+        &:hover:not(:disabled) {
+            background: $color-neutral-100;
+            color: $color-neutral-800;
+        }
+
+        &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .dark & {
+            border-color: rgba(255, 255, 255, 0.15);
+            color: $color-neutral-400;
+
+            &:hover:not(:disabled) {
+                background: rgba(255, 255, 255, 0.1);
+                color: $color-neutral-200;
+            }
+        }
+    }
+
+    &__activity-page {
+        font-size: $font-size-xs;
+        color: $color-neutral-500;
+    }
+
+    &__status-title {
+        margin: 0;
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-bold;
+
+        @media (min-width: 1024px) {
+            font-size: 2.25rem;
+        }
+    }
+}
+
+@keyframes dashboard-hero-entrance {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(1.25rem);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes dashboard-hero-wave {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(10deg);
+    }
+    75% {
+        transform: rotate(-10deg);
+    }
+}
+
+@keyframes dashboard-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(-1.25rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 // Dark mode
@@ -382,20 +636,8 @@
     }
 
     .dashboard__activity-badge {
-        &--egg {
-            color: #4ade80;
-            background: rgba(34, 197, 94, 0.15);
-        }
-
-        &--sale {
-            color: #60a5fa;
-            background: rgba(59, 130, 246, 0.15);
-        }
-
-        &--batch-event {
-            color: #fbbf24;
-            background: rgba(245, 158, 11, 0.15);
-        }
+        color: $color-neutral-400;
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .dashboard__revenue-subtitle {

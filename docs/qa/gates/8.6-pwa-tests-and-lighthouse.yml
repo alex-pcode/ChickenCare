@@ -1,0 +1,45 @@
+schema: 1
+story: "8.6"
+story_title: "PWA Tests and Lighthouse Verification"
+gate: PASS
+status_reason: "PHPUnit Pwa filter covers layout metadata (both layouts), manifest contract, icons, sw.js content markers, /offline route, and /csrf-token (8 tests / 39 assertions). offline-queue.test.js (node --test) covers enqueue, 419 retry, dedupe, and failed-bucket (4/4). Lighthouse artifacts saved under public/screenshots/pwa-lighthouse/. DEPLOY.md release checklist and rollback playbook in place. Live-host Lighthouse re-run is operator follow-up tracked alongside Story 8.5."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-04-26T00:00:00Z"
+
+waiver: { active: false }
+top_issues:
+  - id: "lighthouse-live-rerun"
+    severity: low
+    summary: "Local Lighthouse run did not emit a dedicated PWA category in the current Chrome DevTools CLI schema; live-host audit pending Plesk deploy."
+    suggested_owner: "dev"
+    refs: ["public/screenshots/pwa-lighthouse/report.html", "DEPLOY.md"]
+
+quality_score: 95
+expires: "2026-05-10T00:00:00Z"
+
+evidence:
+  tests_reviewed: 12
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Test surface introduces no attack surface. /csrf-token auth gating is itself covered by a feature test."
+  performance:
+    status: PASS
+    notes: "Pwa filter completes in ~0.35s; offline-queue.test.js completes in <100ms."
+  reliability:
+    status: PASS
+    notes: "Two-test-runner setup (PHPUnit + node --test) keeps tooling churn minimal while exercising both server and client edges."
+  maintainability:
+    status: PASS
+    notes: "Comment in PwaFoundationTest documents that HTTP-level cache-header verification lives in the curl -I checklist and is Apache-owned."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Operator: re-run Lighthouse against https://koke.svetpiva.rs after Plesk has the new files, replace local artifacts with live-origin evidence, and confirm installability green on the deployed host"
+      refs: ["DEPLOY.md", "public/screenshots/pwa-lighthouse/"]

@@ -1,17 +1,17 @@
 @php
     $isBusinessGoal = $summary['isBusinessGoal'];
     $periodOptions = [
-        'month' => 'This Month',
-        'year' => 'This Year',
-        'custom' => 'Custom Period',
-        'all' => 'All Time',
+        'month' => __('savings.periods.month'),
+        'year' => __('savings.periods.year'),
+        'custom' => __('savings.periods.custom'),
+        'all' => __('savings.periods.all'),
     ];
 @endphp
 
 <section class="savings__section savings__section--animated" aria-labelledby="savings-summary-heading">
     <div class="savings__section-header">
         <h2 class="savings__section-title" id="savings-summary-heading">
-            {{ $isBusinessGoal ? 'Business Performance' : 'Financial Summary' }}
+            {{ $isBusinessGoal ? __('savings.summary.business_performance') : __('savings.summary.financial_summary') }}
         </h2>
         <x-forms.select
             name="period"
@@ -35,27 +35,27 @@
         {{-- You Got --}}
         <x-ui.stat-card
             variant="dark"
-            title="You Got"
+            :title="__('savings.summary.cards.got.title')"
             :total="number_format($summary['totalEggs'])"
-            label="eggs without breaking them"
+            :label="__('savings.summary.cards.got.label')"
             icon="🥚"
         />
 
         {{-- You Saved / You Earned (goal-aware) --}}
         <x-ui.stat-card
             variant="dark"
-            :title="$isBusinessGoal ? 'You Earned' : 'You Saved'"
+            :title="$isBusinessGoal ? __('savings.summary.cards.earned.title') : __('savings.summary.cards.saved.title')"
             :total="$isBusinessGoal ? App\Support\Money::usd($summary['actualRevenue']) : App\Support\Money::usd($summary['eggValue'])"
-            :label="$isBusinessGoal ? 'from egg sales' : 'vs buying organic eggs'"
+            :label="$isBusinessGoal ? __('savings.summary.cards.earned.label') : __('savings.summary.cards.saved.label')"
             icon="💰"
         />
 
         {{-- You Invested --}}
         <x-ui.stat-card
             variant="dark"
-            title="You Invested"
+            :title="__('savings.summary.cards.invested.title')"
             :total="App\Support\Money::usd($summary['totalExpenses'])"
-            label="in chicken happiness"
+            :label="__('savings.summary.cards.invested.label')"
             icon="❤️"
         />
 
@@ -63,12 +63,12 @@
         @php
             $netPositive = $summary['netResult'] >= 0;
             if ($isBusinessGoal) {
-                $netTitle = 'Net Profit';
-                $netLabel = $netPositive ? 'business profit' : 'to break even';
+                $netTitle = __('savings.summary.cards.net_profit.title');
+                $netLabel = $netPositive ? __('savings.summary.cards.net_profit.positive') : __('savings.summary.cards.net_profit.negative');
                 $netIcon = $netPositive ? '📈' : '🤝';
             } else {
-                $netTitle = 'Net Savings';
-                $netLabel = $netPositive ? 'of delicious egg value' : 'egg value to cover costs';
+                $netTitle = __('savings.summary.cards.net_savings.title');
+                $netLabel = $netPositive ? __('savings.summary.cards.net_savings.positive') : __('savings.summary.cards.net_savings.negative');
                 $netIcon = $netPositive ? '😋' : '🤝';
             }
         @endphp

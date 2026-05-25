@@ -1,15 +1,15 @@
 @extends('layouts.guest')
 
-@section('title', 'Forgot Password')
+@section('title', __('auth.pages.forgot_password.title'))
 
 @section('content')
     <form method="POST" action="{{ route('password.email') }}" class="auth-form">
         @csrf
 
-        <h1 class="auth-form__title">{{ __('Forgot Password') }}</h1>
+        <h1 class="auth-form__title">{{ __('auth.pages.forgot_password.title') }}</h1>
 
         <p class="auth-form__description">
-            {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+            {{ __('auth.pages.forgot_password.description') }}
         </p>
 
         @if (session('status'))
@@ -19,7 +19,7 @@
         @endif
 
         <div class="auth-form__field">
-            <label for="email" class="form-label">{{ __('Email') }}</label>
+            <label for="email" class="form-label">{{ __('auth.fields.email') }}</label>
             <input id="email" class="form-input" type="email" name="email" value="{{ old('email') }}" required autofocus
                 @if ($errors->has('email')) aria-invalid="true" aria-describedby="email-error" @endif>
             @error('email')
@@ -28,7 +28,7 @@
         </div>
 
         <div class="auth-form__actions">
-            <button type="submit" class="btn btn--primary">{{ __('Email Password Reset Link') }}</button>
+            <button type="submit" class="btn btn--primary">{{ __('auth.pages.forgot_password.submit') }}</button>
         </div>
     </form>
 @endsection

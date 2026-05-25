@@ -1,25 +1,39 @@
 @extends('layouts.app')
 
-@section('title', 'Viability Calculator')
+@section('title', __('viability.page.title'))
 
 @section('content')
-<div class="viability" x-data="viabilityCalculator({{ Js::from($newDefaults) }})" x-cloak>
-    <x-layout.page-header title="Viability Calculator" />
+<div class="viability" x-data="viabilityCalculator({{ Js::from($newDefaults) }}, {{ Js::from(__('viability')) }})" x-cloak>
+    <x-layout.page-header :title="__('viability.page.header')" />
 
     {{-- Hero Section --}}
     <div class="viability__hero">
-        <img src="/images/cute-chickens-discussing.webp" alt="Cute chickens discussing" class="viability__hero-image">
-        <div class="viability__hero-badge">🐔 Viability Calculator</div>
-        <div class="viability__hero-welcome">Calculate your chicken venture!</div>
+        <div class="viability__hero-badge" aria-hidden="true">
+            <span class="viability__hero-badge-icon">🐔</span>
+        </div>
+        <div class="viability__hero-media">
+            <img src="/images/cute-chickens-discussing.webp" alt="{{ __('viability.hero.image_alt') }}" class="viability__hero-image">
+        </div>
+
+        <div class="viability__hero-side">
+            <div class="viability__hero-notice" role="note">
+                <div class="viability__hero-notice-text">
+                    <h2 class="viability__hero-notice-title">
+                        <span class="d-none-mobile">{{ __('viability.hero.notice') }}</span>
+                        <span class="d-only-mobile">{{ __('viability.hero.notice_short') }}</span>
+                    </h2>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- Starting Investment Section --}}
     <div class="viability__investment glass-card">
-        <h2 class="viability__section-title">Starting Investment</h2>
-        <p class="viability__section-desc">Starting costs for chicken keeping can vary dramatically based on your situation. Some people can start with minimal investment using existing structures and gifted birds, while others need to build everything from scratch. Consider your available space, DIY skills, and whether you have existing materials or structures to work with.</p>
+        <h2 class="viability__section-title">{{ __('viability.sections.starting_investment.title') }}</h2>
+        <p class="viability__section-desc">{{ __('viability.sections.starting_investment.description') }}</p>
 
         <div class="viability__info-box">
-            <p><strong>💰 Don't forget:</strong> If you're purchasing birds, include their costs in your starting investment above. Baby chicks typically cost $3-5 each, while laying hens cost $15-25 each. Many people receive birds for free from friends or neighbors!</p>
+            <p><strong>{{ __('viability.sections.starting_investment.reminder_title') }}</strong> {{ __('viability.sections.starting_investment.reminder_body') }}</p>
         </div>
 
         {{-- Desktop Grid --}}
@@ -77,40 +91,40 @@
                     <button class="viability__carousel-dot"
                             :class="{ 'viability__carousel-dot--active': activeCarouselIndex === index }"
                             @click="$refs.carouselTrack.children[index]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })"
-                            :aria-label="'Go to ' + option.title"></button>
+                            :aria-label="interpolate(i18n.labels.go_to_option, { option: option.title })"></button>
                 </template>
             </div>
         </div>
 
         {{-- Custom Amount (desktop) --}}
         <div class="viability__custom-amount viability__custom-amount--desktop glass-card">
-            <h3>Custom Amount</h3>
-            <p class="viability__section-desc">If your setup doesn't match these scenarios, you can enter a custom amount below:</p>
+            <h3>{{ __('viability.sections.starting_investment.custom_amount_title') }}</h3>
+            <p class="viability__section-desc">{{ __('viability.sections.starting_investment.custom_amount_description') }}</p>
             <div class="viability__custom-amount-input">
                 <input type="number" min="0" class="viability__param-input"
                        x-model.number="startingCost"
                        @input="selectedStartingCostId = startingCostOptions.find(o => o.cost === startingCost)?.id || 'custom'">
-                <span class="viability__input-label">USD</span>
+                <span class="viability__input-label">{{ __('viability.sections.starting_investment.currency_label') }}</span>
             </div>
         </div>
 
         {{-- Custom Amount (mobile) --}}
         <div class="viability__custom-amount viability__custom-amount--mobile glass-card">
-            <h3>Custom Amount</h3>
-            <p class="viability__section-desc">If your setup doesn't match these scenarios, you can enter a custom amount below:</p>
+            <h3>{{ __('viability.sections.starting_investment.custom_amount_title') }}</h3>
+            <p class="viability__section-desc">{{ __('viability.sections.starting_investment.custom_amount_description') }}</p>
             <div class="viability__custom-amount-input">
                 <input type="number" min="0" class="viability__param-input"
                        x-model.number="startingCost"
                        @input="selectedStartingCostId = startingCostOptions.find(o => o.cost === startingCost)?.id || 'custom'">
-                <span class="viability__input-label">USD</span>
+                <span class="viability__input-label">{{ __('viability.sections.starting_investment.currency_label') }}</span>
             </div>
         </div>
     </div>
 
     {{-- Acquisition Method Section --}}
     <div class="viability__acquisition glass-card">
-        <h2 class="viability__section-title">Acquisition Method</h2>
-        <p class="viability__section-desc">Your acquisition method significantly impacts both costs and timeline. Baby chicks cost less upfront but require 5 months of feeding before they start laying eggs. Mature laying hens cost more initially but begin producing immediately. Consider your patience, budget, and desire to raise chickens from the beginning.</p>
+        <h2 class="viability__section-title">{{ __('viability.sections.acquisition.title') }}</h2>
+        <p class="viability__section-desc">{{ __('viability.sections.acquisition.description') }}</p>
 
         <div class="viability__option-grid viability__option-grid--acquisition">
             <template x-for="option in acquisitionOptions" :key="option.id">
@@ -125,7 +139,7 @@
                     <div class="viability__option-card-title" x-text="option.title"></div>
                     <div class="viability__option-card-desc" x-text="option.description"></div>
                     <template x-if="option.layingDelayMonths > 0">
-                        <span class="viability__delay-badge" x-text="option.layingDelayMonths + ' months until laying'"></span>
+                        <span class="viability__delay-badge" x-text="interpolate(i18n.labels.months_until_laying, { months: option.layingDelayMonths })"></span>
                     </template>
                     <ul class="viability__option-card-details">
                         <template x-for="detail in option.details" :key="detail">
@@ -142,17 +156,17 @@
 
     {{-- Setup Parameters Section --}}
     <div class="viability__params glass-card">
-        <h2 class="viability__section-title">Setup Parameters</h2>
+        <h2 class="viability__section-title">{{ __('viability.sections.parameters.title') }}</h2>
 
         <div class="viability__params-grid">
             <div class="viability__param-group">
-                <label class="viability__param-label" for="bird-count">Number of Chickens</label>
+                <label class="viability__param-label" for="bird-count">{{ __('viability.sections.parameters.bird_count') }}</label>
                 <input type="number" id="bird-count" min="1" max="100" step="1"
                        class="viability__param-input"
                        x-model.number="birdCount">
             </div>
             <div class="viability__param-group">
-                <label class="viability__param-label" for="egg-price">Price per Egg ($)</label>
+                <label class="viability__param-label" for="egg-price">{{ __('viability.sections.parameters.egg_price') }}</label>
                 <input type="number" id="egg-price" min="0" step="0.01"
                        class="viability__param-input"
                        x-model.number="eggPrice">
@@ -162,8 +176,8 @@
 
     {{-- Feeding Approach Section --}}
     <div class="viability__feeding glass-card">
-        <h2 class="viability__section-title">Feeding Approach</h2>
-        <p class="viability__section-desc">Your feeding approach significantly impacts both costs and chicken health. Consider your available time, space for free-ranging, access to kitchen scraps, and whether you prefer organic or conventional feeds. The right approach balances cost-effectiveness with your chickens' nutritional needs and your lifestyle.</p>
+        <h2 class="viability__section-title">{{ __('viability.sections.feeding.title') }}</h2>
+        <p class="viability__section-desc">{{ __('viability.sections.feeding.description') }}</p>
 
         <div class="viability__option-grid viability__option-grid--feed">
             <template x-for="option in feedOptions" :key="option.id">
@@ -192,8 +206,8 @@
 
     {{-- Egg Production Scenario Section --}}
     <div class="viability__production glass-card">
-        <h2 class="viability__section-title">Egg Production Scenario</h2>
-        <p class="viability__section-desc">Egg production varies significantly based on breed, age, season, and care quality. Younger hens in their prime (1-2 years) with good nutrition and long daylight hours will lay more eggs. Winter months, older hens, and stress can dramatically reduce production. Choose a scenario that matches your expected conditions and chicken care level.</p>
+        <h2 class="viability__section-title">{{ __('viability.sections.production.title') }}</h2>
+        <p class="viability__section-desc">{{ __('viability.sections.production.description') }}</p>
 
         <div class="viability__option-grid viability__option-grid--production">
             <template x-for="option in productionOptions" :key="option.id">
@@ -225,7 +239,7 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 transform translate-y-4"
          x-transition:enter-end="opacity-100 transform translate-y-0">
-        <h2 class="viability__section-title">Financial Analysis</h2>
+        <h2 class="viability__section-title">{{ __('viability.sections.analysis.title') }}</h2>
 
         {{-- StatCards Grid --}}
         <div class="viability__analysis-grid">
@@ -233,10 +247,10 @@
                 <div class="stat-card__gradient-blob" aria-hidden="true"></div>
                 <div class="stat-card__inner">
                     <div class="stat-card__body">
-                        <div class="stat-card__title">Monthly Egg Production</div>
+                        <div class="stat-card__title">{{ __('viability.metrics.monthly_egg_production') }}</div>
                         <div class="stat-card__value" x-text="results.monthlyEggProduction"></div>
                         <div class="stat-card__meta">
-                            <span x-text="results.layingDelayMonths > 0 ? 'after ' + results.layingDelayMonths + ' months' : 'eggs per month'"></span>
+                            <span x-text="results.layingDelayMonths > 0 ? interpolate(i18n.labels.after_months, { months: results.layingDelayMonths }) : i18n.labels.eggs_per_month"></span>
                         </div>
                     </div>
                 </div>
@@ -246,9 +260,9 @@
                 <div class="stat-card__gradient-blob" aria-hidden="true"></div>
                 <div class="stat-card__inner">
                     <div class="stat-card__body">
-                        <div class="stat-card__title">Monthly Egg Value</div>
+                        <div class="stat-card__title">{{ __('viability.metrics.monthly_egg_value') }}</div>
                         <div class="stat-card__value" x-text="formatUsd(results.monthlyEggValue)"></div>
-                        <div class="stat-card__meta"><span>potential revenue</span></div>
+                        <div class="stat-card__meta"><span x-text="i18n.labels.potential_revenue"></span></div>
                     </div>
                 </div>
             </div>
@@ -257,9 +271,9 @@
                 <div class="stat-card__gradient-blob" aria-hidden="true"></div>
                 <div class="stat-card__inner">
                     <div class="stat-card__body">
-                        <div class="stat-card__title">Monthly Feed Cost</div>
+                        <div class="stat-card__title">{{ __('viability.metrics.monthly_feed_cost') }}</div>
                         <div class="stat-card__value" x-text="formatUsd(results.monthlyFeedCost)"></div>
-                        <div class="stat-card__meta"><span>total feed expense</span></div>
+                        <div class="stat-card__meta"><span x-text="i18n.labels.total_feed_expense"></span></div>
                     </div>
                 </div>
             </div>
@@ -268,12 +282,12 @@
                 <div class="stat-card__gradient-blob" aria-hidden="true"></div>
                 <div class="stat-card__inner">
                     <div class="stat-card__body">
-                        <div class="stat-card__title">Monthly Profit</div>
+                        <div class="stat-card__title">{{ __('viability.metrics.monthly_profit') }}</div>
                         <div class="stat-card__value" x-text="formatUsd(results.monthlyProfit)"></div>
                         <div class="stat-card__meta">
                             <span class="viability__profit-badge"
                                   :class="isProfitable ? 'viability__profit-badge--positive' : 'viability__profit-badge--negative'"
-                                  x-text="isProfitable ? 'Profitable (when laying)' : 'Loss (when laying)'"></span>
+                                  x-text="isProfitable ? i18n.labels.profitable : i18n.labels.loss"></span>
                         </div>
                     </div>
                 </div>
@@ -285,11 +299,11 @@
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100">
-            <h3>Baby Chick Timeline Impact</h3>
+            <h3>{{ __('viability.sections.timeline.title') }}</h3>
             <ul class="viability__timeline-list">
-                <li>Non-laying period: <strong x-text="results.layingDelayMonths"></strong> months with <strong x-text="formatUsd(results.nonLayingFeedCost)"></strong> feed costs and no egg revenue</li>
-                <li>First year production: Only <strong x-text="12 - results.layingDelayMonths"></strong> months of egg laying</li>
-                <li>Starting investment: Remember to include chick costs in your starting investment above if purchasing</li>
+                <li x-text="interpolate(@js(__('viability.sections.timeline.non_laying_period')), { months: results.layingDelayMonths, cost: formatUsd(results.nonLayingFeedCost) })"></li>
+                <li x-text="interpolate(@js(__('viability.sections.timeline.first_year_production')), { months: 12 - results.layingDelayMonths })"></li>
+                <li>{{ __('viability.sections.timeline.starting_investment') }}</li>
             </ul>
         </div>
 
@@ -297,34 +311,34 @@
         <div class="viability__panels">
             {{-- Annual Summary Panel --}}
             <div class="viability__summary-panel">
-                <h3>📈 Annual Summary</h3>
+                <h3>{{ __('viability.sections.annual_summary.title') }}</h3>
 
                 <div class="viability__panel-row">
-                    <span class="viability__panel-label">First Year Feed Cost</span>
+                    <span class="viability__panel-label">{{ __('viability.sections.annual_summary.first_year_feed_cost') }}</span>
                     <div>
                         <span class="viability__panel-value" x-text="formatUsd(results.annualFeedCost)"></span>
-                        <span class="viability__panel-sub" x-text="'(' + formatUsd(results.monthlyFeedCost) + ' × 12)'"></span>
+                        <span class="viability__panel-sub" x-text="interpolate(i18n.labels.times_twelve, { amount: formatUsd(results.monthlyFeedCost) })"></span>
                     </div>
                 </div>
 
                 <div class="viability__panel-row">
-                    <span class="viability__panel-label">First Year Egg Value</span>
+                    <span class="viability__panel-label">{{ __('viability.sections.annual_summary.first_year_egg_value') }}</span>
                     <div>
                         <span class="viability__panel-value" x-text="formatUsd(results.annualEggValue)"></span>
-                        <span class="viability__panel-sub" x-text="'(' + formatUsd(results.monthlyEggValue) + ' × ' + (12 - results.layingDelayMonths) + ')'"></span>
+                        <span class="viability__panel-sub" x-text="interpolate(i18n.labels.times_laying_months, { amount: formatUsd(results.monthlyEggValue), months: 12 - results.layingDelayMonths })"></span>
                     </div>
                 </div>
 
                 <template x-if="results.layingDelayMonths > 0">
                     <div class="viability__panel-row viability__panel-row--warning">
-                        <span x-text="'• Non-laying months: ' + results.layingDelayMonths + ' (feed only)'"></span>
+                        <span x-text="interpolate(@js(__('viability.sections.annual_summary.non_laying_months')), { months: results.layingDelayMonths })"></span>
                     </div>
                 </template>
 
                 <div class="viability__panel-separator"></div>
 
                 <div class="viability__panel-row">
-                    <span class="viability__panel-label">First Year Profit</span>
+                    <span class="viability__panel-label">{{ __('viability.sections.annual_summary.first_year_profit') }}</span>
                     <span class="viability__panel-value"
                           :class="results.annualProfit >= 0 ? 'viability__panel-value--positive' : 'viability__panel-value--negative'"
                           x-text="formatUsd(results.annualProfit)"></span>
@@ -333,15 +347,15 @@
 
             {{-- Payback Analysis Panel --}}
             <div class="viability__summary-panel">
-                <h3>⏱️ Payback Analysis</h3>
+                <h3>{{ __('viability.sections.payback.title') }}</h3>
 
                 <div class="viability__panel-row">
-                    <span class="viability__panel-label">Starting Investment</span>
+                    <span class="viability__panel-label">{{ __('viability.sections.payback.starting_investment') }}</span>
                     <span class="viability__panel-value" x-text="formatUsd(startingCost)"></span>
                 </div>
 
                 <div class="viability__panel-row">
-                    <span class="viability__panel-label">Monthly Profit (when laying)</span>
+                    <span class="viability__panel-label">{{ __('viability.sections.payback.monthly_profit') }}</span>
                     <span class="viability__panel-value"
                           :class="results.monthlyProfit >= 0 ? 'viability__panel-value--positive' : 'viability__panel-value--negative'"
                           x-text="formatUsd(results.monthlyProfit)"></span>
@@ -350,7 +364,7 @@
                 <div class="viability__panel-separator"></div>
 
                 <div class="viability__panel-row">
-                    <span class="viability__panel-label">Payback Period</span>
+                    <span class="viability__panel-label">{{ __('viability.sections.payback.payback_period') }}</span>
                     <span class="viability__payback-badge"
                           :class="'viability__payback-badge--' + paybackColor"
                           x-text="paybackText"></span>
@@ -364,20 +378,20 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 transform translate-y-4"
          x-transition:enter-end="opacity-100 transform translate-y-0">
-        <h2 class="viability__section-title">💡 Viability Assessment</h2>
+        <h2 class="viability__section-title">{{ __('viability.sections.assessment.title') }}</h2>
 
         <div class="viability__assessment-item">
-            <h4>Break-Even Analysis</h4>
-            <p>A dozen store-bought eggs costs $4-6+ in 2025. Each chicken lays about 20 eggs per month, so your feed cost per bird should be less than $6-10 to break even on eggs alone.</p>
+            <h4>{{ __('viability.sections.assessment.break_even_title') }}</h4>
+            <p>{{ __('viability.sections.assessment.break_even_body') }}</p>
         </div>
 
         <div class="viability__assessment-item">
-            <h4>Your Assessment</h4>
+            <h4>{{ __('viability.sections.assessment.your_assessment') }}</h4>
             <p x-text="assessmentText"></p>
         </div>
 
         <div class="viability__assessment-item">
-            <h4>Recommendations</h4>
+            <h4>{{ __('viability.sections.assessment.recommendations') }}</h4>
             <p x-text="recommendationText"></p>
         </div>
     </div>

@@ -1,0 +1,45 @@
+schema: 1
+story: "8.5"
+story_title: "Plesk and Apache Deployment Configuration for PWA"
+gate: PASS
+status_reason: ".htaccess rules satisfy ACs 1-5. DEPLOY.md now documents deployment mode (nginx -> Apache), root-hosting hard requirement, future-only Service-Worker-Allowed escape hatch, and a curl -I post-deploy verification checklist. Live-host re-verification remains an operator task tracked in DEPLOY.md."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-04-26T00:00:00Z"
+
+waiver: { active: false }
+top_issues:
+  - id: "deploy-rerun"
+    severity: low
+    summary: "Live host currently returns 404 for /sw.js, /manifest.webmanifest, and /images/pwa/apple-touch-icon.png; documented checklist must be rerun after the next deploy."
+    suggested_owner: "dev"
+    refs: ["DEPLOY.md"]
+
+quality_score: 95
+expires: "2026-05-10T00:00:00Z"
+
+evidence:
+  tests_reviewed: 0
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "HTTPS enforced via Let's Encrypt. .htaccess rules introduce no new attack surface. sw.js no-cache prevents stale-worker pinning."
+  performance:
+    status: PASS
+    notes: "Cache tier hierarchy is clean: sw.js no-cache, manifest 300s, /images/* 3600s, /build/assets/* immutable."
+  reliability:
+    status: PASS
+    notes: "Static carve-outs are evaluated before the Laravel front-controller; matching order is documented."
+  maintainability:
+    status: PASS
+    notes: "DEPLOY.md operator runbook covers release checklist, verification checklist, and rollback in one place."
+
+recommendations:
+  immediate:
+    - action: "Operator: deploy public/sw.js, public/manifest.webmanifest, and public/images/pwa/* to the Plesk host, then run the documented curl -I checklist and replace the pre-deploy 404 snapshot with the live-origin headers"
+      refs: ["DEPLOY.md", "public/.htaccess"]
+  future: []

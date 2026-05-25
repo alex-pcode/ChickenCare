@@ -11,8 +11,11 @@
 
 <div class="progress-card {{ $variant !== 'default' ? 'progress-card--' . $variant : '' }}">
     @if($loading)
-        <div style="height: 0.75rem; width: 50%; background: rgba(0,0,0,0.08); border-radius: 4px; margin-bottom: 0.75rem;"></div>
-        <div style="height: 0.75rem; width: 100%; background: rgba(0,0,0,0.05); border-radius: 9999px;"></div>
+        <div class="progress-card__header">
+            <span class="progress-card__title"><x-ui.skel block="label" /></span>
+            <span class="progress-card__percentage"><x-ui.skel block="pill" /></span>
+        </div>
+        <div class="progress-card__bar"><x-ui.skel block="block" style="width:100%;height:100%;" /></div>
     @else
         <div class="progress-card__header">
             <span class="progress-card__title">{{ $title }}</span>

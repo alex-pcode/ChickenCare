@@ -41,4 +41,17 @@ class RegistrationTest extends TestCase
 
         $response->assertSessionHasErrors(['name', 'email', 'password']);
     }
+
+    public function test_registration_page_renders_serbian_copy_when_locale_cookie_is_serbian(): void
+    {
+        $response = $this->withCookie(config('app.locale_cookie'), 'sr')->get('/register');
+
+        $response->assertOk();
+        $response->assertSee('<html lang="sr">', false);
+        $response->assertSee('Registrujte se');
+        $response->assertSee('Registrujte se putem Google');
+        $response->assertSee('ili se registrujte e-postom');
+        $response->assertSee('Vec ste registrovani?');
+        $response->assertDontSee('auth.pages.register.title', false);
+    }
 }

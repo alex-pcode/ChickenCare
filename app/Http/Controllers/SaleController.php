@@ -46,7 +46,7 @@ class SaleController extends Controller
                 ->header('HX-Trigger', 'crm:changed');
         }
 
-        return redirect()->route('app.sales.index')->with('success', 'Sale recorded.');
+        return redirect()->route('app.sales.index')->with('success', __('crm.messages.sale_recorded'));
     }
 
     public function show(Request $request, Sale $sale): mixed
@@ -83,7 +83,7 @@ class SaleController extends Controller
                 ->header('HX-Trigger', 'crm:changed');
         }
 
-        return redirect()->route('app.sales.index')->with('success', 'Sale updated.');
+        return redirect()->route('app.sales.index')->with('success', __('crm.messages.sale_updated'));
     }
 
     public function destroy(Request $request, Sale $sale): mixed
@@ -98,7 +98,7 @@ class SaleController extends Controller
             return response('', 200)->header('HX-Trigger', 'crm:changed');
         }
 
-        return redirect()->route('app.sales.index')->with('success', 'Sale deleted.');
+        return redirect()->route('app.sales.index')->with('success', __('crm.messages.sale_deleted'));
     }
 
     public function togglePayment(Request $request, Sale $sale): mixed

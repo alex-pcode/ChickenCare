@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../variables' as *;
 @use '../mixins' as *;
 
@@ -66,7 +67,7 @@
         @include transition(color, background-color);
 
         &:hover {
-            color: darken($color-error, 10%);
+            color: color.adjust($color-error, $lightness: -10%);
             background-color: rgba($color-error, 0.08);
         }
 
@@ -79,6 +80,80 @@
     &--striped {
         .data-table__body .data-table__row:nth-child(even) {
             background-color: rgba($neu-bg, 0.5);
+        }
+    }
+
+    // Stacked card layout on mobile — each row becomes a card with label/value pairs.
+    @include mobile {
+        display: block;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border-radius: 0;
+
+        &__head {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        &__body {
+            display: block;
+        }
+
+        tr {
+            display: block;
+            border: 1px solid $glass-border;
+            border-radius: $card-radius;
+            background: $glass-bg;
+            -webkit-backdrop-filter: blur($glass-blur);
+            backdrop-filter: blur($glass-blur);
+            box-shadow: $glass-shadow;
+            margin-bottom: $space-3;
+            padding: $space-2 $space-3;
+            border-top: 1px solid $glass-border !important;
+        }
+
+        &__cell {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: $space-1;
+            padding: $space-2 0;
+            border-bottom: 1px solid rgba($color-neutral-200, 0.5);
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &::before {
+                content: attr(data-label);
+                font-size: $font-size-xs;
+                font-weight: $font-weight-semibold;
+                color: $color-neutral-500;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+        }
+
+        &__cell:last-child {
+            flex-direction: row;
+        }
+
+        &__actions {
+            justify-content: flex-start;
+        }
+
+        &--striped .data-table__body .data-table__row:nth-child(even) {
+            background-color: $glass-bg;
         }
     }
 }

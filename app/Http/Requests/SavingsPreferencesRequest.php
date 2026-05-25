@@ -26,7 +26,7 @@ class SavingsPreferencesRequest extends FormRequest
     {
         return [
             'egg_price' => ['required', 'numeric', 'min:0', 'max:999.99'],
-            'chicken_goal' => ['required', Rule::enum(ChickenGoal::class)],
+            'chicken_goal' => ['sometimes', Rule::enum(ChickenGoal::class)],
         ];
     }
 }

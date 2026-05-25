@@ -14,19 +14,19 @@
 
     $emptyMessage = null;
     if ($currentVal === null && $prevVal === null) {
-        $emptyMessage = "No eggs logged in the last " . ($costWindowMonths * 2) . " months.";
+        $emptyMessage = __('expenses.stats.empty.no_eggs_last_range', ['months' => $costWindowMonths * 2]);
     } elseif ($currentVal === null) {
-        $emptyMessage = "No eggs logged in the last {$windowLabel}.";
+        $emptyMessage = __('expenses.stats.empty.no_eggs_last_window', ['window' => $windowLabel]);
     } elseif ($prevVal === null) {
-        $emptyMessage = "Not enough history — log more data to compare against the prior {$windowLabel}.";
+        $emptyMessage = __('expenses.stats.empty.not_enough_history', ['window' => $windowLabel]);
     }
 @endphp
 
 <div id="cost-per-egg-card" class="comparison-card expenses__cost-comparison">
     <div class="comparison-card__header expenses__cost-comparison-header">
-        <h3 class="comparison-card__title">Cost per Egg</h3>
+        <h3 class="comparison-card__title">{{ __('expenses.stats.cost_per_egg') }}</h3>
 
-        <div class="expenses__cost-card-pills" role="tablist" aria-label="Time window">
+        <div class="expenses__cost-card-pills" role="tablist" aria-label="{{ __('expenses.stats.time_window') }}">
             @foreach([3, 6, 12] as $window)
                 <a href="#"
                    role="tab"
@@ -63,7 +63,7 @@
                     ${{ number_format($prevVal, 3) }}
                 </div>
                 <div class="comparison-card__column-label comparison-card__column-label--before">
-                    Previous {{ $windowLabel }}
+                    {{ __('expenses.stats.previous_window', ['window' => $windowLabel]) }}
                 </div>
             </div>
             <div class="comparison-card__arrow" aria-hidden="true">→</div>
@@ -72,7 +72,7 @@
                     ${{ number_format($currentVal, 3) }}
                 </div>
                 <div class="comparison-card__column-label comparison-card__column-label--after">
-                    Last {{ $windowLabel }}
+                    {{ __('expenses.stats.last_window', ['window' => $windowLabel]) }}
                 </div>
             </div>
         </div>

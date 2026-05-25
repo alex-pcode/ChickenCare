@@ -1,0 +1,52 @@
+schema: 1
+story: '7.2'
+story_title: 'Dynamic HTML, HTMX, and JSON Cache Headers'
+gate: PASS
+status_reason: 'Centralized middleware applies private, no-store to all eight covered response classes; ETag/Last-Modified are stripped; focused feature suite passes 9 tests / 58 assertions and maps cleanly to AC1-AC8.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-26T00:00:00Z'
+expires: '2026-05-10T00:00:00Z'
+
+quality_score: 100
+
+evidence:
+  tests_reviewed: 9
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8]
+    ac_gaps: []
+  notes: |
+    Re-ran tests/Feature/Http/CacheHeadersTest.php on review: 9 passed, 58 assertions.
+    Each covered response class is asserted to contain "private" and "no-store",
+    not contain "public", and to have ETag and Last-Modified absent.
+    Middleware is prepended on the web stack, so it stamps headers on the response
+    phase after EnsurePremiumTier fragments and HTMX validation renderable output.
+
+top_issues: []
+
+waiver:
+  active: false
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Conservative blanket private, no-store eliminates back-button replay of session-bound HTML/JSON and keeps CSRF-token-bearing guest pages out of shared caches.'
+  performance:
+    status: PASS
+    notes: 'One header set + two header removes per response. Loss of 304 revalidation on dynamic responses is the intended trade-off.'
+  reliability:
+    status: PASS
+    notes: 'Single ownership point; BinaryFileResponse/StreamedResponse skip prevents accidental rewrite of file/stream semantics.'
+  maintainability:
+    status: PASS
+    notes: 'Small, single-purpose middleware; one registration site in bootstrap/app.php; comprehensive feature coverage prevents regressions.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'When authenticated file downloads (PDF/CSV) ship, revisit the BinaryFileResponse skip and decide whether session-bound exports should also receive private, no-store.'
+      refs: ['app/Http/Middleware/SetDynamicResponseCacheHeaders.php']
+    - action: 'Optionally extend test coverage to a 4xx error HTML response to lock in non-storability of error pages.'
+      refs: ['tests/Feature/Http/CacheHeadersTest.php']
+    - action: 'Optional: add a one-line PHPDoc on SetDynamicResponseCacheHeaders documenting its contract and the file/stream skip rationale.'
+      refs: ['app/Http/Middleware/SetDynamicResponseCacheHeaders.php']

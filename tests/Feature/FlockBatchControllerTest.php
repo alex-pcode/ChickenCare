@@ -25,34 +25,34 @@ class FlockBatchControllerTest extends TestCase
     private function validBatchData(array $overrides = []): array
     {
         return array_merge([
-            'batch_name'         => 'Spring Layers',
-            'breed'              => 'Rhode Island Red',
-            'acquisition_date'   => '2026-03-01',
-            'hens_count'         => 8,
-            'roosters_count'     => 1,
-            'chicks_count'       => 1,
-            'brooding_count'     => 0,
+            'batch_name' => 'Spring Layers',
+            'breed' => 'Rhode Island Red',
+            'acquisition_date' => '2026-03-01',
+            'hens_count' => 8,
+            'roosters_count' => 1,
+            'chicks_count' => 1,
+            'brooding_count' => 0,
             'age_at_acquisition' => 'adult',
-            'source'             => 'Local breeder',
-            'cost'               => 150.00,
+            'source' => 'Local breeder',
+            'cost' => 150.00,
         ], $overrides);
     }
 
     private function validUpdateData(array $overrides = []): array
     {
         return array_merge([
-            'batch_name'         => 'Spring Layers',
-            'breed'              => 'Rhode Island Red',
-            'acquisition_date'   => '2026-03-01',
-            'current_count'      => 10,
-            'hens_count'         => 8,
-            'roosters_count'     => 1,
-            'chicks_count'       => 1,
-            'brooding_count'     => 0,
-            'type'               => 'mixed',
+            'batch_name' => 'Spring Layers',
+            'breed' => 'Rhode Island Red',
+            'acquisition_date' => '2026-03-01',
+            'current_count' => 10,
+            'hens_count' => 8,
+            'roosters_count' => 1,
+            'chicks_count' => 1,
+            'brooding_count' => 0,
+            'type' => 'mixed',
             'age_at_acquisition' => 'adult',
-            'source'             => 'Local breeder',
-            'cost'               => 150.00,
+            'source' => 'Local breeder',
+            'cost' => 150.00,
         ], $overrides);
     }
 
@@ -118,7 +118,7 @@ class FlockBatchControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertViewHas('batches', function ($batches) {
-            return $batches->count() === 15 && $batches->total() === 20;
+            return $batches->count() === 10 && $batches->total() === 20;
         });
     }
 
@@ -164,7 +164,7 @@ class FlockBatchControllerTest extends TestCase
         $response->assertRedirect(route('app.batches.show', $batch));
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('flock_batches', [
-            'user_id'    => $this->user->id,
+            'user_id' => $this->user->id,
             'batch_name' => 'Spring Layers',
         ]);
     }
@@ -173,14 +173,14 @@ class FlockBatchControllerTest extends TestCase
     {
         $this->actingAs($this->user)
             ->post('/app/batches', $this->validBatchData([
-                'hens_count'     => 10,
+                'hens_count' => 10,
                 'roosters_count' => 3,
-                'chicks_count'   => 0,
+                'chicks_count' => 0,
                 'brooding_count' => 2,
             ]));
 
         $this->assertDatabaseHas('flock_batches', [
-            'user_id'       => $this->user->id,
+            'user_id' => $this->user->id,
             'initial_count' => 15,
             'current_count' => 15,
         ]);
@@ -202,9 +202,9 @@ class FlockBatchControllerTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->post('/app/batches', $this->validBatchData([
-                'hens_count'     => 0,
+                'hens_count' => 0,
                 'roosters_count' => 0,
-                'chicks_count'   => 0,
+                'chicks_count' => 0,
                 'brooding_count' => 0,
             ]));
 
@@ -279,7 +279,7 @@ class FlockBatchControllerTest extends TestCase
         $response->assertRedirect(route('app.batches.show', $batch));
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('flock_batches', [
-            'id'         => $batch->id,
+            'id' => $batch->id,
             'batch_name' => 'Updated Batch',
         ]);
     }
@@ -314,7 +314,7 @@ class FlockBatchControllerTest extends TestCase
 
         $response->assertRedirect(route('app.batches.index'));
         $this->assertDatabaseHas('flock_batches', [
-            'id'        => $batch->id,
+            'id' => $batch->id,
             'is_active' => false,
         ]);
     }
@@ -329,7 +329,7 @@ class FlockBatchControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertDatabaseHas('flock_batches', [
-            'id'        => $batch->id,
+            'id' => $batch->id,
             'is_active' => false,
         ]);
     }

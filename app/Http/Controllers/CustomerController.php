@@ -55,7 +55,7 @@ class CustomerController extends Controller
         }
 
         return redirect()->route('app.customers.index')
-            ->with('success', 'Customer added.');
+            ->with('success', __('crm.messages.customer_added'));
     }
 
     public function show(Request $request, Customer $customer)
@@ -86,7 +86,7 @@ class CustomerController extends Controller
         }
 
         return redirect()->route('app.customers.index')
-            ->with('success', 'Customer updated.');
+            ->with('success', __('crm.messages.customer_updated'));
     }
 
     public function destroy(Request $request, Customer $customer)
@@ -101,6 +101,6 @@ class CustomerController extends Controller
         }
 
         return redirect()->route('app.customers.index')
-            ->with('success', 'Customer deactivated.');
+            ->with('success', __('crm.messages.customer_deactivated'));
     }
 }

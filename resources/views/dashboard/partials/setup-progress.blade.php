@@ -1,15 +1,7 @@
 @if($progress['percentage'] < 100)
 <section class="dashboard__section dashboard__section--animate" style="animation-delay: 0.1s">
     <h2 class="dashboard__section-title">
-        @if($progress['percentage'] <= 40)
-            🚀 Getting Started
-        @elseif($progress['percentage'] <= 70)
-            📈 Building Your Farm
-        @elseif($progress['percentage'] <= 90)
-            ⚡ Advanced Features
-        @else
-            🎯 Final Steps
-        @endif
+        {{ __('dashboard.setup.phase_headings.' . $progress['bracket']) }}
     </h2>
 
     <div class="glass-card dashboard__setup">
@@ -21,7 +13,7 @@
         </div>
 
         <x-ui.progress-card
-            title="Setup Progress"
+            :title="__('dashboard.setup.progress_title')"
             :value="$progress['percentage']"
             :max="100"
             variant="detailed"
@@ -33,7 +25,7 @@
                     <span class="dashboard__setup-item-icon">{{ $item['icon'] }}</span>
                     <div class="dashboard__setup-item-body">
                         <div class="dashboard__setup-item-label">{{ $item['label'] }}</div>
-                        <div class="dashboard__setup-item-points">{{ $item['points'] }} pts</div>
+                        <div class="dashboard__setup-item-points">{{ $item['points'] }} {{ __('dashboard.setup.points') }}</div>
                     </div>
                     <div class="dashboard__setup-item-status">
                         @if($item['completed'])

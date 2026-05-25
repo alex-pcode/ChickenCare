@@ -35,6 +35,7 @@ class EggEntry extends Model
     public function scopeForWeek(Builder $query, ?Carbon $date = null): Builder
     {
         $date ??= now();
+
         return $query->whereBetween('date', [
             $date->copy()->startOfWeek(),
             $date->copy()->endOfWeek(),
@@ -44,7 +45,10 @@ class EggEntry extends Model
     public function scopeForMonth(Builder $query, ?Carbon $date = null): Builder
     {
         $date ??= now();
-        return $query->whereMonth('date', $date->month)
-                     ->whereYear('date', $date->year);
+
+        return $query->whereBetween('date', [
+            $date->copy()->startOfMonth(),
+            $date->copy()->endOfMonth(),
+        ]);
     }
 }

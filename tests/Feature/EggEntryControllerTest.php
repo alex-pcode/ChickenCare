@@ -247,7 +247,7 @@ class EggEntryControllerTest extends TestCase
 
     // === Pagination & Empty State (Task 14) ===
 
-    public function test_index_paginates_at_15_items(): void
+    public function test_index_paginates_at_5_items(): void
     {
         $user = User::factory()->create();
         EggEntry::factory()->count(20)->create(['user_id' => $user->id]);
@@ -256,7 +256,7 @@ class EggEntryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewHas('entries', function ($entries) {
-            return $entries->count() === 15 && $entries->total() === 20;
+            return $entries->count() === 5 && $entries->total() === 20;
         });
     }
 
@@ -880,7 +880,7 @@ class EggEntryControllerTest extends TestCase
         $response->assertSee('egg-hero', false);
         $response->assertSee('egg-hero__image', false);
         $response->assertSee('egg-hero__badge', false);
-        $response->assertSee('egg-hero__welcome', false);
+        $response->assertSee('egg-hero__status', false);
     }
 
     public function test_hero_image_has_correct_attributes(): void
@@ -906,7 +906,7 @@ class EggEntryControllerTest extends TestCase
         $response->assertSee('aria-hidden="true"', false);
     }
 
-    public function test_hero_welcome_message_has_aria_status_role(): void
+    public function test_hero_status_has_aria_status_role(): void
     {
         $user = User::factory()->create();
 
@@ -914,17 +914,38 @@ class EggEntryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('role="status"', false);
-        $response->assertSee('Count your eggs!');
+        $response->assertSee('No eggs logged yet');
     }
 
-    public function test_hero_welcome_message_has_dark_mode_text_class(): void
+    public function test_hero_status_reflects_logged_today(): void
     {
         $user = User::factory()->create();
+        $user->eggEntries()->create([
+            'date' => now()->toDateString(),
+            'count' => 3,
+        ]);
 
         $response = $this->actingAs($user)->get('/app/eggs');
 
         $response->assertStatus(200);
-        $response->assertSee('dark:text-gray-200', false);
+        $response->assertSee('You collected eggs today!');
+        $response->assertSee('egg-hero__status--success', false);
+    }
+
+    public function test_hero_status_reflects_days_since_last_entry(): void
+    {
+        $user = User::factory()->create();
+        $user->eggEntries()->create([
+            'date' => now()->subDays(4)->toDateString(),
+            'count' => 2,
+        ]);
+
+        $response = $this->actingAs($user)->get('/app/eggs');
+
+        $response->assertStatus(200);
+        $response->assertViewHas('daysSinceLastEntry', 4);
+        $response->assertViewHas('loggedToday', false);
+        $response->assertViewHas('todayTotal', 0);
     }
 
     public function test_response_contains_reduced_motion_media_query(): void
@@ -951,15 +972,13 @@ class EggEntryControllerTest extends TestCase
         $response = $this->actingAs($user)->get('/app/eggs');
 
         $response->assertStatus(200);
-        $response->assertSee('neu-button', false);
+        $response->assertSee('submit-button', false);
         $response->assertSee('shiny-cta', false);
-        $response->assertSee('bg-blue-600', false);
-        $response->assertSee('bg-green-600', false);
-        $response->assertSee('animate-spin', false);
-        $response->assertSee('rounded-full', false);
-        $response->assertSee('border-t-transparent', false);
-        $response->assertSee('Saving...', false);
-        $response->assertSee('Saved Successfully!', false);
+        $response->assertSee('submit-button__spinner', false);
+        $response->assertSee('submit-button--submitting', false);
+        $response->assertSee('submit-button--success', false);
+        $response->assertSee('Saving…', false);
+        $response->assertSee('Saved!', false);
         $response->assertSee('Log Eggs', false);
     }
 
@@ -971,11 +990,13 @@ class EggEntryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('x-data="{ detailed: false, submitting: false, success: false }"', false);
+        $response->assertSee('x-data="{ submitting: false, success: false }"', false);
         $response->assertSee(':disabled="submitting || success"', false);
         $response->assertSee('submitting = true; success = false', false);
-        $response->assertSee('submitting = false; success = true; setTimeout(() => success = false, 3000)', false);
+        $response->assertSee('form.addEventListener(\'htmx:beforeRequest\'', false);
+        $response->assertSee('form.addEventListener(\'htmx:afterRequest\'', false);
+        $response->assertSee('setTimeout(() => { success = false; }, 2500);', false);
         $response->assertSee('this.reset(); detailed = false', false);
-        $response->assertSee('opacity-70 cursor-not-allowed', false);
     }
 
     public function test_page_contains_recent_entries_header(): void

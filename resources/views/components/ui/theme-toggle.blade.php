@@ -3,22 +3,15 @@
             class="account-theme-toggle__btn"
             :class="{ 'account-theme-toggle__btn--active': theme === 'light' }"
             @click="setTheme('light')"
-            aria-label="Light theme">
-        ☀️ Light
+            aria-label="{{ __('ui.theme.light_aria_label') }}">
+        ☀️ {{ __('ui.theme.light') }}
     </button>
     <button type="button"
             class="account-theme-toggle__btn"
             :class="{ 'account-theme-toggle__btn--active': theme === 'dark' }"
             @click="setTheme('dark')"
-            aria-label="Dark theme">
-        🌙 Dark
-    </button>
-    <button type="button"
-            class="account-theme-toggle__btn"
-            :class="{ 'account-theme-toggle__btn--active': theme === 'system' }"
-            @click="setTheme('system')"
-            aria-label="System theme">
-        💻 System
+            aria-label="{{ __('ui.theme.dark_aria_label') }}">
+        🌙 {{ __('ui.theme.dark') }}
     </button>
 </div>
 

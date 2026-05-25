@@ -1,11 +1,5 @@
 <div class="crm-page__content-enter">
 <div class="crm-quick-sale" x-data="quickSale()">
-    {{-- Header --}}
-    <div class="crm-quick-sale__header">
-        <h2 class="crm-quick-sale__title">Quick Sale ⚡</h2>
-        <p class="crm-quick-sale__subtitle">Record a sale in seconds with smart calculations</p>
-    </div>
-
     {{-- Error Banner --}}
     <template x-if="error">
         <div class="crm-quick-sale__error" x-transition:enter="slide-in">
@@ -16,72 +10,66 @@
     {{-- Main Form --}}
     <div class="form-card">
         <div class="form-card__header">
-            <h2 class="form-card__title">Record Sale</h2>
-            <p class="form-card__subtitle">Enter sale details and pricing below</p>
+            <h2 class="form-card__title">{{ __('crm.quick_sale.form.title') }}</h2>
+            <p class="form-card__subtitle">{{ __('crm.quick_sale.form.subtitle') }}</p>
         </div>
         <form @submit.prevent="submitSale" class="form-card__form">
             @csrf
-            <div class="form-row form-row--3-col">
-                <div class="form-group">
-                    <label for="qs-price-per-egg" class="form-label">Price per Egg ($)</label>
-                    <input type="number" id="qs-price-per-egg" class="form-input"
-                           step="0.01" min="0" placeholder="0.30"
-                           x-model.number="price_per_egg"
-                           @input="recalcTotal()">
-                </div>
-                <div class="form-group">
-                    <label for="qs-customer" class="form-label">
-                        Customer <span class="form-label__required" aria-hidden="true">*</span>
-                    </label>
-                    <select id="qs-customer" class="form-select" x-model="customer_id" required>
-                        <option value="">Select a customer</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="qs-date" class="form-label">
-                        Sale Date <span class="form-label__required" aria-hidden="true">*</span>
-                    </label>
-                    <input type="date" id="qs-date" class="form-input"
-                           x-model="sale_date" required
-                           max="{{ today()->format('Y-m-d') }}">
-                </div>
+            <div class="form-group">
+                <label for="qs-customer" class="form-label">
+                    {{ __('crm.quick_sale.form.fields.customer') }} <span class="form-label__required" aria-hidden="true">*</span>
+                </label>
+                <select id="qs-customer" class="form-select" x-model="customer_id" required>
+                    <option value="">{{ __('crm.quick_sale.form.placeholders.customer') }}</option>
+                    @foreach($customers as $customer)
+                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="qs-date" class="form-label">
+                    {{ __('crm.quick_sale.form.fields.sale_date') }} <span class="form-label__required" aria-hidden="true">*</span>
+                </label>
+                <input type="date" id="qs-date" class="form-input"
+                       x-model="sale_date" required
+                       max="{{ today()->format('Y-m-d') }}">
             </div>
 
             <div class="form-row form-row--2-col">
                 <div class="form-group">
                     <label for="qs-eggs" class="form-label">
-                        Number of Eggs <span class="form-label__required" aria-hidden="true">*</span>
+                        {{ __('crm.quick_sale.form.fields.number_of_eggs') }} <span class="form-label__required" aria-hidden="true">*</span>
                     </label>
                     <input type="number" id="qs-eggs" class="form-input"
-                           min="0" placeholder="Enter egg count" required
+                           min="0" placeholder="{{ __('crm.quick_sale.form.placeholders.eggs_count') }}" required
                            x-model.number="eggs_count"
-                           @input="recalcTotal()">
+                           @input="recalcTotal()"
+                           @click="$el.select()"
+                           @focus="$el.select()">
                 </div>
                 <div class="form-group">
-                    <label for="qs-total" class="form-label">
-                        Total Amount ($) <span class="form-label__required" aria-hidden="true">*</span>
-                    </label>
-                    <input type="number" id="qs-total" class="form-input"
-                           step="0.01" min="0" required
-                           x-model.number="total_amount"
-                           @input="manualTotal = true">
+                    <label for="qs-price-per-egg" class="form-label">{{ __('crm.quick_sale.form.fields.price_per_egg') }}</label>
+                    <input type="number" id="qs-price-per-egg" class="form-input"
+                           step="0.01" min="0" placeholder="{{ __('crm.quick_sale.form.placeholders.price_per_egg') }}"
+                           x-model.number="price_per_egg"
+                           @input="recalcTotal()"
+                           @click="$el.select()"
+                           @focus="$el.select()">
                 </div>
             </div>
 
             {{-- Dozen display --}}
             <template x-if="eggs_count >= 12">
                 <p class="crm-quick-sale__dozen-info">
-                    <span x-text="Math.floor(eggs_count / 12)"></span> dozen + <span x-text="eggs_count % 12"></span> individual
+                    <span x-text="Math.floor(eggs_count / 12)"></span> {{ __('crm.quick_sale.form.labels.dozen') }} + <span x-text="eggs_count % 12"></span> {{ __('crm.quick_sale.form.labels.individual') }}
                 </p>
             </template>
 
             <div class="form-group">
-                <label for="qs-notes" class="form-label">Notes (optional)</label>
+                <label for="qs-notes" class="form-label">{{ __('crm.quick_sale.form.fields.notes') }}</label>
                 <textarea id="qs-notes" class="form-textarea" rows="2"
-                          placeholder="Any notes about this sale..."
+                          placeholder="{{ __('crm.quick_sale.form.placeholders.notes') }}"
                           x-model="notes"></textarea>
             </div>
 
@@ -102,7 +90,6 @@
 </div>
 </div>
 
-@push('scripts')
 <script>
 document.addEventListener('alpine:init', () => {
     if (Alpine.data && typeof Alpine._data === 'undefined') {
@@ -124,10 +111,14 @@ function quickSale() {
         manualTotal: false,
 
         get buttonLabel() {
-            if (this.submitting) return 'Recording...';
-            if (this.success) return 'Recorded! ✓';
-            if (this.total_amount === 0 && this.eggs_count > 0) return 'Record Free Eggs 🥚';
-            return `Record Sale - $${this.total_amount.toFixed(2)}`;
+            const amountLabel = `$${this.total_amount.toFixed(2)}`;
+
+            if (this.submitting) return @js(__('crm.quick_sale.actions.recording'));
+            if (this.success) return @js(__('crm.quick_sale.actions.recorded'));
+            if (this.total_amount === 0 && this.eggs_count > 0) return @js(__('crm.quick_sale.actions.record_free'));
+
+            return @js(__('crm.quick_sale.actions.record_with_amount', ['amount' => '__amount__']))
+                .replace('__amount__', amountLabel);
         },
 
         recalcTotal() {
@@ -168,7 +159,7 @@ function quickSale() {
                         const firstError = Object.values(data.errors).flat()[0];
                         this.error = firstError;
                     } else {
-                        this.error = data.message || 'Failed to record sale';
+                        this.error = data.message || @js(__('crm.quick_sale.errors.record_failed'));
                     }
                     return;
                 }
@@ -189,7 +180,7 @@ function quickSale() {
                 // Trigger CRM refresh
                 document.body.dispatchEvent(new CustomEvent('crm:changed'));
             } catch (err) {
-                this.error = 'Network error. Please try again.';
+                this.error = @js(__('crm.quick_sale.errors.network'));
             } finally {
                 this.submitting = false;
             }
@@ -197,4 +188,3 @@ function quickSale() {
     };
 }
 </script>
-@endpush

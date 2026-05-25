@@ -1,7 +1,7 @@
 @if($events->isEmpty())
     <x-ui.empty-state
-        title="No events recorded yet"
-        description="Add your first event above to start tracking your flock's timeline!"
+        :title="__('flock.timeline.empty_title')"
+        :description="__('flock.timeline.empty_description')"
         icon="📅"
     />
 @else

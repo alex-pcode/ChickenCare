@@ -1,5 +1,5 @@
 <details class="savings__preferences">
-    <summary class="savings__preferences-toggle">⚙️ Savings Preferences</summary>
+    <summary class="savings__preferences-toggle">{{ __('savings.preferences.toggle') }}</summary>
 
     <form
         class="savings__preferences-form"
@@ -13,7 +13,7 @@
 
         <div class="savings__preferences-fields">
             <label class="savings__preferences-label">
-                Egg Price (€)
+                {{ __('savings.preferences.egg_price') }}
                 <input
                     type="number"
                     name="egg_price"
@@ -26,7 +26,7 @@
             </label>
 
             <label class="savings__preferences-label">
-                Goal
+                {{ __('savings.preferences.goal') }}
                 <select name="chicken_goal" class="savings__preferences-input">
                     @foreach(\App\Enums\ChickenGoal::cases() as $goal)
                         <option value="{{ $goal->value }}" @selected(old('chicken_goal', $user->chicken_goal?->value) === $goal->value)>
@@ -37,6 +37,6 @@
             </label>
         </div>
 
-        <button type="submit" class="savings__preferences-save">Save</button>
+        <button type="submit" class="savings__preferences-save">{{ __('savings.preferences.save') }}</button>
     </form>
 </details>

@@ -36,10 +36,10 @@
         hx-post="{{ route('app.batches.deaths.store', $batch) }}"
         hx-target="#deaths-form-region"
         hx-swap="outerHTML"
-        hx-headers='{"Accept": "application/json"}'
+        :hx-headers='json_encode(["Accept" => "application/json"])'
         hx-on::before-request="submitting = true; errors = []; success = false"
-        hx-on::after-request="submitting = false; if (event.detail.successful) { success = true; $el.reset(); setTimeout(() => success = false, 4000); }"
-        hx-on::response-error="try { errors = Object.values(JSON.parse(event.detail.xhr.responseText).errors).flat(); } catch(e) { errors = ['An unexpected error occurred.']; }">
+        hx-on::after-request="submitting = false; if (event.detail.successful) { success = true; window.ChickenCare.htmx.resetForm(event); setTimeout(() => success = false, 4000); }"
+        hx-on::response-error="errors = window.ChickenCare.htmx.extractErrors(event.detail.xhr)">
 
         <div class="batches__form-grid">
             <div class="batches__form-field">

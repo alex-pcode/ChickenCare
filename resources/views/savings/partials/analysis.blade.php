@@ -4,7 +4,7 @@
 
 <section class="savings__section" aria-labelledby="savings-analysis-heading">
     <h2 class="savings__section-title" id="savings-analysis-heading">
-        {{ $isBusinessGoal ? 'Profitability Analysis' : 'Cost Analysis' }}
+        {{ $isBusinessGoal ? __('savings.analysis.profitability') : __('savings.analysis.cost') }}
     </h2>
 
     <div class="savings__analysis-grid">
@@ -12,14 +12,14 @@
         @if($analysis['hasCostData'])
             <x-ui.metric-display
                 :value="$analysis['costPerEgg']"
-                :label="'total cost per egg' . ($period->includesStartupCosts() ? ' (incl. startup)' : '')"
+                :label="__('savings.analysis.metrics.cost_per_egg') . ($period->includesStartupCosts() ? __('savings.analysis.metrics.including_startup') : '')"
                 format="currency"
                 :precision="3"
                 color="info"
             />
         @else
             <div class="glass-card savings__analysis-empty">
-                No egg production data available
+                {{ __('savings.analysis.empty.no_egg_production') }}
             </div>
         @endif
 
@@ -27,14 +27,14 @@
         @if($analysis['hasCostData'])
             <x-ui.metric-display
                 :value="$analysis['profitPerEgg']"
-                :label="'net profit per egg' . ($period->includesStartupCosts() ? ' (incl. startup)' : '')"
+                :label="__('savings.analysis.metrics.profit_per_egg') . ($period->includesStartupCosts() ? __('savings.analysis.metrics.including_startup') : '')"
                 format="currency"
                 :precision="3"
                 :color="$analysis['profitPositive'] ? 'success' : 'danger'"
             />
         @else
             <div class="glass-card savings__analysis-empty">
-                No egg production data available
+                {{ __('savings.analysis.empty.no_egg_production') }}
             </div>
         @endif
 
@@ -42,15 +42,15 @@
         @if($analysis['hasBreakEvenData'])
             <x-ui.metric-display
                 :value="$analysis['eggsToBreakEven']"
-                :label="'eggs to cover all costs' . ($period->includesStartupCosts() ? ' (incl. startup)' : '')"
+                :label="__('savings.analysis.metrics.eggs_to_break_even') . ($period->includesStartupCosts() ? __('savings.analysis.metrics.including_startup') : '')"
                 format="number"
                 :precision="0"
-                unit="eggs"
+                :unit="__('savings.analysis.metrics.unit_eggs')"
                 color="warning"
             />
         @else
             <div class="glass-card savings__analysis-empty">
-                Insufficient data for break-even analysis
+                {{ __('savings.analysis.empty.insufficient_break_even') }}
             </div>
         @endif
     </div>

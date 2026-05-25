@@ -82,6 +82,23 @@ class FlockEventControllerTest extends TestCase
         $response->assertSessionHasErrors(['type']);
     }
 
+    public function test_user_can_add_recount_event(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post("/app/flock/{$this->profile->id}/events", $this->validEventData([
+                'type' => 'recount',
+                'description' => 'Monthly head count',
+                'affected_birds' => 20,
+            ]));
+
+        $response->assertRedirect(route('app.flock.index'));
+        $this->assertDatabaseHas('flock_events', [
+            'flock_profile_id' => $this->profile->id,
+            'type' => 'recount',
+            'affected_birds' => 20,
+        ]);
+    }
+
     public function test_user_cannot_add_event_to_another_users_profile(): void
     {
         $response = $this->actingAs($this->user)

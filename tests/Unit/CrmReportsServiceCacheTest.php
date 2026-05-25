@@ -12,31 +12,21 @@ class CrmReportsServiceCacheTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_clear_cache_for_user_forgets_revenue_keys(): void
+    public function test_clear_cache_for_user_bumps_cache_version(): void
     {
         $user = User::factory()->create();
         $service = app(CrmReportsService::class);
 
-        // Populate cache
         $service->revenueOverview($user, 'month');
-        $service->revenueOverview($user, 'year');
-        $service->revenueOverview($user, 'all');
 
-        // Verify cache is populated
-        $this->assertNotNull(Cache::get("crm_revenue_{$user->id}_month__"));
-        $this->assertNotNull(Cache::get("crm_revenue_{$user->id}_year__"));
-        $this->assertNotNull(Cache::get("crm_revenue_{$user->id}_all__"));
+        $this->assertSame(1, Cache::get("crm_cache_version_{$user->id}", 1));
 
-        // Clear cache
         $service->clearCacheForUser($user);
 
-        // Verify cache is cleared
-        $this->assertNull(Cache::get("crm_revenue_{$user->id}_month__"));
-        $this->assertNull(Cache::get("crm_revenue_{$user->id}_year__"));
-        $this->assertNull(Cache::get("crm_revenue_{$user->id}_all__"));
+        $this->assertSame(2, Cache::get("crm_cache_version_{$user->id}"));
     }
 
-    public function test_clear_cache_does_not_affect_other_users(): void
+    public function test_clear_cache_does_not_affect_other_users_versions(): void
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
@@ -47,7 +37,7 @@ class CrmReportsServiceCacheTest extends TestCase
 
         $service->clearCacheForUser($user1);
 
-        $this->assertNull(Cache::get("crm_revenue_{$user1->id}_month__"));
-        $this->assertNotNull(Cache::get("crm_revenue_{$user2->id}_month__"));
+        $this->assertSame(2, Cache::get("crm_cache_version_{$user1->id}"));
+        $this->assertSame(1, Cache::get("crm_cache_version_{$user2->id}", 1));
     }
 }

@@ -10,11 +10,11 @@
              setTimeout(() => this.visible = false, 4000);
          }
      }"
-     @toast:success.window="show($event.detail?.value ?? $event.detail?.message ?? 'Done.', 'success')"
-     @toast:error.window="show($event.detail?.value ?? $event.detail?.message ?? 'Something went wrong.', 'error')"
-     @flock:success.window="show($event.detail?.value ?? $event.detail?.message ?? 'Updated.', 'success')"
-     @flock:error.window="show($event.detail?.value ?? $event.detail?.message ?? 'Something went wrong.', 'error')"
-     @flock:changed.window="show($event.detail?.message ?? 'Flock updated.', $event.detail?.type ?? 'success')">
+     @toast:success.window="show($event.detail?.value ?? $event.detail?.message ?? @js(__('ui.toast.done')), 'success')"
+     @toast:error.window="show($event.detail?.value ?? $event.detail?.message ?? @js(__('ui.toast.something_went_wrong')), 'error')"
+     @flock:success.window="show($event.detail?.value ?? $event.detail?.message ?? @js(__('ui.toast.updated')), 'success')"
+     @flock:error.window="show($event.detail?.value ?? $event.detail?.message ?? @js(__('ui.toast.something_went_wrong')), 'error')"
+     @flock:changed.window="show($event.detail?.message ?? @js(__('ui.toast.flock_updated')), $event.detail?.type ?? 'success')">
     <div class="toast"
          x-show="visible"
          x-cloak

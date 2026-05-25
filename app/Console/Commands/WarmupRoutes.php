@@ -15,12 +15,15 @@ class WarmupRoutes extends Command
     private array $routes = [
         '/app',
         '/app/eggs',
+        '/app/account',
+        '/app/crm',
+        '/app/crm/reports',
         '/app/flock',
         '/app/batches',
         '/app/expenses',
         '/app/feed',
-        '/app/customers',
-        '/app/sales',
+        '/app/savings',
+        '/app/viability',
     ];
 
     public function handle(): int

@@ -17,11 +17,11 @@
 
     <div class="egg-counter__backfill-modal-content">
         <div class="egg-counter__backfill-modal-header">
-            <h2 id="backfill-title" class="egg-counter__backfill-modal-title">Backfill History</h2>
+            <h2 id="backfill-title" class="egg-counter__backfill-modal-title">{{ __('eggs.backfill.modal_title') }}</h2>
             <button type="button" class="btn btn--sm btn--secondary" @click="close()" aria-label="Close modal">&times;</button>
         </div>
 
-        <p class="egg-counter__backfill-modal-desc">Enter historical egg counts (up to 90 days in the past).</p>
+        <p class="egg-counter__backfill-modal-desc">{{ __('eggs.backfill.description') }}</p>
 
         <form hx-post="{{ route('app.eggs.backfill') }}"
               hx-target="#backfill-modal"
@@ -32,7 +32,7 @@
                 <template x-for="(row, index) in rows" :key="index">
                     <div class="egg-counter__backfill-row">
                         <div class="form-group">
-                            <label class="form-label" x-bind:for="'entries_' + index + '_date'">Date</label>
+                            <label class="form-label" x-bind:for="'entries_' + index + '_date'">{{ __('eggs.backfill.date_label') }}</label>
                             <input type="date"
                                    class="egg-counter__input"
                                    x-bind:id="'entries_' + index + '_date'"
@@ -43,7 +43,7 @@
                                    required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" x-bind:for="'entries_' + index + '_count'">Count</label>
+                            <label class="form-label" x-bind:for="'entries_' + index + '_count'">{{ __('eggs.backfill.count_label') }}</label>
                             <input type="number"
                                    class="egg-counter__input"
                                    x-bind:id="'entries_' + index + '_count'"
@@ -57,10 +57,10 @@
             </div>
 
             <div class="egg-counter__backfill-modal-actions">
-                <button type="button" class="btn btn--sm btn--secondary" @click="addRow()">Add Row</button>
+                <button type="button" class="btn btn--sm btn--secondary" @click="addRow()">{{ __('eggs.backfill.add_row') }}</button>
                 <div class="egg-counter__backfill-modal-actions-right">
-                    <button type="button" class="btn btn--sm btn--secondary" @click="close()">Cancel</button>
-                    <button type="submit" class="btn btn--sm btn--primary">Save Entries</button>
+                    <button type="button" class="btn btn--sm btn--secondary" @click="close()">{{ __('eggs.backfill.cancel') }}</button>
+                    <button type="submit" class="btn btn--sm btn--primary">{{ __('eggs.backfill.save') }}</button>
                 </div>
             </div>
         </form>

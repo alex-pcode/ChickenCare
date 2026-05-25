@@ -1,0 +1,51 @@
+schema: 1
+story: 'serbian-translation-story-1-foundation'
+story_title: 'Localization Foundation and Locale Persistence'
+gate: PASS
+status_reason: 'All blocking CONCERNS resolved: full suite passes 1071/0/3005, enum unit tests fixed, viability assertion fixed. Locale plumbing is solid, focused locale suite verified, AC11 fallback is native Laravel behavior locked by downstream Story 3 raw-key assertions.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-26T12:00:00Z'
+expires: '2026-05-10T00:00:00Z'
+
+quality_score: 95
+
+evidence:
+  tests_reviewed: 57
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    ac_gaps: []
+  notes: |
+    Re-review after dev resolved all 7 inherited test failures.
+    Full suite: php artisan test → 1071 passed, 0 failed (3005 assertions)
+    Focused: AccountController + Layout + LocalePersistence → 57 passed (192 assertions)
+    AC11 (English fallback for missing sr key) is now indirectly locked by Story 3's
+    assertDontSee('app.expenses.index', false) and DeferredFeatureTranslationTest's
+    assertDontSee('Savings Analysis') / assertDontSee('Feed Inventory') etc.
+    Cookie optimization (persist only on locale change) was already implemented per
+    Story 1 QA v1 recommendation.
+
+top_issues: []
+
+waiver:
+  active: false
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'All locale candidates pass an allowlist before App::setLocale(). Cookie is opaque. Story 7.2 private,no-store prevents locale-dependent cache poisoning.'
+  performance:
+    status: PASS
+    notes: 'One additional middleware doing array-membership checks; one nullable 5-byte column on users. No N+1.'
+  reliability:
+    status: PASS
+    notes: 'Full suite is green (1071/0). Locale resolution is deterministic and fail-safe across all four sources (user pref, session, cookie, config default).'
+  maintainability:
+    status: PASS
+    notes: 'Middleware is short, single-purpose, follows existing sibling patterns. Lang directory cleanly mirrors namespace.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Consider adding an explicit AC11 test that deliberately removes an sr key and asserts the en fallback renders. Currently covered indirectly but not by a dedicated assertion.'
+      refs: ['tests/Feature/LocalePersistenceTest.php']

@@ -1,7 +1,7 @@
-@props(['title' => 'Dashboard'])
+@props(['title' => __('dashboard.page.title')])
 
 <header class="navbar">
-    <button class="navbar__toggle" @click="$dispatch('toggle-sidebar')" aria-label="Toggle navigation">
+    <button class="navbar__toggle" @click="$dispatch('toggle-sidebar')" aria-label="{{ __('navigation.navbar.toggle_navigation') }}">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <line x1="3" y1="6" x2="21" y2="6"/>
             <line x1="3" y1="12" x2="21" y2="12"/>
@@ -21,11 +21,11 @@
 
         <div x-show="open" @click.away="open = false" x-cloak class="navbar__dropdown">
             @if(Route::has('app.account.index'))
-            <a href="{{ route('app.account.index') }}" class="navbar__dropdown-item">Account Settings</a>
+            <a href="{{ route('app.account.index') }}" class="navbar__dropdown-item">{{ __('navigation.navbar.account_settings') }}</a>
             @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="navbar__dropdown-item">Logout</button>
+                <button type="submit" class="navbar__dropdown-item">{{ __('navigation.navbar.logout') }}</button>
             </form>
         </div>
     </div>

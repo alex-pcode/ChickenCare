@@ -1,26 +1,31 @@
+@php
+    $pageTitle = __('account.page.title');
+    $skel = $skel ?? false;
+@endphp
+
 @extends('layouts.app')
 
-@section('title', 'Account Settings')
+@section('title', $pageTitle)
 
 @section('content')
 <div class="account-page">
     <x-ui.breadcrumbs :items="[
-        ['label' => 'Dashboard', 'href' => route('app.dashboard')],
-        ['label' => 'Account Settings', 'current' => true],
+        ['label' => __('navigation.menu.dashboard'), 'href' => route('app.dashboard')],
+        ['label' => $pageTitle, 'current' => true],
     ]" />
 
     <div class="account-page__header">
-        <h1 class="account-page__title">Account Settings</h1>
+        <h1 class="account-page__title">{{ $pageTitle }}</h1>
     </div>
 
-    <div class="account-page__tabs" role="tablist" aria-label="Account settings tabs"
+    <div class="account-page__tabs" role="tablist" aria-label="{{ __('account.page.tabs_aria_label') }}"
          x-data="{ activeTab: '{{ $tab }}' }">
         @php
             $tabs = [
-                'profile' => 'Profile',
-                'security' => 'Security',
-                'billing' => 'Billing',
-                'goals' => 'Goals & Preferences',
+                'profile' => __('account.tabs.profile'),
+                'security' => __('account.tabs.security'),
+                'billing' => __('account.tabs.billing'),
+                'goals' => __('account.tabs.goals'),
             ];
         @endphp
         @foreach($tabs as $id => $label)
@@ -41,10 +46,10 @@
 
     <div id="account-banner"
          x-data="accountBanners()"
-         @account-profile-updated.window="show('success', 'Profile updated successfully!')"
-         @account-preferences-updated.window="show('success', 'Preferences updated successfully!')"
-         @account-password-reset-sent.window="show('success', 'Password reset link sent to your email!')"
-         @account-password-reset-failed.window="show('error', $event.detail?.message || 'Failed to send password reset link.')">
+            @account-profile-updated.window="show('success', @js(__('account.messages.profile_updated')))"
+            @account-preferences-updated.window="show('success', @js(__('account.messages.preferences_updated')))"
+            @account-password-reset-sent.window="show('success', @js(__('account.messages.password_reset_sent')))"
+            @account-password-reset-failed.window="show('error', $event.detail?.message || @js(__('account.messages.password_reset_failed')))">
         <template x-if="visible">
             <div :class="'account-page__banner account-page__banner--' + type"
                  x-transition:enter="account-page__banner-enter"
@@ -54,13 +59,39 @@
                  :aria-live="type === 'error' ? 'assertive' : 'polite'">
                 <span x-text="type === 'success' ? '✅' : '❌'" aria-hidden="true"></span>
                 <span x-text="message"></span>
-                <button @click="dismiss()" class="account-page__banner-close" aria-label="Dismiss">&times;</button>
+                <button @click="dismiss()" class="account-page__banner-close" aria-label="{{ __('account.page.dismiss_banner') }}">&times;</button>
             </div>
         </template>
     </div>
 
-    <div id="account-tab-content" class="account-page__tab-content">
-        @include("account.partials.tab-{$tab}")
+    <div id="account-tab-content" class="account-page__tab-content has-loading-skeleton" data-loading-skeleton="account-tab">
+        @if ($skel)
+            <div class="account-profile">
+                <div class="form-card">
+                    <div class="form-card__header">
+                        <h2 class="form-card__title"><x-ui.skel block="title" /></h2>
+                        <p class="form-card__subtitle"><x-ui.skel block="body-wide" /></p>
+                    </div>
+                    <div class="form-card__form">
+                        <x-forms.input name="skel-1" label=" " :loading="true" />
+                        <x-forms.input name="skel-2" label=" " :loading="true" />
+                        <x-forms.input name="skel-3" label=" " :loading="true" />
+                        <x-forms.submit-button label="" :loading="true" />
+                    </div>
+                </div>
+                <div class="form-card">
+                    <div class="form-card__header">
+                        <h2 class="form-card__title"><x-ui.skel block="title" /></h2>
+                        <p class="form-card__subtitle"><x-ui.skel block="body-wide" /></p>
+                    </div>
+                    <div class="form-card__form">
+                        <p><x-ui.skel block="body-wide" /></p>
+                    </div>
+                </div>
+            </div>
+        @else
+            @include("account.partials.tab-{$tab}")
+        @endif
     </div>
 </div>
 @endsection

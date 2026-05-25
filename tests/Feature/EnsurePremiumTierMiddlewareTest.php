@@ -38,6 +38,16 @@ class EnsurePremiumTierMiddlewareTest extends TestCase
             ->assertSessionHas('warning', 'Upgrade to Premium to access this feature.');
     }
 
+    public function test_free_user_redirected_from_premium_route_with_serbian_warning(): void
+    {
+        $user = User::factory()->create(['locale' => 'sr']);
+
+        $this->actingAs($user)
+            ->get('/app/expenses')
+            ->assertRedirect('/app')
+            ->assertSessionHas('warning', 'Predjite na Premium da biste pristupili ovoj funkciji.');
+    }
+
     public function test_free_user_htmx_request_returns_premium_gate_partial(): void
     {
         $user = User::factory()->create();
@@ -48,5 +58,20 @@ class EnsurePremiumTierMiddlewareTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('premium-gate', false);
+    }
+
+    public function test_free_user_htmx_request_returns_localized_premium_gate_partial_for_serbian_locale(): void
+    {
+        $user = User::factory()->create(['locale' => 'sr']);
+
+        $response = $this->actingAs($user)
+            ->withHeaders(['HX-Request' => 'true'])
+            ->get('/app/expenses');
+
+        $response->assertOk();
+        $response->assertViewIs('partials.premium-gate');
+        $response->assertSee('Premium funkcija');
+        $response->assertSee('Za pristup funkciji Troškovi potrebna je Premium pretplata.');
+        $response->assertDontSee('app.expenses.index', false);
     }
 }

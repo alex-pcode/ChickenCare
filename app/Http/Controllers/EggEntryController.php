@@ -9,6 +9,9 @@ use App\Models\EggEntry;
 use App\Services\EggStatsService;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 class EggEntryController extends Controller
@@ -20,7 +23,7 @@ class EggEntryController extends Controller
         $entries = $request->user()
             ->eggEntries()
             ->orderBy('date', 'desc')
-            ->paginate(15);
+            ->paginate(5);
 
         if ($this->isHtmx($request) && $request->has('page')) {
             return view('eggs.partials.table', compact('entries'));
@@ -34,7 +37,43 @@ class EggEntryController extends Controller
             $yearlyGoal = $request->user()->yearly_egg_goal;
         }
 
-        return view('eggs.index', compact('entries', 'stats', 'yearlyGoal'));
+        $today = now()->startOfDay();
+        $lastEntry = $request->user()
+            ->eggEntries()
+            ->orderBy('date', 'desc')
+            ->first();
+        $lastEntryDate = $lastEntry?->date;
+        $loggedToday = $lastEntryDate !== null && $lastEntryDate->isSameDay($today);
+        $todayTotal = $loggedToday
+            ? (int) $request->user()->eggEntries()->whereDate('date', $today->toDateString())->sum('count')
+            : 0;
+        $daysSinceLastEntry = $lastEntryDate
+            ? (int) abs($today->diffInDays($lastEntryDate->copy()->startOfDay()))
+            : null;
+
+        return view('eggs.index', compact(
+            'entries',
+            'stats',
+            'yearlyGoal',
+            'lastEntryDate',
+            'loggedToday',
+            'todayTotal',
+            'daysSinceLastEntry'
+        ));
+    }
+
+    public function skeleton(): Response
+    {
+        return response()->view('eggs.index', [
+            'skel' => true,
+            'entries' => new LengthAwarePaginator(new Collection, 0, 5),
+            'stats' => null,
+            'yearlyGoal' => null,
+            'lastEntryDate' => null,
+            'loggedToday' => false,
+            'todayTotal' => 0,
+            'daysSinceLastEntry' => null,
+        ])->header('Cache-Control', 'private, max-age=300');
     }
 
     public function store(StoreEggEntryRequest $request)
@@ -72,7 +111,7 @@ class EggEntryController extends Controller
             }
 
             return redirect()->back()
-                ->with('warning', "An entry for {$existing->date->format('M d, Y')} already exists with {$existing->count} eggs.")
+                ->with('warning', __('eggs.messages.duplicate_warning', ['date' => $existing->date->format('M d, Y'), 'count' => $existing->count]))
                 ->withInput();
         }
 
@@ -87,7 +126,7 @@ class EggEntryController extends Controller
             }
 
             return redirect()->route('app.eggs.index')
-                ->with('success', 'Existing entry updated.');
+                ->with('success', __('eggs.messages.existing_updated'));
         }
 
         $entry = $request->user()
@@ -99,7 +138,7 @@ class EggEntryController extends Controller
         }
 
         return redirect()->route('app.eggs.index')
-            ->with('success', 'Egg entry recorded.');
+            ->with('success', __('eggs.messages.recorded'));
     }
 
     public function show(Request $request, EggEntry $egg)
@@ -126,7 +165,7 @@ class EggEntryController extends Controller
         }
 
         return redirect()->route('app.eggs.index')
-            ->with('success', 'Entry updated.');
+            ->with('success', __('eggs.messages.updated'));
     }
 
     public function backfillForm()
@@ -150,7 +189,7 @@ class EggEntryController extends Controller
         }
 
         return redirect()->route('app.eggs.index')
-            ->with('success', count($entries).' entries backfilled.');
+            ->with('success', __('eggs.messages.backfilled', ['count' => count($entries)]));
     }
 
     public function destroy(Request $request, EggEntry $egg)
@@ -162,12 +201,12 @@ class EggEntryController extends Controller
             return response('', 200)
                 ->header('HX-Trigger', json_encode([
                     'closeModal' => true,
-                    'toast:success' => 'Entry deleted.',
+                    'toast:success' => __('eggs.messages.deleted'),
                 ]));
         }
 
         return redirect()->route('app.eggs.index')
-            ->with('success', 'Entry deleted.');
+            ->with('success', __('eggs.messages.deleted'));
     }
 
     public function deleteConfirm(Request $request, EggEntry $egg)

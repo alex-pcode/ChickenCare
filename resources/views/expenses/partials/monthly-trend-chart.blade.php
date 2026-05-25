@@ -1,7 +1,7 @@
 <section class="expenses__trend glass-card">
-    <h2 class="expenses__trend-title">📊 12-Month Expense Trend</h2>
+    <h2 class="expenses__trend-title">📊 {{ __('expenses.charts.monthly_trend.title') }}</h2>
     <div class="expenses__trend-canvas-wrap">
-        <canvas id="expense-monthly-trend" aria-label="12-month expense bar chart" role="img"></canvas>
+        <canvas id="expense-monthly-trend" aria-label="{{ __('expenses.charts.monthly_trend.aria_label') }}" role="img"></canvas>
     </div>
 </section>
 

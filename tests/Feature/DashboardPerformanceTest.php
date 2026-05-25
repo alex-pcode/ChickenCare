@@ -80,4 +80,35 @@ class DashboardPerformanceTest extends TestCase
 
         $this->assertLessThan(2000, $elapsed, "Dashboard took {$elapsed}ms to load.");
     }
+
+    public function test_htmx_recent_activity_query_count_stays_narrow(): void
+    {
+        $user = User::factory()->premium()->create();
+        $batch = FlockBatch::factory()->active()->create(['user_id' => $user->id]);
+
+        EggEntry::factory()->count(10)->create(['user_id' => $user->id]);
+        Expense::factory()->count(5)->create(['user_id' => $user->id]);
+        Sale::factory()->count(3)->create(['user_id' => $user->id]);
+        BatchEvent::factory()->count(3)->create([
+            'user_id' => $user->id,
+            'batch_id' => $batch->id,
+        ]);
+
+        $this->actingAs($user);
+
+        DB::enableQueryLog();
+
+        $this->withHeaders([
+            'HX-Request' => 'true',
+            'HX-Target' => 'dashboard-activity',
+        ])->get(route('app.dashboard'));
+
+        $queryCount = collect(DB::getQueryLog())
+            ->reject(fn ($query) => preg_match('/from ["`]sessions["`]/', $query['query']))
+            ->count();
+
+        DB::disableQueryLog();
+
+        $this->assertLessThan(10, $queryCount, "HTMX recent activity exceeded query budget: {$queryCount} queries fired.");
+    }
 }

@@ -1,0 +1,67 @@
+schema: 1
+story: '7.1'
+story_title: 'Static Asset Browser Caching'
+gate: CONCERNS
+status_reason: 'Apache cache rules and deploy docs are correctly implemented and safe by construction, but AC7 (header verification against a built Apache environment) is explicitly unfulfilled per the dev''s own completion notes.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-26T00:00:00Z'
+expires: '2026-05-10T00:00:00Z'
+
+quality_score: 90
+
+evidence:
+  tests_reviewed: 1            # tests/Feature/Http/CacheHeadersTest.php (adjacent dynamic-response coverage; not exercising .htaccess)
+  risks_identified: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6]
+    ac_gaps: [7]
+  notes: |
+    Static-asset .htaccess rules cannot be exercised by PHPUnit; out-of-process curl/HEAD verification
+    against Apache is the appropriate evidence and is the missing artifact. Hashed-asset regex was
+    cross-checked against public/build/manifest.json: app-BL0cYPyJ.js, app-DxvgWbFR.css, and
+    fraunces-400-MH2cmx7r.woff2 all match the immutable rule; manifest.json correctly does not.
+
+top_issues:
+  - id: AC7-VERIFICATION-MISSING
+    severity: medium
+    summary: 'Header matrix not verified against a real Apache response.'
+    refs: ['public/.htaccess', 'docs/stories/7.1.story.md']
+    suggested_action: 'Run a curl -I matrix in production/staging covering one hashed JS, one hashed CSS, one Vite-emitted font, one /images/*, one /screenshots/*, /favicon.ico, /robots.txt, plus one unhashed control. Paste results into the story Completion Notes.'
+    suggested_owner: dev
+  - id: DUPLICATE-PUBLIC-FONTS
+    severity: low
+    summary: 'public/fonts/ duplicates Vite-emitted hashed fonts under /build/assets/.'
+    refs: ['public/fonts/', 'DEPLOY.md']
+    suggested_action: 'Confirm the directory is unreferenced and delete it, or document the deliberate fallback rationale in DEPLOY.md so the conservative /fonts/* rule is not load-bearing forever.'
+    suggested_owner: dev
+
+waiver:
+  active: false
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Policy widens cacheability only for enumerated public paths; auth, /app/*, and JSON endpoints remain governed by CacheHeadersTest (private, no-store).'
+  performance:
+    status: CONCERNS
+    notes: 'Net positive design (immutable hashed assets, short TTLs on unhashed), but unverified in production. No before/after measurement captured.'
+  reliability:
+    status: PASS
+    notes: 'Mutually exclusive URL matchers prevent immutable being applied to unhashed paths; manual-upload deploy flow on Plesk is protected by the short TTLs on /images, /screenshots, /fonts.'
+  maintainability:
+    status: PASS
+    notes: '.htaccess change is small, idiomatic, and documented in DEPLOY.md. Recommend a brief inline comment explaining why the hashed-asset regex is intentionally narrow.'
+
+recommendations:
+  immediate:
+    - action: 'Capture a curl -I header matrix from the Apache-served built environment and append to story Completion Notes (closes AC7).'
+      refs: ['public/.htaccess', 'docs/stories/7.1.story.md']
+    - action: 'Verify at least one unhashed control path does not receive Cache-Control: immutable.'
+      refs: ['public/.htaccess']
+  future:
+    - action: 'Resolve duplicate public/fonts/ directory: remove or document.'
+      refs: ['public/fonts/', 'DEPLOY.md']
+    - action: 'Add Vary: Accept-Encoding for compressible static responses.'
+      refs: ['public/.htaccess']
+    - action: 'Re-run Lighthouse after AC7 verification to record the cache-policy win.'
+      refs: ['DEPLOY.md']

@@ -38,7 +38,7 @@ class FlockEventController extends Controller
         }
 
         return redirect()->route('app.flock.index')
-            ->with('success', 'Event added.');
+            ->with('success', __('flock.messages.event_added'));
     }
 
     public function edit(FlockProfile $flockProfile, FlockEvent $flockEvent)
@@ -68,7 +68,7 @@ class FlockEventController extends Controller
         }
 
         return redirect()->route('app.flock.index')
-            ->with('success', 'Event updated.');
+            ->with('success', __('flock.messages.event_updated'));
     }
 
     public function destroy(Request $request, FlockProfile $flockProfile, FlockEvent $flockEvent)
@@ -82,6 +82,6 @@ class FlockEventController extends Controller
         }
 
         return redirect()->route('app.flock.index')
-            ->with('success', 'Event removed.');
+            ->with('success', __('flock.messages.event_removed'));
     }
 }

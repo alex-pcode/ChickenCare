@@ -1,0 +1,40 @@
+schema: 1
+story: "8.4"
+story_title: "Offline Write Queue with Background Sync"
+gate: PASS
+status_reason: "Full offline write queue is implemented: IndexedDB-backed queue with explicit allowlist (eggs/expenses/feed/batch-deaths), service-worker Background Sync replay + page-level online/visibilitychange fallback, /csrf-token refresh, lock-based dedupe, 419 single-retry, failed-bucket review/discard surface in Account. JS unit tests (4/4) and PHPUnit /csrf-token tests pass."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-04-26T00:00:00Z"
+
+waiver: { active: false }
+top_issues: []
+
+quality_score: 100
+expires: "2026-05-10T00:00:00Z"
+
+evidence:
+  tests_reviewed: 12
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "/csrf-token gated behind auth middleware (verified by test). Replay reuses original CSRF-protected Laravel routes. Interactive HTML responses are classified as failed, preventing silent data loss on session expiry."
+  performance:
+    status: PASS
+    notes: "Tiny IndexedDB schema with two object stores; replay loop uses lock leases instead of retry storms; bounded payloads (scalar form fields only)."
+  reliability:
+    status: PASS
+    notes: "Lock-based claim/release prevents double-replay across SW + page paths. 419 retry path is single-attempt to avoid token thrash. Non-retryable failures move to a visible review bucket rather than being dropped."
+  maintainability:
+    status: PASS
+    notes: "Allowlist is data-driven (QUEUE_SOURCE_DEFINITIONS); replay classifier is small and shared between SW and page modules."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Operator: end-to-end browser verification of all four allowlisted flows on the live host post-deploy"
+      refs: ["resources/js/offline-queue.js", "public/sw.js"]

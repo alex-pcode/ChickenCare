@@ -1,0 +1,87 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.pwa-banner {
+    position: sticky;
+    top: $space-4;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0 $space-4;
+    margin: 0 0 $space-4;
+}
+
+.pwa-banner__panel {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    width: min(100%, 42rem);
+    padding: $space-4;
+    border: 1px solid rgba($color-primary, 0.16);
+    border-radius: $radius-xl;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: $shadow-lg, 0 18px 40px rgba($color-primary-dark, 0.12);
+    backdrop-filter: blur(10px);
+}
+
+.pwa-banner__copy {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+}
+
+.pwa-banner__title {
+    margin: 0;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-neutral-900;
+}
+
+.pwa-banner__message {
+    margin: 0;
+    font-size: $font-size-sm;
+    color: $color-neutral-600;
+}
+
+.pwa-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+}
+
+@media (max-width: $breakpoint-mobile) {
+    .pwa-banner {
+        top: $space-3;
+        padding: 0 $space-3;
+    }
+
+    .pwa-banner__actions {
+        width: 100%;
+    }
+
+    .pwa-banner__actions .btn {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pwa-banner__panel {
+        backdrop-filter: none;
+        box-shadow: $shadow-md;
+    }
+}
+
+.dark .pwa-banner__panel {
+    background: rgba($color-neutral-800, 0.96);
+    border-color: rgba($color-primary, 0.32);
+}
+
+.dark .pwa-banner__title {
+    color: $color-neutral-100;
+}
+
+.dark .pwa-banner__message {
+    color: $color-neutral-400;
+}

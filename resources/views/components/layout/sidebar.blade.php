@@ -1,18 +1,18 @@
 @php
     $menuLinks = [
-        ['route' => 'app.dashboard', 'pattern' => 'app.dashboard', 'label' => 'Dashboard', 'emoji' => '🏠'],
-        ['route' => 'app.eggs.index', 'pattern' => 'app.eggs.*', 'label' => 'Eggs', 'emoji' => '🥚'],
-        ['route' => 'app.account.index', 'pattern' => 'app.account.*', 'label' => 'Account', 'emoji' => '⚙️'],
+        ['route' => 'app.dashboard', 'pattern' => 'app.dashboard', 'label' => __('navigation.menu.dashboard'), 'emoji' => '🏠'],
+        ['route' => 'app.eggs.index', 'pattern' => 'app.eggs.*', 'label' => __('navigation.menu.eggs'), 'emoji' => '🥚'],
+        ['route' => 'app.account.index', 'pattern' => 'app.account.*', 'label' => __('navigation.menu.account'), 'emoji' => '⚙️'],
     ];
 
     $premiumLinks = [
-        ['route' => 'app.flock.index', 'pattern' => 'app.flock.*', 'label' => 'My Flock', 'emoji' => '🐔'],
-        ['route' => 'app.batches.index', 'pattern' => 'app.batches.*', 'label' => 'Batches', 'emoji' => '📦'],
-        ['route' => 'app.crm.index', 'pattern' => 'app.crm.*', 'label' => 'CRM', 'emoji' => '💼'],
-        ['route' => 'app.expenses.index', 'pattern' => 'app.expenses.*', 'label' => 'Expenses', 'emoji' => '💰'],
-        ['route' => 'app.feed.index', 'pattern' => 'app.feed.*', 'label' => 'Feed', 'emoji' => '🌾'],
-        ['route' => 'app.savings.index', 'pattern' => 'app.savings.*', 'label' => 'Savings', 'emoji' => '📈'],
-        ['route' => 'app.viability.index', 'pattern' => 'app.viability.*', 'label' => 'Viability', 'emoji' => '🧮'],
+        ['route' => 'app.flock.index', 'pattern' => 'app.flock.*', 'label' => __('navigation.premium.flock'), 'emoji' => '🐔'],
+        ['route' => 'app.batches.index', 'pattern' => 'app.batches.*', 'label' => __('navigation.premium.batches'), 'emoji' => '📦'],
+        ['route' => 'app.crm.index', 'pattern' => 'app.crm.*', 'label' => __('navigation.premium.crm'), 'emoji' => '💼'],
+        ['route' => 'app.expenses.index', 'pattern' => 'app.expenses.*', 'label' => __('navigation.premium.expenses'), 'emoji' => '💰'],
+        ['route' => 'app.feed.index', 'pattern' => 'app.feed.*', 'label' => __('navigation.premium.feed'), 'emoji' => '🌾'],
+        ['route' => 'app.savings.index', 'pattern' => 'app.savings.*', 'label' => __('navigation.premium.savings'), 'emoji' => '📈'],
+        ['route' => 'app.viability.index', 'pattern' => 'app.viability.*', 'label' => __('navigation.premium.viability'), 'emoji' => '🧮'],
     ];
 @endphp
 
@@ -25,13 +25,13 @@
         <span class="sidebar__brand-emoji" role="img" aria-label="ChickenCare">🐔</span>
         <div>
             <h1 class="sidebar__brand-title">ChickenCare</h1>
-            <p class="sidebar__brand-subtitle">Egg-ceptional flock management</p>
+            <p class="sidebar__brand-subtitle">{{ __('navigation.brand.tagline') }}</p>
         </div>
     </div>
 
-    <nav class="sidebar__nav" role="navigation" aria-label="Main navigation">
+    <nav class="sidebar__nav" role="navigation" aria-label="{{ __('navigation.aria.main') }}">
         {{-- Free tier — always visible --}}
-        <span class="sidebar__section-label">Menu</span>
+        <span class="sidebar__section-label">{{ __('navigation.menu.section') }}</span>
 
         @foreach($menuLinks as $link)
             @if(Route::has($link['route']))
@@ -51,7 +51,7 @@
 
         {{-- Premium tier — conditionally rendered --}}
         @if(auth()->user()->isPremium())
-        <span class="sidebar__section-label">Premium</span>
+        <span class="sidebar__section-label">{{ __('navigation.premium.section') }}</span>
 
         @foreach($premiumLinks as $link)
             @if(Route::has($link['route']))
@@ -79,19 +79,19 @@
             </svg>
             <div>
                 <span class="sidebar__user-email">{{ Str::limit(auth()->user()->email, 20) }}</span>
-                <span class="sidebar__user-greeting">Welcome back!</span>
+                <span class="sidebar__user-greeting">{{ __('navigation.sidebar.welcome_back') }}</span>
             </div>
         </div>
 
         <div class="sidebar__theme">
-            <span class="sidebar__section-label" style="padding-left: 0;">Theme</span>
+            <span class="sidebar__section-label" style="padding-left: 0;">{{ __('navigation.sidebar.theme') }}</span>
             <x-ui.theme-toggle />
         </div>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="sidebar__logout-btn">
-                Logout ({{ Str::before(auth()->user()->email, '@') }})
+                {{ __('navigation.sidebar.logout', ['name' => Str::before(auth()->user()->email, '@')]) }}
             </button>
         </form>
     </div>

@@ -9,6 +9,9 @@
     <h4>{{ $isEdit ? 'Edit Death Record' : 'Record Death' }}</h4>
     <p class="batches__death-form-context">Current birds in batch: <strong>{{ $batch->current_count }}</strong></p>
     <form
+        @unless($isEdit)
+            data-offline-queue="batch-deaths"
+        @endunless
         @if($isEdit)
             hx-put="{{ $action }}"
         @else

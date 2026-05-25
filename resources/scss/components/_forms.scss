@@ -4,7 +4,8 @@
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: $space-1;
+    gap: $space-2;
+    margin-bottom: $space-3;
 
     &--error {
         .form-input,
@@ -87,5 +88,9 @@
 
     @include mobile {
         flex-direction: column;
+
+        &.form-row--2-col {
+            flex-direction: row;
+        }
     }
 }

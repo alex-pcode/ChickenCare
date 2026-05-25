@@ -1,32 +1,32 @@
 @extends('layouts.app')
 
-@section('title', 'Flock Batches')
+@section('title', __('batches.page.title'))
 
 @section('content')
 <div class="batches"
      @modal:close.window="document.getElementById('modal-container').innerHTML = ''">
 
-    <x-layout.page-header title="Flock Batches">
+    <x-layout.page-header :title="__('batches.page.header')">
         <x-slot:actions>
-            <a href="{{ route('app.batches.create') }}" class="btn btn--primary">Add Batch</a>
+            <a href="{{ route('app.batches.create') }}" class="btn btn--primary">{{ __('batches.actions.add_batch') }}</a>
         </x-slot:actions>
     </x-layout.page-header>
 
-    <div class="batches__filter-bar" role="group" aria-label="Filter batches">
+    <div class="batches__filter-bar" role="group" aria-label="{{ __('batches.filters.label') }}">
         <a href="{{ route('app.batches.index', ['filter' => 'active']) }}"
            class="batches__filter-btn {{ $filter === 'active' ? 'batches__filter-btn--active' : '' }}"
            @if($filter === 'active') aria-current="true" @endif>
-            Active
+            {{ __('batches.filters.active') }}
         </a>
         <a href="{{ route('app.batches.index', ['filter' => 'archived']) }}"
            class="batches__filter-btn {{ $filter === 'archived' ? 'batches__filter-btn--active' : '' }}"
            @if($filter === 'archived') aria-current="true" @endif>
-            Archived
+            {{ __('batches.filters.archived') }}
         </a>
         <a href="{{ route('app.batches.index', ['filter' => 'all']) }}"
            class="batches__filter-btn {{ $filter === 'all' ? 'batches__filter-btn--active' : '' }}"
            @if($filter === 'all') aria-current="true" @endif>
-            All
+            {{ __('batches.filters.all') }}
         </a>
     </div>
 

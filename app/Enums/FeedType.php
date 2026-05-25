@@ -10,6 +10,10 @@ enum FeedType: string
 
     public function label(): string
     {
-        return $this->value;
+        return match ($this) {
+            self::BabyChicks => __('feed.types.baby_chicks'),
+            self::BigChicks => __('feed.types.big_chicks'),
+            self::Both => __('feed.types.both'),
+        };
     }
 }

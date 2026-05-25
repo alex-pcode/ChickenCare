@@ -1,0 +1,49 @@
+schema: 1
+story: 'serbian-translation-story-2-priority-rollout'
+story_title: 'Serbian Translation Rollout for Shared UI and Priority Product Flows'
+gate: PASS
+status_reason: 'All blocking CONCERNS resolved: full suite passes 1071/0/3005, inherited enum/viability failures fixed. In-scope rollout is complete, focused suite 80/80, all ACs satisfied.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-26T12:00:00Z'
+expires: '2026-05-10T00:00:00Z'
+
+quality_score: 95
+
+evidence:
+  tests_reviewed: 80
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    ac_gaps: []
+  notes: |
+    Re-review after dev resolved all 7 inherited test failures.
+    Full suite: php artisan test → 1071 passed, 0 failed (3005 assertions)
+    Focused: Layout + DashboardController + AccountController + Auth/Login +
+             Auth/PasswordReset + SocialAuthentication → 80 passed (279 assertions)
+    AC14 fallback is locked by Story 3's raw-key contract plus native Laravel behavior.
+    AC15 deferred surfaces documented in Story Context + Completion Notes + Story 4.
+
+top_issues: []
+
+waiver:
+  active: false
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Display-only changes. No new routes, no auth changes, persisted enum values unchanged.'
+  performance:
+    status: PASS
+    notes: 'Translator file-cache amortizes lookup cost; view rendering dominates.'
+  reliability:
+    status: PASS
+    notes: 'Full suite green (1071/0). In-scope behavior verified under both locales.'
+  maintainability:
+    status: PASS
+    notes: 'Single translation pattern (__()). Namespaced lang files cleanly mirror domains. sr is intentionally a subset relying on documented fallback.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Capture a small visual smoke of sr layout (sidebar, mobile-dock, billing card, premium gate) against a built bundle to validate the layout-regression risk the story calls out.'
+      refs: ['resources/views/components/layout/', 'resources/views/components/premium-gate.blade.php']

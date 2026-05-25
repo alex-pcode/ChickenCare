@@ -18,7 +18,7 @@ class FlockEventFactory extends Factory
         return [
             'flock_profile_id' => FlockProfile::factory(),
             'date' => fake()->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
-            'type' => fake()->randomElement(['acquisition', 'laying_start', 'broody', 'hatching', 'other']),
+            'type' => fake()->randomElement(['acquisition', 'laying_start', 'broody', 'hatching', 'recount', 'other']),
             'description' => fake()->sentence(),
             'affected_birds' => fake()->optional(0.6)->numberBetween(1, 15),
             'notes' => fake()->optional(0.3)->sentence(),
@@ -54,6 +54,15 @@ class FlockEventFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'type' => 'hatching',
             'description' => 'Eggs hatched successfully',
+        ]);
+    }
+
+    public function recount(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'recount',
+            'description' => 'Periodic head count',
+            'affected_birds' => fake()->numberBetween(5, 50),
         ]);
     }
 

@@ -11,10 +11,20 @@
 
 <div class="stat-card stat-card--{{ $variant }}" {{ $attributes }}>
     @if($loading)
+        @if($variant === 'corner-gradient')
+            <div class="stat-card__gradient-blob" aria-hidden="true"></div>
+        @endif
         <div class="stat-card__inner">
-            <div style="height: 0.75rem; width: 40%; background: rgba(0,0,0,0.08); border-radius: 4px; margin-bottom: 0.5rem;"></div>
-            <div style="height: 1.5rem; width: 60%; background: rgba(0,0,0,0.08); border-radius: 4px; margin-bottom: 0.25rem;"></div>
-            <div style="height: 0.6rem; width: 50%; background: rgba(0,0,0,0.06); border-radius: 4px;"></div>
+            @if($icon)
+                <div class="stat-card__icon" aria-hidden="true">
+                    <x-ui.skel block="circle" />
+                </div>
+            @endif
+            <div class="stat-card__body">
+                <div class="stat-card__title"><x-ui.skel block="label" /></div>
+                <div class="stat-card__value"><x-ui.skel block="metric" /></div>
+                <div class="stat-card__meta"><x-ui.skel block="body" /></div>
+            </div>
         </div>
     @else
         @if($variant === 'corner-gradient')
@@ -40,7 +50,7 @@
                                 @if($changeType === 'increase')↗ +{{ $change }}%@elseif($changeType === 'decrease')↘ {{ $change }}%@else→ {{ $change }}%@endif
                             </span>
                         @endif
-                        @if($change !== null && $label) <span> vs </span> @endif
+                        @if($change !== null && $label) <span> {{ __('ui.stat_card.versus') }} </span> @endif
                         @if($label) <span>{{ $label }}</span> @endif
                     </div>
                 @endif

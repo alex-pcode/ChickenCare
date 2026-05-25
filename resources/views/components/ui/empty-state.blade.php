@@ -3,7 +3,7 @@
     'description' => '',
     'icon' => null,
     'action' => null,
-    'actionLabel' => 'Get Started',
+    'actionLabel' => __('ui.empty_state.action_label'),
 ])
 
 <div class="empty-state" role="status">

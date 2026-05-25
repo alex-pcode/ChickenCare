@@ -7,14 +7,14 @@
                 hx-target="#crm-tab-content"
                 hx-swap="innerHTML"
                 hx-push-url="true">
-            Overview
+            {{ __('crm.reports.overview') }}
         </button>
         <button class="crm-reports__pill {{ ($reportView ?? 'overview') === 'customer' ? 'crm-reports__pill--active' : '' }}"
                 hx-get="{{ route('app.crm.index', ['tab' => 'reports', 'view' => 'customer']) }}"
                 hx-target="#crm-tab-content"
                 hx-swap="innerHTML"
                 hx-push-url="true">
-            Per Customer
+            {{ __('crm.reports.per_customer') }}
         </button>
     </div>
 

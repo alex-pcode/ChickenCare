@@ -26,10 +26,12 @@ class ExpenseIndexHeroTest extends TestCase
 
     public function test_hero_partial_exists_and_contains_required_strings(): void
     {
-        $heroView = view('expenses.partials.hero')->render();
+        $stats = ['monthOverMonth' => ['thisMonthTotal' => 0, 'previousMonthTotal' => 0]];
+        $heroView = view('expenses.partials.hero', compact('stats'))->render();
 
         $this->assertStringContainsString('chicken-coin.webp', $heroView, 'Hero should contain chicken-coin.webp');
         $this->assertStringContainsString('💰 Expense Tracker', $heroView, 'Hero should contain badge text');
-        $this->assertStringContainsString('Track every expense!', $heroView, 'Hero should contain welcome text');
+        $this->assertStringContainsString('expenses-hero__status', $heroView, 'Hero should contain status card');
+        $this->assertStringContainsString('expenses-hero__side', $heroView, 'Hero should use two-column layout');
     }
 }

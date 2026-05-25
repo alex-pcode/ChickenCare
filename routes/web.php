@@ -13,6 +13,7 @@ use App\Http\Controllers\FlockBatchController;
 use App\Http\Controllers\FlockEventController;
 use App\Http\Controllers\FlockProfileController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SavingsController;
@@ -20,14 +21,21 @@ use App\Http\Controllers\SavingsPreferencesController;
 use App\Http\Controllers\ViabilityController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('landing');
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/costs', [LandingController::class, 'costs'])->name('costs');
+Route::view('/offline', 'app.offline')->name('offline');
+Route::middleware('auth')->get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()]);
+})->name('csrf-token');
 
 require __DIR__.'/auth.php';
 
 Route::middleware(['auth'])->prefix('app')->name('app.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/__skeleton', [DashboardController::class, 'skeleton'])->name('skeleton.dashboard');
+
+    Route::get('eggs/__skeleton', [EggEntryController::class, 'skeleton'])->name('skeleton.eggs');
+    Route::get('account/__skeleton', [AccountController::class, 'skeleton'])->name('skeleton.account');
 
     // Account Settings (free tier)
     Route::get('account', [AccountController::class, 'index'])->name('account.index');
@@ -53,6 +61,7 @@ Route::middleware(['auth'])->prefix('app')->name('app.')->group(function () {
 
     Route::middleware(['premium'])->group(function () {
         Route::get('crm', [CrmController::class, 'index'])->name('crm.index');
+        Route::get('crm/reports', [CrmController::class, 'reports'])->name('crm.reports');
 
         Route::resource('expenses', ExpenseController::class)->except(['create', 'edit', 'show']);
         Route::get('expenses/{expense}/edit-form', [ExpenseController::class, 'editForm'])->name('expenses.edit-form');

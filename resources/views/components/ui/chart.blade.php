@@ -6,7 +6,7 @@
     'height' => 300,
 ])
 
-<div class="chart-container" style="position: relative; height: {{ $height }}px;">
+<div class="chart-container" style="position: relative; height: {{ $height }}px; width: 100%; overflow: hidden;">
     <canvas id="{{ $id }}" aria-label="{{ $attributes->get('aria-label', 'Chart') }}"></canvas>
 </div>
 <script>
@@ -19,7 +19,7 @@
         }
         window.Chart.getChart(ctx)?.destroy();
         const userOptions = @json((object) $options);
-        new window.Chart(ctx.getContext('2d'), {
+        const chart = new window.Chart(ctx.getContext('2d'), {
             type: '{{ $type }}',
             data: @json($data),
             options: Object.assign({
@@ -27,5 +27,6 @@
                 maintainAspectRatio: false,
             }, userOptions),
         });
+        requestAnimationFrame(() => chart.resize());
     })();
 </script>

@@ -10,8 +10,8 @@ enum ChickenGoal: string
     public function label(): string
     {
         return match ($this) {
-            self::Hobby => 'Hobby',
-            self::Business => 'Business',
+            self::Hobby => __('savings.goals.hobby'),
+            self::Business => __('savings.goals.business'),
         };
     }
 }

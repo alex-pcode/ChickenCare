@@ -3,18 +3,18 @@
     $dir = $dir ?? 'desc';
 
     $columns = [
-        'date' => 'Date',
-        'category' => 'Category',
-        'description' => 'Description',
-        'amount' => 'Amount',
+        'date' => __('expenses.records.columns.date'),
+        'category' => __('expenses.records.columns.category'),
+        'description' => __('expenses.records.columns.description'),
+        'amount' => __('expenses.records.columns.amount'),
     ];
 @endphp
 
 <div id="records-table">
     @if($expenses->isEmpty())
         <x-ui.empty-state
-            title="No expenses found"
-            description="No expenses match the selected filter."
+            :title="__('expenses.records.filtered_empty_title')"
+            :description="__('expenses.records.filtered_empty_description')"
             icon="💰"
         />
     @else
@@ -35,12 +35,12 @@
                                    hx-target="#records-table"
                                    hx-swap="outerHTML"
                                    hx-push-url="true"
-                                   aria-label="Sort by {{ $label }}"
+                                   aria-label="{{ __('expenses.records.sort_by', ['label' => $label]) }}"
                                    aria-sort="{{ $isActive ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}"
                                 >{{ $label }}{{ $arrow }}</a>
                             </th>
                         @endforeach
-                        <th scope="col" class="data-table__header">Actions</th>
+                        <th scope="col" class="data-table__header">{{ __('expenses.records.columns.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody id="expense-entries-body" class="data-table__body">
@@ -52,17 +52,17 @@
         </div>
 
         @if($expenses->hasPages())
-            <nav class="pagination" aria-label="Expense pagination">
+            <nav class="pagination" aria-label="{{ __('expenses.records.pagination_aria_label') }}">
                 {{-- Previous --}}
                 @if($expenses->onFirstPage())
-                    <span class="pagination__link pagination__link--disabled">Previous</span>
+                    <span class="pagination__link pagination__link--disabled">{{ __('pagination.previous') }}</span>
                 @else
                     <a href="#" class="pagination__link"
                        hx-get="{{ $expenses->appends(request()->only('sort', 'dir', 'category'))->previousPageUrl() }}"
                        hx-target="#records-table"
                        hx-swap="outerHTML"
                        hx-push-url="true"
-                    >Previous</a>
+                    >{{ __('pagination.previous') }}</a>
                 @endif
 
                 {{-- Page Numbers --}}
@@ -81,14 +81,14 @@
 
                 {{-- Next --}}
                 @if(!$expenses->hasMorePages())
-                    <span class="pagination__link pagination__link--disabled">Next</span>
+                    <span class="pagination__link pagination__link--disabled">{{ __('pagination.next') }}</span>
                 @else
                     <a href="#" class="pagination__link"
                        hx-get="{{ $expenses->appends(request()->only('sort', 'dir', 'category'))->nextPageUrl() }}"
                        hx-target="#records-table"
                        hx-swap="outerHTML"
                        hx-push-url="true"
-                    >Next</a>
+                    >{{ __('pagination.next') }}</a>
                 @endif
             </nav>
         @endif

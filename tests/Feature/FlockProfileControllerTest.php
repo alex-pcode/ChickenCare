@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\FlockEvent;
 use App\Models\FlockProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -107,6 +108,35 @@ class FlockProfileControllerTest extends TestCase
         $response->assertViewHas('profile', function ($viewProfile) use ($profileId) {
             return $viewProfile->id === $profileId;
         });
+    }
+
+    // === Hero / Recount Status ===
+
+    public function test_flock_index_passes_null_last_recount_when_no_recount_exists(): void
+    {
+        FlockProfile::factory()->create(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)->get('/app/flock');
+
+        $response->assertViewHas('lastRecount', null);
+        $response->assertViewHas('daysSinceLastRecount', null);
+    }
+
+    public function test_flock_index_passes_last_recount_event(): void
+    {
+        $profile = FlockProfile::factory()->create(['user_id' => $this->user->id]);
+        FlockEvent::factory()->create([
+            'flock_profile_id' => $profile->id,
+            'type' => 'recount',
+            'date' => now()->subDays(10),
+            'affected_birds' => 25,
+            'description' => 'Head count',
+        ]);
+
+        $response = $this->actingAs($this->user)->get('/app/flock');
+
+        $response->assertViewHas('lastRecount', fn ($event) => $event->type === 'recount');
+        $response->assertViewHas('daysSinceLastRecount', 10);
     }
 
     // === Update ===

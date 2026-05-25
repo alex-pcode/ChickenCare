@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\DetectHtmx;
+use App\Http\Middleware\EnsurePremiumTier;
+use App\Http\Middleware\ResolveLocale;
+use App\Http\Middleware\SetDynamicResponseCacheHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,9 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo('/login');
-        $middleware->append(\App\Http\Middleware\DetectHtmx::class);
+        $middleware->web(prepend: [
+            SetDynamicResponseCacheHeaders::class,
+        ]);
+        $middleware->web(append: [
+            ResolveLocale::class,
+        ]);
+        $middleware->append(DetectHtmx::class);
         $middleware->alias([
-            'premium' => \App\Http\Middleware\EnsurePremiumTier::class,
+            'premium' => EnsurePremiumTier::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -24,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $errors = $e->validator->errors();
                 $html = '<div class="form-errors" role="alert" aria-live="assertive">';
                 foreach ($errors->all() as $message) {
-                    $html .= '<p class="form-error">' . e($message) . '</p>';
+                    $html .= '<p class="form-error">'.e($message).'</p>';
                 }
                 $html .= '</div>';
 

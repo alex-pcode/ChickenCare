@@ -1,11 +1,12 @@
 @php
     $isEdit = $mode === 'edit' && $flockEvent;
     $eventTypeOptions = [
-        'acquisition' => '🐔 New Birds Acquired',
-        'laying_start' => '🥚 Started Laying',
-        'broody' => '🪺 Went Broody',
-        'hatching' => '🐥 Eggs Hatched',
-        'other' => '📝 Other Event',
+        'acquisition' => __('flock.form.types.acquisition'),
+        'laying_start' => __('flock.form.types.laying_start'),
+        'broody' => __('flock.form.types.broody'),
+        'hatching' => __('flock.form.types.hatching'),
+        'recount' => __('flock.form.types.recount'),
+        'other' => __('flock.form.types.other'),
     ];
 @endphp
 
@@ -28,45 +29,45 @@
     <x-forms.form-row :cols="3">
         <x-forms.select
             name="type"
-            label="Event Type"
+            :label="__('flock.form.fields.type')"
             :options="$eventTypeOptions"
             :value="$isEdit ? $flockEvent->type : ''"
             required
         />
         <x-forms.date-input
             name="date"
-            label="Date"
+            :label="__('flock.form.fields.date')"
             :value="$isEdit ? $flockEvent->date->format('Y-m-d') : now()->format('Y-m-d')"
             required
         />
         <x-forms.input
             name="affected_birds"
-            label="Number of Birds"
+            :label="__('flock.form.fields.affected_birds')"
             type="number"
             :value="$isEdit ? $flockEvent->affected_birds : ''"
-            placeholder="Optional"
+            :placeholder="__('flock.form.placeholders.affected_birds')"
         />
     </x-forms.form-row>
 
     <x-forms.form-row :cols="2">
         <x-forms.input
             name="description"
-            label="Description"
+            :label="__('flock.form.fields.description')"
             :value="$isEdit ? $flockEvent->description : ''"
             required
-            placeholder="What happened?"
+            :placeholder="__('flock.form.placeholders.description')"
         />
         <x-forms.textarea
             name="notes"
-            label="Additional Notes"
+            :label="__('flock.form.fields.notes')"
             :value="$isEdit ? $flockEvent->notes : ''"
             :rows="2"
-            placeholder="Optional notes..."
+            :placeholder="__('flock.form.placeholders.notes')"
         />
     </x-forms.form-row>
 
     <div class="flock__event-form-actions">
-        <x-forms.submit-button :label="$isEdit ? 'Update Event' : 'Add Event'" />
+        <x-forms.submit-button :label="$isEdit ? __('flock.form.submit.edit') : __('flock.form.submit.create')" :saving-label="__('ui.submit_button.saving')" :saved-label="__('ui.submit_button.saved')" />
         @if($isEdit)
             <button
                 type="button"
@@ -75,7 +76,7 @@
                 hx-target="#event-form-container"
                 hx-swap="innerHTML"
             >
-                Cancel Edit
+                {{ __('flock.form.submit.cancel') }}
             </button>
         @endif
     </div>

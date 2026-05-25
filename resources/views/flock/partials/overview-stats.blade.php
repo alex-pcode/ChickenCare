@@ -2,7 +2,7 @@
 
     <div style="animation-delay: 0ms" class="flock-card-entrance">
         <x-ui.stat-card
-            title="Laying"
+            :title="__('flock.overview.cards.laying')"
             :total="$overviewStats['laying']['total']"
             :label="$overviewStats['laying']['label']"
             icon="🐔"
@@ -12,7 +12,7 @@
 
     <div style="animation-delay: 50ms" class="flock-card-entrance">
         <x-ui.stat-card
-            title="Not Laying"
+            :title="__('flock.overview.cards.not_laying')"
             :total="$overviewStats['notLaying']['total']"
             :label="$overviewStats['notLaying']['label']"
             icon="⏳"
@@ -23,7 +23,7 @@
     @if($overviewStats['showBrooding'])
     <div style="animation-delay: 100ms" class="flock-card-entrance">
         <x-ui.stat-card
-            title="Brooding"
+            :title="__('flock.overview.cards.brooding')"
             :total="$overviewStats['brooding']['total']"
             :label="$overviewStats['brooding']['label']"
             icon="🐣"
@@ -34,7 +34,7 @@
 
     <div style="animation-delay: {{ $overviewStats['showBrooding'] ? '150' : '100' }}ms" class="flock-card-entrance">
         <x-ui.stat-card
-            title="Roosters"
+            :title="__('flock.overview.cards.roosters')"
             :total="$overviewStats['roosters']['total']"
             :label="$overviewStats['roosters']['label']"
             icon="🐓"
@@ -44,7 +44,7 @@
 
     <div style="animation-delay: {{ $overviewStats['showBrooding'] ? '200' : '150' }}ms" class="flock-card-entrance">
         <x-ui.stat-card
-            title="Chicks"
+            :title="__('flock.overview.cards.chicks')"
             :total="$overviewStats['chicks']['total']"
             :label="$overviewStats['chicks']['label']"
             icon="🐥"

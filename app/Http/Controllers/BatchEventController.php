@@ -35,11 +35,11 @@ class BatchEventController extends Controller
                 'index' => 0,
             ])->header('HX-Trigger', json_encode([
                 'flock:changed' => true,
-                'flock:success' => 'Event added to timeline',
+                'flock:success' => __('batches.messages.event_added_timeline'),
             ]));
         }
 
-        return redirect()->back()->with('success', 'Event added successfully.');
+        return redirect()->back()->with('success', __('batches.messages.event_added'));
     }
 
     public function edit(FlockBatch $batch, BatchEvent $event)
@@ -65,11 +65,11 @@ class BatchEventController extends Controller
                 'index' => 0,
             ])->header('HX-Trigger', json_encode([
                 'flock:changed' => true,
-                'flock:success' => 'Event updated.',
+                'flock:success' => __('flock.messages.event_updated'),
             ]));
         }
 
-        return redirect()->back()->with('success', 'Event updated successfully.');
+        return redirect()->back()->with('success', __('batches.messages.event_updated'));
     }
 
     public function destroy(Request $request, FlockBatch $batch, BatchEvent $event)
@@ -84,6 +84,6 @@ class BatchEventController extends Controller
                 ->header('HX-Trigger', json_encode(['flock:changed' => true]));
         }
 
-        return redirect()->back()->with('success', 'Event deleted successfully.');
+        return redirect()->back()->with('success', __('batches.messages.event_deleted'));
     }
 }

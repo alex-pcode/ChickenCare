@@ -1,0 +1,91 @@
+schema: 1
+story: 'serbian-translation-story-4-deferred-feature-rollout'
+story_title: 'Serbian Translation Rollout for Deferred Authenticated Feature Modules'
+gate: CONCERNS
+status_reason: 'Implementation is solid and all tests pass (1071/0/3005). Translation coverage is now 7/7 modules via DeferredFeatureTranslationTest but the eggs module (resources/views/eggs/) is entirely untranslated — zero __() calls, no lang files — despite being an in-scope authenticated /app feature and arguably the highest-traffic daily surface. Additional CONCERNS: story metadata still desynchronized, AC7 raw-key absence not directly asserted, and Story 4 is missing from the epic file.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-26T12:00:00Z'
+expires: '2026-05-10T00:00:00Z'
+
+quality_score: 85
+
+evidence:
+  tests_reviewed: 188
+  risks_identified: 3
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13]
+    ac_gaps: [2, 7]
+  notes: |
+    Re-review after dev resolved all 7 inherited test failures and added DeferredFeatureTranslationTest.
+    Full suite: php artisan test → 1071 passed, 0 failed (3005 assertions)
+    Translation tests: ExpensesTranslationTest + DeferredFeatureTranslationTest → 10 passed (130 assertions)
+    DeferredFeatureTranslationTest covers: feed (full+HTMX+en), crm (full+HTMX tabs), savings (full),
+    viability (full), flock+batches (full+HTMX). All 7 deferred modules now have regression coverage.
+    Lang file inventory (en/sr line counts): batches 66/66, crm 175/175, expenses 111/111,
+    feed 154/154, flock 80/80, savings 106/106, viability 225/225.
+    Regex sweep for untranslated terms across all 7 module dirs: 0 hits.
+
+top_issues:
+  - id: EGGS-MODULE-UNTRANSLATED
+    severity: high
+    summary: 'The eggs module (resources/views/eggs/) has zero __() calls and no lang/en/eggs.php or lang/sr/eggs.php. This is the core daily-use feature and an authenticated /app surface that should be in scope per AC2.'
+    refs:
+      - 'resources/views/eggs/index.blade.php'
+      - 'resources/views/eggs/partials/table.blade.php'
+      - 'resources/views/eggs/partials/entry-row.blade.php'
+      - 'resources/views/eggs/partials/edit-form.blade.php'
+      - 'resources/views/eggs/partials/backfill-modal.blade.php'
+      - 'resources/views/eggs/partials/set-goal-cta.blade.php'
+      - 'resources/views/eggs/partials/duplicate-confirm.blade.php'
+      - 'resources/views/eggs/partials/delete-confirm-modal.blade.php'
+    suggested_action: 'Add lang/en/eggs.php and lang/sr/eggs.php, replace all hard-coded strings in eggs views with __() calls, add eggs translation regression test to DeferredFeatureTranslationTest.'
+    suggested_owner: dev
+  - id: STORY-METADATA-DESYNC
+    severity: medium
+    summary: 'Story file has Status: In Review but all tasks remain unchecked, no File List, no Dev Agent Record, no Completion Notes — despite implementation being fully present in codebase.'
+    refs: ['docs/stories/serbian-translation-story-4-deferred-feature-rollout.md']
+    suggested_action: 'Reconcile the story: check off completed tasks, populate File List with lang files + modified views + DeferredFeatureTranslationTest, add Dev Agent Record + Completion Notes.'
+    suggested_owner: dev
+  - id: AC7-RAW-KEY-NOT-ASSERTED
+    severity: low
+    summary: 'No test asserts that raw translation keys (e.g. feed.title) do not appear in rendered output.'
+    refs: ['tests/Feature/DeferredFeatureTranslationTest.php']
+    suggested_action: 'Add assertDontSee on a representative key shape per module, mirroring Story 3s assertDontSee("app.expenses.index", false) pattern.'
+    suggested_owner: dev
+  - id: EPIC-MISSING-STORY-4
+    severity: medium
+    summary: 'Story 4 is not referenced in the epic file (Stories, Dependency Order, Definition of Done, Shared Contracts, Verification Boundaries).'
+    refs: ['docs/stories/serbian-translation-epic.md']
+    suggested_action: 'Add Story 4 to the epic: update Stories section, extend Dependency Order (Story 4 depends on Stories 1+2, optionally 3), update Definition of Done to require 4 stories complete.'
+    suggested_owner: sm
+
+waiver:
+  active: false
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Display-only work; no new routes, no auth changes, no enum storage value changes.'
+  performance:
+    status: PASS
+    notes: 'Translator file-cache amortizes the additional key surface; view rendering dominates.'
+  reliability:
+    status: PASS
+    notes: 'Full suite green (1071/0). All 7 deferred modules have at least one regression test.'
+  maintainability:
+    status: PASS
+    notes: 'Per-domain lang topology (AC9) keeps the rollout maintainable; uniform __() pattern across all modules.'
+
+recommendations:
+  immediate:
+    - action: 'Translate the eggs module: add lang/en/eggs.php + lang/sr/eggs.php, replace all hard-coded strings in resources/views/eggs/ with __() calls, add eggs regression test. This is the highest-traffic authenticated feature and currently has zero translation coverage.'
+      refs: ['resources/views/eggs/', 'lang/en/', 'lang/sr/', 'tests/Feature/DeferredFeatureTranslationTest.php']
+    - action: 'Reconcile Story 4 metadata (tasks, File List, Dev Agent Record, Completion Notes) with the actual codebase.'
+      refs: ['docs/stories/serbian-translation-story-4-deferred-feature-rollout.md']
+    - action: 'Add Story 4 to the epic file.'
+      refs: ['docs/stories/serbian-translation-epic.md']
+  future:
+    - action: 'Add assertDontSee raw-key guards for at least one key per module.'
+      refs: ['tests/Feature/DeferredFeatureTranslationTest.php']
+    - action: 'Capture visual smoke of sr layout for chart-heavy pages (savings, viability, CRM reports) to validate Serbian copy length variance.'
+      refs: ['resources/views/savings/', 'resources/views/viability/', 'resources/views/crm/']

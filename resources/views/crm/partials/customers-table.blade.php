@@ -11,18 +11,18 @@
                     hx-target="#crm-customers-table"
                     hx-swap="innerHTML"
                     style="cursor: pointer;">
-                    Customer Name {!! $sortIcon('name') !!}
+                    {{ __('crm.customers.table.name') }} {!! $sortIcon('name') !!}
                 </th>
-                <th scope="col" class="data-table__header">Phone</th>
-                <th scope="col" class="data-table__header">Notes</th>
+                <th scope="col" class="data-table__header">{{ __('crm.customers.table.phone') }}</th>
+                <th scope="col" class="data-table__header">{{ __('crm.customers.table.notes') }}</th>
                 <th scope="col" class="data-table__header data-table__header--sortable"
                     hx-get="{{ route('app.crm.index', ['tab' => 'customers', 'sort' => 'created_at', 'dir' => $nextDir('created_at')]) }}"
                     hx-target="#crm-customers-table"
                     hx-swap="innerHTML"
                     style="cursor: pointer;">
-                    Added {!! $sortIcon('created_at') !!}
+                    {{ __('crm.customers.table.added') }} {!! $sortIcon('created_at') !!}
                 </th>
-                <th scope="col" class="data-table__header">Actions</th>
+                <th scope="col" class="data-table__header">{{ __('crm.customers.table.actions') }}</th>
             </tr>
         </thead>
         <tbody class="data-table__body">

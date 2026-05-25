@@ -1,10 +1,10 @@
 @props([
     'id',
-    'title' => 'Confirm',
-    'message' => 'Are you sure?',
+    'title' => __('ui.confirm_dialog.title'),
+    'message' => __('ui.confirm_dialog.message'),
     'variant' => 'warning',
-    'confirmText' => 'Continue',
-    'cancelText' => 'Cancel',
+    'confirmText' => __('ui.confirm_dialog.confirm'),
+    'cancelText' => __('ui.confirm_dialog.cancel'),
 ])
 
 <div x-data="{ open: false }"

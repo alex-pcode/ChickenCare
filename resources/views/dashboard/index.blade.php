@@ -1,36 +1,27 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', __('dashboard.page.title'))
+
+@php($skel = $skel ?? false)
 
 @section('content')
 <div class="dashboard">
-    @include('dashboard.partials.welcome-header', ['displayName' => $displayName])
+    @include('dashboard.partials.welcome-header', [
+        'displayName' => $displayName,
+        'recentActivity' => $summary['recent_activity'] ?? collect(),
+        'skel' => $skel,
+    ])
 
-    @include('dashboard.partials.setup-progress', ['progress' => $progress])
+    @if (! $skel)
+        @include('dashboard.partials.setup-progress', ['progress' => $progress])
+    @endif
 
-    @include('dashboard.partials.production-metrics', ['productionMetrics' => $productionMetrics])
+    @include('dashboard.partials.production-metrics', ['productionMetrics' => $productionMetrics, 'skel' => $skel])
 
-    @include('dashboard.partials.production-chart', ['productionChartData' => $productionChartData])
+    @include('dashboard.partials.production-chart', ['productionChartData' => $productionChartData, 'skel' => $skel])
 
-    @include('dashboard.partials.financial-overview', ['financialOverview' => $financialOverview])
+    @include('dashboard.partials.financial-overview', ['financialOverview' => $financialOverview, 'skel' => $skel])
 
-    @include('dashboard.partials.revenue-trend', ['revenueTrendData' => $revenueTrendData])
-
-    {{-- Recent Activity — all users --}}
-    <section class="dashboard__section">
-        <div class="dashboard__activity-header">
-            <h2 class="dashboard__section-title">Recent Activity</h2>
-            <button class="btn btn--secondary btn--sm"
-                    hx-get="{{ route('app.dashboard') }}"
-                    hx-target="#dashboard-activity"
-                    hx-swap="innerHTML"
-                    aria-label="Refresh recent activity">
-                Refresh
-            </button>
-        </div>
-        <div id="dashboard-activity">
-            @include('dashboard.partials.recent-activity', ['recentActivity' => $summary['recent_activity']])
-        </div>
-    </section>
+    @include('dashboard.partials.revenue-trend', ['revenueTrendData' => $revenueTrendData, 'skel' => $skel])
 </div>
 @endsection

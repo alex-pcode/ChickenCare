@@ -10,61 +10,42 @@ class FlockBatchStatsService
 {
     public function overview(User $user): array
     {
-        $batches = $user->flockBatches()->active()->with('deathRecords')->get();
-
-        // Laying: batches where actual_laying_start_date IS NOT NULL
-        $layingBatches = $batches->filter(fn ($b) => $b->actual_laying_start_date !== null);
-        $layingTotal = $layingBatches->sum(fn ($b) => max(0, ($b->hens_count ?? 0) - ($b->brooding_count ?? 0)));
-        $layingCount = $layingBatches->filter(fn ($b) => ($b->hens_count ?? 0) > 0)->count();
-
-        // Not Laying: actual_laying_start_date IS NULL AND (hens_count > 0 OR type = 'hens')
-        $notLayingBatches = $batches->filter(
-            fn ($b) => $b->actual_laying_start_date === null
-                    && (($b->hens_count ?? 0) > 0 || $b->type === 'hens')
-        );
-        $notLayingTotal = $notLayingBatches->sum(fn ($b) => max(0, ($b->hens_count ?? 0) - ($b->brooding_count ?? 0)));
-        $notLayingCount = $notLayingBatches->count();
-
-        // Brooding
-        $showBrooding = $batches->contains(fn ($b) => ($b->brooding_count ?? 0) > 0);
-        $broodingTotal = $batches->sum(fn ($b) => $b->brooding_count ?? 0);
-        $broodingCount = $batches->filter(fn ($b) => ($b->brooding_count ?? 0) > 0)->count();
-
-        // Roosters
-        $roostersTotal = $batches->sum(fn ($b) => $b->roosters_count ?? 0);
-        $roostersCount = $batches->filter(fn ($b) => ($b->roosters_count ?? 0) > 0)->count();
-
-        // Chicks
-        $chicksTotal = $batches->sum(fn ($b) => $b->chicks_count ?? 0);
-        $chicksCount = $batches->filter(fn ($b) => ($b->chicks_count ?? 0) > 0)->count();
+        $stats = $this->activeBatchAggregates($user);
+        $layingCount = (int) $stats->laying_count;
+        $notLayingCount = (int) $stats->not_laying_count;
+        $broodingCount = (int) $stats->brooding_count;
+        $roostersCount = (int) $stats->roosters_count;
+        $chicksCount = (int) $stats->chicks_count;
 
         return [
-            'laying'      => ['total' => $layingTotal,   'label' => "{$layingCount} batches laying"],
-            'notLaying'   => ['total' => $notLayingTotal, 'label' => "{$notLayingCount} batches"],
-            'brooding'    => ['total' => $broodingTotal,  'label' => "{$broodingCount} hen brooding"],
-            'roosters'    => ['total' => $roostersTotal,  'label' => "{$roostersCount} batches"],
-            'chicks'      => ['total' => $chicksTotal,    'label' => "{$chicksCount} batches"],
-            'showBrooding' => $showBrooding,
+            'laying' => ['total' => (int) $stats->laying_total, 'label' => trans_choice('flock.overview.labels.laying_batches', $layingCount, ['count' => $layingCount])],
+            'notLaying' => ['total' => (int) $stats->not_laying_total, 'label' => trans_choice('flock.overview.labels.not_laying_batches', $notLayingCount, ['count' => $notLayingCount])],
+            'brooding' => ['total' => (int) $stats->brooding_total, 'label' => trans_choice('flock.overview.labels.brooding_hens', $broodingCount, ['count' => $broodingCount])],
+            'roosters' => ['total' => (int) $stats->roosters_total, 'label' => trans_choice('flock.overview.labels.rooster_batches', $roostersCount, ['count' => $roostersCount])],
+            'chicks' => ['total' => (int) $stats->chicks_total, 'label' => trans_choice('flock.overview.labels.chick_batches', $chicksCount, ['count' => $chicksCount])],
+            'showBrooding' => (int) $stats->brooding_total > 0,
+            'totalBirds' => (int) $stats->total_birds,
         ];
     }
 
     public function metricDisplayStats(User $user): array
     {
-        $batches = $user->flockBatches()->active()->with('deathRecords')->get();
+        $stats = $this->activeBatchAggregates($user);
+        $activeBatchIds = $user->flockBatches()->active()->select('id');
 
         return [
-            'totalBatches'  => $batches->count(),
-            'totalBirds'    => $batches->sum('current_count'),
-            'layingBatches' => $batches->filter(fn ($b) => $b->actual_laying_start_date !== null)->count(),
-            'totalLosses'   => $batches->sum(fn ($b) => $b->deathRecords->sum('count')),
+            'totalBatches' => (int) $stats->total_batches,
+            'totalBirds' => (int) $stats->total_birds,
+            'layingBatches' => (int) $stats->laying_batch_count,
+            'totalLosses' => (int) DeathRecord::whereIn('batch_id', $activeBatchIds)->sum('count'),
         ];
     }
 
     public function tabCounts(User $user): array
     {
         return [
-            'batches'  => $user->flockBatches()->active()->count(),
-            'deaths'   => DeathRecord::whereIn('batch_id', $user->flockBatches()->select('id'))->count(),
+            'batches' => $user->flockBatches()->active()->count(),
+            'deaths' => DeathRecord::whereIn('batch_id', $user->flockBatches()->select('id'))->count(),
             'addBatch' => null,
         ];
     }
@@ -72,12 +53,31 @@ class FlockBatchStatsService
     public function batchComposition(FlockBatch $batch): array
     {
         return [
-            'hens'       => $batch->hens_count ?? 0,
+            'hens' => $batch->hens_count ?? 0,
             'activeHens' => max(0, ($batch->hens_count ?? 0) - ($batch->brooding_count ?? 0)),
-            'brooding'   => $batch->brooding_count ?? 0,
-            'roosters'   => $batch->roosters_count ?? 0,
-            'chicks'     => $batch->chicks_count ?? 0,
-            'total'      => $batch->current_count ?? 0,
+            'brooding' => $batch->brooding_count ?? 0,
+            'roosters' => $batch->roosters_count ?? 0,
+            'chicks' => $batch->chicks_count ?? 0,
+            'total' => $batch->current_count ?? 0,
         ];
+    }
+
+    private function activeBatchAggregates(User $user): object
+    {
+        return once(fn () => $user->flockBatches()
+            ->active()
+            ->selectRaw('COUNT(*) as total_batches')
+            ->selectRaw('COALESCE(SUM(current_count), 0) as total_birds')
+            ->selectRaw('COALESCE(SUM(CASE WHEN actual_laying_start_date IS NOT NULL THEN 1 ELSE 0 END), 0) as laying_batch_count')
+            ->selectRaw('COALESCE(SUM(CASE WHEN actual_laying_start_date IS NOT NULL THEN CASE WHEN COALESCE(hens_count, 0) - COALESCE(brooding_count, 0) > 0 THEN COALESCE(hens_count, 0) - COALESCE(brooding_count, 0) ELSE 0 END ELSE 0 END), 0) as laying_total')
+            ->selectRaw("COALESCE(SUM(CASE WHEN actual_laying_start_date IS NULL AND (COALESCE(hens_count, 0) > 0 OR type = 'hens') THEN 1 ELSE 0 END), 0) as not_laying_count")
+            ->selectRaw("COALESCE(SUM(CASE WHEN actual_laying_start_date IS NULL AND (COALESCE(hens_count, 0) > 0 OR type = 'hens') THEN CASE WHEN COALESCE(hens_count, 0) - COALESCE(brooding_count, 0) > 0 THEN COALESCE(hens_count, 0) - COALESCE(brooding_count, 0) ELSE 0 END ELSE 0 END), 0) as not_laying_total")
+            ->selectRaw('COALESCE(SUM(COALESCE(brooding_count, 0)), 0) as brooding_total')
+            ->selectRaw('COALESCE(SUM(CASE WHEN COALESCE(brooding_count, 0) > 0 THEN 1 ELSE 0 END), 0) as brooding_count')
+            ->selectRaw('COALESCE(SUM(COALESCE(roosters_count, 0)), 0) as roosters_total')
+            ->selectRaw('COALESCE(SUM(CASE WHEN COALESCE(roosters_count, 0) > 0 THEN 1 ELSE 0 END), 0) as roosters_count')
+            ->selectRaw('COALESCE(SUM(COALESCE(chicks_count, 0)), 0) as chicks_total')
+            ->selectRaw('COALESCE(SUM(CASE WHEN COALESCE(chicks_count, 0) > 0 THEN 1 ELSE 0 END), 0) as chicks_count')
+            ->first());
     }
 }

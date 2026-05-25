@@ -2,10 +2,10 @@
 <div class="crm-customers" x-data="customerForm()">
     {{-- Header --}}
     <div class="crm-customers__header">
-        <h2 class="crm-customers__title">Customers</h2>
+        <h2 class="crm-customers__title">{{ __('crm.customers.title') }}</h2>
         <button type="button" class="shiny-cta" :disabled="formOpen"
                 @click="openAddForm()">
-            <span>+ Add Customer</span>
+            <span>{{ __('crm.customers.add') }}</span>
         </button>
     </div>
 
@@ -13,7 +13,7 @@
     <template x-if="error">
         <div class="crm-customers__error">
             <p x-text="error"></p>
-            <button type="button" class="btn btn--sm btn--secondary" @click="error = null">Dismiss</button>
+            <button type="button" class="btn btn--sm btn--secondary" @click="error = null">{{ __('crm.customers.dismiss_error') }}</button>
         </div>
     </template>
 
@@ -21,40 +21,40 @@
     <div x-show="formOpen" x-collapse x-cloak class="crm-customers__form-wrapper">
         <div class="form-card">
             <div class="form-card__header">
-                <h2 class="form-card__title" x-text="editing ? 'Edit Customer' : 'Add New Customer'"></h2>
-                <p class="form-card__subtitle">Manage customer information and contact details</p>
+                <h2 class="form-card__title" x-text="editing ? @js(__('crm.customers.form.title_edit')) : @js(__('crm.customers.form.title_add'))"></h2>
+                <p class="form-card__subtitle">{{ __('crm.customers.form.subtitle') }}</p>
             </div>
             <form @submit.prevent="submitCustomer" class="form-card__form">
                 @csrf
                 <div class="form-row form-row--2-col">
                     <div class="form-group">
                         <label for="cf-name" class="form-label">
-                            Customer Name <span class="form-label__required" aria-hidden="true">*</span>
+                            {{ __('crm.customers.form.name') }} <span class="form-label__required" aria-hidden="true">*</span>
                         </label>
                         <input type="text" id="cf-name" class="form-input"
-                               placeholder="Enter customer name" required
+                               placeholder="{{ __('crm.customers.form.name_placeholder') }}" required
                                x-model="form.name">
                     </div>
                     <div class="form-group">
-                        <label for="cf-phone" class="form-label">Phone Number</label>
+                        <label for="cf-phone" class="form-label">{{ __('crm.customers.form.phone') }}</label>
                         <input type="text" id="cf-phone" class="form-input"
-                               placeholder="Enter phone number"
+                               placeholder="{{ __('crm.customers.form.phone_placeholder') }}"
                                x-model="form.phone">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="cf-notes" class="form-label">Notes</label>
+                    <label for="cf-notes" class="form-label">{{ __('crm.customers.form.notes') }}</label>
                     <textarea id="cf-notes" class="form-textarea" rows="3"
-                              placeholder="Any notes about this customer..."
+                              placeholder="{{ __('crm.customers.form.notes_placeholder') }}"
                               x-model="form.notes"></textarea>
                 </div>
                 <div class="crm-customers__form-actions">
                     <button type="submit" class="shiny-cta"
                             :disabled="submitting || !form.name.trim()">
                         <span x-show="submitting" class="crm-customers__spinner"></span>
-                        <span x-text="editing ? 'Update Customer' : 'Add Customer'"></span>
+                        <span x-text="editing ? @js(__('crm.customers.form.save_edit')) : @js(__('crm.customers.form.save_add'))"></span>
                     </button>
-                    <button type="button" class="btn btn--secondary" @click="closeForm()">Cancel</button>
+                    <button type="button" class="btn btn--secondary" @click="closeForm()">{{ __('crm.customers.form.cancel') }}</button>
                 </div>
             </form>
         </div>
@@ -65,8 +65,8 @@
         @if($customers->isEmpty())
             <x-ui.empty-state
                 icon="👥"
-                title="No Customers Yet"
-                description="Add your first customer to start tracking sales and building relationships."
+                :title="__('crm.customers.empty_title')"
+                :description="__('crm.customers.empty_description')"
             />
         @else
             @include('crm.partials.customers-table', ['customers' => $customers, 'sort' => $sort, 'dir' => $dir])
@@ -75,7 +75,6 @@
 </div>
 </div>
 
-@push('scripts')
 <script>
 function customerForm() {
     return {
@@ -137,7 +136,7 @@ function customerForm() {
                     if (data.errors) {
                         this.error = Object.values(data.errors).flat()[0];
                     } else {
-                        this.error = data.message || 'Failed to save customer';
+                        this.error = data.message || @js(__('crm.customers.errors.save_failed'));
                     }
                     return;
                 }
@@ -149,7 +148,7 @@ function customerForm() {
                     swap: 'innerHTML',
                 });
             } catch (err) {
-                this.error = 'Network error. Please try again.';
+                this.error = @js(__('crm.customers.errors.network'));
             } finally {
                 this.submitting = false;
             }
@@ -188,11 +187,10 @@ function customerForm() {
                 this.deleteArmed = null;
                 document.body.dispatchEvent(new CustomEvent('crm:changed'));
             } catch (err) {
-                this.error = 'Failed to delete customer.';
+                this.error = @js(__('crm.customers.errors.delete_failed'));
                 this.deleteArmed = null;
             }
         },
     };
 }
 </script>
-@endpush

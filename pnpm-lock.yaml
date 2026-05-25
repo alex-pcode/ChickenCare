@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@alpinejs/intersect':
+        specifier: ^3.15.11
+        version: 3.15.11
       alpinejs:
         specifier: ^3.15.11
         version: 3.15.11
@@ -35,6 +38,9 @@ importers:
         version: 7.3.2(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.99.0)
 
 packages:
+
+  '@alpinejs/intersect@3.15.11':
+    resolution: {integrity: sha512-oGbp6vvn19vN8xoph32Wpo6DrGLXcMR/hLr8hh+gGhgrDpseDOG72h+lsjUivZYI58Uzs1oAxl7XPiQdRyRbtw==}
 
   '@esbuild/aix-ppc64@0.27.7':
     resolution: {integrity: sha512-EKX3Qwmhz1eMdEJokhALr0YiD0lhQNwDqkPYyPhiSwKrh7/4KRjQc04sZ8db+5DVVnZ1LmbNDI1uAMPEUBnQPg==}
@@ -820,6 +826,8 @@ packages:
     engines: {node: '>=12'}
 
 snapshots:
+
+  '@alpinejs/intersect@3.15.11': {}
 
   '@esbuild/aix-ppc64@0.27.7':
     optional: true

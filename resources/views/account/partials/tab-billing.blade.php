@@ -3,9 +3,9 @@
     <div class="account-billing__plan-card account-billing__plan-card--{{ $user->isPremium() ? 'premium' : 'free' }}">
         <div class="account-billing__plan-inner">
             <div>
-                <div class="account-billing__plan-label">Current plan</div>
-                <div class="account-billing__plan-tier">{{ $user->isPremium() ? 'Premium' : 'Free' }}</div>
-                <div class="account-billing__plan-description">{{ $user->isPremium() ? 'Full access to all features' : 'Basic features available' }}</div>
+                <div class="account-billing__plan-label">{{ __('account.billing.current_plan') }}</div>
+                <div class="account-billing__plan-tier">{{ $user->isPremium() ? __('account.billing.tiers.premium') : __('account.billing.tiers.free') }}</div>
+                <div class="account-billing__plan-description">{{ $user->isPremium() ? __('account.billing.descriptions.premium') : __('account.billing.descriptions.free') }}</div>
             </div>
         </div>
     </div>
@@ -15,25 +15,21 @@
         <div class="form-card__header">
             <h4 class="form-card__title">
                 @if($user->isPremium())
-                    Your access
+                    {{ __('account.billing.premium_access_title') }}
                 @else
-                    What you'll get with Premium
+                    {{ __('account.billing.free_access_title') }}
                 @endif
             </h4>
         </div>
 
         @if($user->isPremium())
-            <p class="account-billing__access-confirm">You have full access to ChickenCare.</p>
-            <p class="account-billing__support-hint">Need help with billing? Contact support.</p>
+            <p class="account-billing__access-confirm">{{ __('account.billing.access_confirm') }}</p>
+            <p class="account-billing__support-hint">{{ __('account.billing.support_hint') }}</p>
         @else
             <ul class="account-billing__features">
-                <li>Dashboard analytics and insights</li>
-                <li>My Flock management</li>
-                <li>Customer relationship management</li>
-                <li>Expense tracking</li>
-                <li>Feed management</li>
-                <li>Savings analysis</li>
-                <li>Viability calculator</li>
+                @foreach(__('account.billing.features') as $feature)
+                    <li>{{ $feature }}</li>
+                @endforeach
             </ul>
         @endif
     </div>
@@ -44,8 +40,8 @@
             <button type="button"
                     class="btn btn--secondary btn--full btn--lg account-billing__upgrade-btn"
                     disabled
-                    title="Upgrade flow launching soon">
-                Upgrade to Premium (Coming Soon)
+                    title="{{ __('account.billing.upgrade_title') }}">
+                {{ __('account.billing.upgrade') }}
             </button>
         </div>
     @endif

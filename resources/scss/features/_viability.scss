@@ -181,13 +181,62 @@
     // ---------- Hero ----------
     &__hero {
         position: relative;
-        height: 256px;
-        overflow: hidden;
-        border-radius: $card-radius;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 100%;
+        max-width: 1200px;
+        margin-inline: auto;
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+        align-items: stretch;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding: 1rem 1.25rem;
+        overflow: visible;
         animation: viabilityHeroEntry 0.8s forwards;
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            z-index: 0;
+
+            .dark & {
+                background: rgba(30, 30, 30, 0.9);
+            }
+        }
+
+        > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            grid-template-columns: 3fr 2fr;
+            grid-template-rows: auto auto;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem 0.75rem 0.5rem;
+            align-items: center;
+        }
+    }
+
+    &__hero-media {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 16rem;
+        overflow: hidden;
+
+        @media (max-width: 768px) {
+            order: 2;
+            grid-row: 1;
+            grid-column: 2;
+            height: 7rem;
+            overflow: visible;
+        }
     }
 
     &__hero-image {
@@ -198,39 +247,133 @@
         animation:
             viabilityImageSpring 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
             viabilityGentleRock 8s 1.5s infinite ease-in-out;
+
+        @media (max-width: 768px) {
+            height: 140%;
+            max-width: none;
+        }
     }
 
     &__hero-badge {
+        $curve: 1.25rem;
+        $btn-size: 4.375rem;
+
+        display: grid;
         position: absolute;
-        top: 0.5rem;
-        right: 1rem;
-        background: #8b5cf6;
-        color: #fff;
-        padding: 0.25rem 0.75rem;
-        border-radius: $radius-pill;
-        font-weight: $font-weight-semibold;
-        font-size: $font-size-sm;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        top: 0;
+        left: 0;
+        height: $btn-size;
+        width: $btn-size;
+        place-items: center;
+        background: $neu-bg;
+        border-radius: $curve 0 $curve 0;
+        z-index: 3;
         animation: viabilityPopIn 0.4s 0.8s backwards;
+
+        .dark & {
+            background: #1a1a1a;
+        }
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        &::before {
+            top: 100%;
+            left: 0;
+            width: $curve;
+            height: $curve * 3;
+            border-radius: $curve 0 0 0;
+            box-shadow: 0 (-$curve * 2) 0 $neu-bg;
+
+            .dark & {
+                box-shadow: 0 (-$curve * 2) 0 #1a1a1a;
+            }
+        }
+
+        &::after {
+            top: 0;
+            left: 100%;
+            width: $curve * 3;
+            height: $curve;
+            border-radius: $curve 0 0 0;
+            box-shadow: (-$curve * 2) 0 0 $neu-bg;
+
+            .dark & {
+                box-shadow: (-$curve * 2) 0 0 #1a1a1a;
+            }
+        }
     }
 
-    &__hero-welcome {
-        position: absolute;
-        bottom: 1.5rem;
-        left: 1.5rem;
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(4px);
+    &__hero-badge-icon {
+        height: 3.125rem;
+        width: 3.125rem;
+        display: grid;
+        place-items: center;
+        background: transparent;
         border-radius: $radius-base;
-        padding: 0.5rem 1rem;
+        font-size: 1.5rem;
+        line-height: 1;
+        animation: fade-in-delayed 0.4s ease-out 0.8s both;
+    }
+
+    &__hero-side {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            order: 1;
+            grid-row: 1;
+            grid-column: 1;
+        }
+    }
+
+    &__hero-notice {
+        display: flex;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-radius: $radius-base;
+        background: rgba(255, 255, 255, 0.9);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border: 1px solid $color-neutral-200;
-        font-weight: $font-weight-semibold;
-        animation: viabilitySlideInLeft 0.5s 0.5s backwards;
+        animation: viabilitySlideInLeft 0.5s ease-out 0.5s both;
 
         .dark & {
             background: rgba(31, 41, 55, 0.9);
-            color: #fff;
             border-color: #4b5563;
+        }
+
+        @media (max-width: 768px) {
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    &__hero-notice-text {
+        min-width: 0;
+    }
+
+    &__hero-notice-title {
+        margin: 0;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: #1f2937;
+        line-height: 1.5;
+
+        .dark & {
+            color: #f3f4f6;
+        }
+
+        @media (max-width: 768px) {
+            font-size: $font-size-base;
         }
     }
 

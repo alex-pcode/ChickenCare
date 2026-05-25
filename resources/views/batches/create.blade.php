@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Add New Batch')
+@section('title', __('batches.page.create_title'))
 
 @section('content')
 <div class="batches">
-    <x-layout.page-header title="Add New Batch">
+    <x-layout.page-header :title="__('batches.page.create_title')">
         <x-slot:actions>
-            <a href="{{ route('app.batches.index') }}" class="btn btn--outline">Back to Batches</a>
+            <a href="{{ route('app.batches.index') }}" class="btn btn--outline">{{ __('batches.actions.back_to_batches') }}</a>
         </x-slot:actions>
     </x-layout.page-header>
 
@@ -58,10 +58,10 @@
             method="POST"
             :action="route('app.batches.store')"
             hx-post="{{ route('app.batches.store') }}"
-            hx-headers='{"Accept": "application/json"}'
+            :hx-headers='json_encode(["Accept" => "application/json"])'
             hx-on::before-request="submitting = true; errors = []; success = false"
             hx-on::after-request="submitting = false;"
-            hx-on::response-error="try { errors = Object.values(JSON.parse(event.detail.xhr.responseText).errors).flat(); } catch(e) { errors = ['An unexpected error occurred.']; }"
+            hx-on::response-error="errors = window.ChickenCare.htmx.extractErrors(event.detail.xhr)"
         >
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -197,8 +197,8 @@
                         class="shiny-cta"
                         :disabled="submitting"
                         :aria-busy="submitting">
-                    <span x-show="!submitting">Add Batch</span>
-                    <span x-show="submitting" x-cloak>Adding Batch...</span>
+                    <span x-show="!submitting">{{ __('batches.actions.add_batch') }}</span>
+                    <span x-show="submitting" x-cloak>{{ __('ui.submit_button.saving') }}</span>
                 </button>
             </div>
 

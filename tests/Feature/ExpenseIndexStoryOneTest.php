@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Expense;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,7 +27,7 @@ class ExpenseIndexStoryOneTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('/images/chicken-coin.webp');
         $response->assertSee('💰 Expense Tracker');
-        $response->assertSee('Track every expense!');
+        $response->assertSee('expenses-hero__status', false);
     }
 
     public function test_form_card_renders_with_eight_titlecase_categories(): void
@@ -50,7 +49,8 @@ class ExpenseIndexStoryOneTest extends TestCase
             ->get(route('app.expenses.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('lg:mx-[20%]');
+        $response->assertSee('expenses__form-container', false);
+        $response->assertSee('form-card', false);
     }
 
     public function test_htmx_validation_failure_returns_json_errors(): void

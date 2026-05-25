@@ -4,8 +4,8 @@
     </td>
     <td class="data-table__cell">
         <select name="category" class="form-select" required>
-            @foreach(['feed' => 'Feed', 'medical' => 'Medical', 'equipment' => 'Equipment', 'housing' => 'Housing', 'utilities' => 'Utilities', 'other' => 'Other'] as $val => $label)
-                <option value="{{ $val }}" {{ $expense->category === $val ? 'selected' : '' }}>{{ $label }}</option>
+            @foreach(\App\Enums\ExpenseCategory::cases() as $category)
+                <option value="{{ $category->value }}" {{ (string) $expense->category === $category->value ? 'selected' : '' }}>{{ $category->label() }}</option>
             @endforeach
         </select>
     </td>
@@ -21,15 +21,15 @@
             hx-include="closest tr"
             hx-target="closest tr"
             hx-swap="outerHTML"
-            aria-label="Save expense for {{ $expense->date->format('M d, Y') }}">
-            Save
+            aria-label="{{ __('expenses.actions.save_aria_label', ['date' => $expense->date->translatedFormat('d. M Y.')]) }}">
+            {{ __('expenses.actions.save') }}
         </button>
         <button type="button" class="btn btn--sm btn--secondary"
             hx-get="{{ route('app.expenses.show-row', $expense) }}"
             hx-target="closest tr"
             hx-swap="outerHTML"
-            aria-label="Cancel editing">
-            Cancel
+            aria-label="{{ __('expenses.actions.cancel_aria_label') }}">
+            {{ __('expenses.actions.cancel') }}
         </button>
     </td>
 </tr>

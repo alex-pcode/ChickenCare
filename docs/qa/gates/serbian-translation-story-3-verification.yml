@@ -1,0 +1,58 @@
+schema: 1
+story: 'serbian-translation-story-3-verification'
+story_title: 'Verification, Fallback Hardening, and Cross-Flow Consistency'
+gate: PASS
+status_reason: 'Verification story over-delivered: caught and fixed a real defect (raw route names in premium-gate UI), added the raw-key contract assertion that closes the AC11/AC14 gaps from Stories 1 and 2, and shipped focused suite of 79 passing tests covering persistence, fallback, unsupported-locale handling, and HTMX flows.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-04-26T00:00:00Z'
+expires: '2026-05-10T00:00:00Z'
+
+quality_score: 100
+
+evidence:
+  tests_reviewed: 79            # focused Story 3 suite
+  risks_identified: 1           # inherited family-level failures, not caused by Story 3
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ac_gaps: []
+  notes: |
+    Focused: php artisan test --compact tests/Feature/{Auth/Login,Auth/Registration,Auth/PasswordReset,
+                                                       Auth/AuthRedirect,LocalePersistence,AccountController,
+                                                       DashboardController,EnsurePremiumTierMiddleware}.php
+      → Tests: 79 passed (244 assertions)
+    Full suite: php artisan test
+      → Tests: 1067 total, 7 failed, 1060 passed (2982 assertions) — inherited from Story 1's enum/viability work, NOT caused by Story 3, NOT in Story 3's stated priority surfaces.
+    Real defect caught and fixed in EnsurePremiumTier: feature label was previously interpolated from $routeName
+    (e.g. "app.expenses.index" leaked into UI). Now resolved via __('navigation.premium.<feature>') and
+    locked by assertDontSee('app.expenses.index', false).
+
+top_issues: []
+
+waiver:
+  active: false
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'EnsurePremiumTier fix removed a real information leak (internal route names in user-visible UI). Locale allowlist enforcement unchanged.'
+  performance:
+    status: PASS
+    notes: 'match(true) prefix checks on rare premium-gate path; no measurable impact.'
+  reliability:
+    status: PASS
+    notes: 'AC4 unsupported-locale fail-safe verified across all three sources (cookie/session/auth pref). AC6 raw-key absence directly asserted.'
+  maintainability:
+    status: PASS
+    notes: 'EnsurePremiumTier::resolveFeatureLabel is a clean enumerated match; new tests follow existing project conventions.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Track the 7 inherited full-suite failures under Story 1''s gate; closing them does not require additional Story 3 work but the rollout family is not "all green" until they are resolved.'
+      refs:
+        - 'docs/qa/gates/serbian-translation-story-1-foundation.yml'
+        - 'docs/qa/gates/serbian-translation-story-2-priority-rollout.yml'
+    - action: 'File a one-line ticket for the integrated browser viewport-width artifact noted in Completion Notes so it is not lost if it reappears on a real device.'
+      refs: ['docs/stories/serbian-translation-story-3-verification.md']
+    - action: 'Consider promoting the raw-key absence assertion pattern (assertDontSee on translation key shapes) to a shared TestCase helper if more surfaces adopt it.'
+      refs: ['tests/Feature/EnsurePremiumTierMiddlewareTest.php']

@@ -54,11 +54,11 @@ final class SavingsPeriod
     public function label(): string
     {
         return match ($this->key) {
-            'month' => 'This Month',
-            'year' => 'This Year',
-            'custom' => 'Custom Period',
-            'all' => 'All Time',
-            default => 'This Month',
+            'month' => __('savings.periods.month'),
+            'year' => __('savings.periods.year'),
+            'custom' => __('savings.periods.custom'),
+            'all' => __('savings.periods.all'),
+            default => __('savings.periods.month'),
         };
     }
 }

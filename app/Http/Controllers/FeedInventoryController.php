@@ -37,7 +37,20 @@ class FeedInventoryController extends Controller
             return view('feed.partials.records-table', compact('feeds', 'sort', 'dir'));
         }
 
-        return view('feed.index', compact('feeds', 'sort', 'dir'));
+        $lastFeed = $request->user()->feedInventory()
+            ->orderByRaw('COALESCE(opened_date, created_at) DESC')
+            ->first();
+
+        $lastPurchaseDate = null;
+        if ($lastFeed) {
+            $lastPurchaseDate = $lastFeed->opened_date ?? $lastFeed->created_at->startOfDay();
+        }
+
+        $daysSinceLastPurchase = $lastPurchaseDate
+            ? (int) abs(now()->startOfDay()->diffInDays($lastPurchaseDate->copy()->startOfDay()))
+            : null;
+
+        return view('feed.index', compact('feeds', 'sort', 'dir', 'lastPurchaseDate', 'daysSinceLastPurchase'));
     }
 
     public function store(StoreFeedInventoryRequest $request)
@@ -64,7 +77,7 @@ class FeedInventoryController extends Controller
         }
 
         return redirect()->route('app.feed.index')
-            ->with('success', 'Feed entry recorded.');
+            ->with('success', __('feed.messages.recorded'));
     }
 
     public function show(Request $request, FeedInventory $feed)
@@ -99,7 +112,7 @@ class FeedInventoryController extends Controller
         }
 
         return redirect()->route('app.feed.index')
-            ->with('success', 'Feed entry updated.');
+            ->with('success', __('feed.messages.updated'));
     }
 
     public function destroy(Request $request, FeedInventory $feed)
@@ -113,12 +126,12 @@ class FeedInventoryController extends Controller
             return response('', 200)
                 ->header('HX-Trigger', json_encode([
                     'closeModal' => true,
-                    'toast:success' => 'Feed entry deleted.',
+                    'toast:success' => __('feed.messages.deleted'),
                 ]));
         }
 
         return redirect()->route('app.feed.index')
-            ->with('success', 'Feed entry deleted.');
+            ->with('success', __('feed.messages.deleted'));
     }
 
     public function deleteConfirm(Request $request, FeedInventory $feed)
@@ -138,7 +151,7 @@ class FeedInventoryController extends Controller
         }
 
         return redirect()->route('app.feed.index')
-            ->with('success', 'Feed marked as depleted.');
+            ->with('success', __('feed.messages.depleted'));
     }
 
     public function stats(Request $request): JsonResponse
@@ -154,7 +167,6 @@ class FeedInventoryController extends Controller
         return response()->json([
             ...$service->metrics($range),
             'trends' => $service->monthlyTrends($range),
-            'breakdown' => $service->feedPeriodBreakdown(),
         ]);
     }
 }

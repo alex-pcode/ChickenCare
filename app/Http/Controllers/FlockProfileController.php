@@ -22,10 +22,19 @@ class FlockProfileController extends Controller
 
         $events = $profile->flockEvents()->orderBy('date', 'asc')->get();
 
-        $batches       = $request->user()->flockBatches()->where('is_active', true)->get();
+        $batches = $request->user()->flockBatches()->where('is_active', true)->get();
         $overviewStats = $this->statsService->overview($request->user());
 
-        return view('flock.index', compact('profile', 'events', 'batches', 'overviewStats'));
+        $lastRecount = $profile->flockEvents()
+            ->where('type', 'recount')
+            ->orderByDesc('date')
+            ->first();
+
+        $daysSinceLastRecount = $lastRecount
+            ? abs((int) now()->startOfDay()->diffInDays($lastRecount->date->startOfDay()))
+            : null;
+
+        return view('flock.index', compact('profile', 'events', 'batches', 'overviewStats', 'lastRecount', 'daysSinceLastRecount'));
     }
 
     public function update(StoreFlockProfileRequest $request, FlockProfile $flockProfile)
@@ -36,13 +45,13 @@ class FlockProfileController extends Controller
 
         if ($this->isHtmx($request)) {
             $overviewStats = $this->statsService->overview($request->user());
-            $batches       = $request->user()->flockBatches()->where('is_active', true)->get();
-            $profile       = $flockProfile;
+            $batches = $request->user()->flockBatches()->where('is_active', true)->get();
+            $profile = $flockProfile;
 
             return view('flock.partials.flock-overview', compact('profile', 'batches', 'overviewStats'));
         }
 
         return redirect()->route('app.flock.index')
-            ->with('success', 'Flock profile updated.');
+            ->with('success', __('flock.messages.profile_updated'));
     }
 }

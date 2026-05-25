@@ -1,49 +1,17 @@
-window.viabilityCalculator = function(defaults) {
+window.viabilityCalculator = function(defaults, translations = {}) {
+    const i18n = translations.js ?? {};
+
     return {
+        translations,
+        i18n,
         birdCount: defaults.birdCount ?? 5,
         eggPrice: defaults.eggPrice ?? 0.30,
         startingCost: defaults.startingCost ?? 50,
         selectedStartingCostId: 'minimal',
         selectedAcquisitionId: 'laying_hens',
         activeCarouselIndex: 0,
-
-        startingCostOptions: [
-            {
-                id: 'minimal', cost: 50, title: 'Minimal Setup',
-                description: '~$50 total investment',
-                details: ['Existing structure or simple shelter', 'Basic feeders & waterers', 'Repurposed materials', 'Gifted or free chickens']
-            },
-            {
-                id: 'basic', cost: 200, title: 'Basic Setup',
-                description: '~$200 total investment',
-                details: ['Simple coop construction', 'Basic fencing & security', 'Essential equipment', 'Store-bought chickens']
-            },
-            {
-                id: 'premium', cost: 500, title: 'Premium Setup',
-                description: '~$500 total investment',
-                details: ['Quality coop with features', 'Professional fencing', 'Automatic systems', 'Premium breeds & equipment']
-            },
-            {
-                id: 'luxury', cost: 1000, title: 'Luxury Setup',
-                description: '~$1000+ total investment',
-                details: ['Custom-built coop', 'Landscaping & features', 'Automated systems', 'High-end breeds & accessories']
-            },
-        ],
-
-        acquisitionOptions: [
-            {
-                id: 'baby_chicks', title: 'Raise Baby Chicks', emoji: '🐣',
-                layingDelayMonths: 5, costMultiplier: 0.3,
-                description: 'Start with day-old chicks (~$3-5 each)',
-                details: ['Lower initial cost per bird', '5 months before laying begins', 'More feed costs before production', 'Higher mortality risk', 'Bond with chickens from day one']
-            },
-            {
-                id: 'laying_hens', title: 'Buy Laying Hens', emoji: '🐔',
-                layingDelayMonths: 0, costMultiplier: 1.0,
-                description: 'Purchase ready-to-lay hens (~$15-25 each)',
-                details: ['Higher upfront cost per bird', 'Immediate egg production', 'Already mature and healthy', 'Lower mortality risk', 'Instant gratification']
-            },
-        ],
+        startingCostOptions: i18n.startingCostOptions ?? [],
+        acquisitionOptions: i18n.acquisitionOptions ?? [],
 
         selectStartingCost(option) {
             this.selectedStartingCostId = option.id;
@@ -58,41 +26,9 @@ window.viabilityCalculator = function(defaults) {
         selectedFeedId: 'standard',
         selectedProductionId: 'realistic',
 
-        feedOptions: [
-            {
-                id: 'budget', costPerBird: 1.50, title: 'Budget Approach',
-                description: '~$1.50 per bird per month',
-                details: ['Free-range during day', 'Kitchen scraps & garden waste', 'Buy feed from co-ops in bulk', 'Minimal supplements']
-            },
-            {
-                id: 'standard', costPerBird: 3.50, title: 'Standard Approach',
-                description: '~$3.50 per bird per month',
-                details: ['Commercial feed only', 'Chain store purchases', 'Basic layer pellets', 'Limited free-ranging']
-            },
-            {
-                id: 'premium', costPerBird: 5.00, title: 'Premium Approach',
-                description: '~$5.00 per bird per month',
-                details: ['Organic/premium feeds', 'Treats & supplements', 'Scratch grains & extras', 'Spoiled chicken lifestyle']
-            },
-        ],
+        feedOptions: i18n.feedOptions ?? [],
 
-        productionOptions: [
-            {
-                id: 'conservative', eggsPerBirdPerWeek: 4, eggsPerBirdPerMonth: 16, title: 'Conservative Estimate',
-                description: '~4 eggs per bird per week',
-                details: ['Older hens or winter months', 'Less daylight hours', 'Basic nutrition', 'Stress or health issues']
-            },
-            {
-                id: 'realistic', eggsPerBirdPerWeek: 5.5, eggsPerBirdPerMonth: 22, title: 'Realistic Average',
-                description: '~5.5 eggs per bird per week',
-                details: ['Healthy adult layers', 'Good nutrition & care', 'Spring/summer months', 'Popular breeds (Rhode Island Red, etc.)']
-            },
-            {
-                id: 'optimistic', eggsPerBirdPerWeek: 6.5, eggsPerBirdPerMonth: 26, title: 'Optimistic Scenario',
-                description: '~6.5 eggs per bird per week',
-                details: ['Prime laying age (1-2 years)', 'Excellent nutrition & care', 'Long daylight hours', 'High-production breeds']
-            },
-        ],
+        productionOptions: i18n.productionOptions ?? [],
 
         get selectedFeed() {
             return this.feedOptions.find(o => o.id === this.selectedFeedId) || this.feedOptions[1];
@@ -153,9 +89,16 @@ window.viabilityCalculator = function(defaults) {
             };
         },
 
+        interpolate(template, params = {}) {
+            return Object.entries(params).reduce(
+                (result, [key, value]) => result.replaceAll(`:${key}`, value),
+                template,
+            );
+        },
+
         formatUsd(value) {
             const n = Number.isFinite(value) ? value : 0;
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat(i18n.locale ?? 'en-US', {
                 style: 'currency',
                 currency: 'USD',
                 minimumFractionDigits: 2,
@@ -176,8 +119,11 @@ window.viabilityCalculator = function(defaults) {
 
         get paybackText() {
             const p = this.results.paybackPeriod;
-            if (p === null || p <= 0) return 'Never';
-            return p.toFixed(1) + ' months';
+            if (p === null || p <= 0) return this.i18n.payback?.never ?? 'Never';
+
+            return this.interpolate(this.i18n.payback?.months ?? ':count months', {
+                count: p.toFixed(1),
+            });
         },
 
         get assessmentText() {
@@ -185,31 +131,59 @@ window.viabilityCalculator = function(defaults) {
             const acq = this.selectedAcquisition.title.toLowerCase();
             const feed = this.selectedFeed.title.toLowerCase();
             const prod = this.selectedProduction.title.toLowerCase();
+            const assessment = this.i18n.assessment ?? {};
 
             if (r.monthlyProfit > 0) {
-                let text = `With ${this.birdCount} chickens using ${acq}, ${feed}, and ${prod}, you'll make ${this.formatUsd(r.monthlyProfit)}/month once laying begins.`;
+                let text = this.interpolate(assessment.positive_base ?? '', {
+                    count: this.birdCount,
+                    acquisition: acq,
+                    feed,
+                    production: prod,
+                    profit: this.formatUsd(r.monthlyProfit),
+                });
+
                 if (r.layingDelayMonths > 0) {
-                    text += ` However, with baby chicks, you'll wait ${r.layingDelayMonths} months and spend ${this.formatUsd(r.nonLayingFeedCost)} on feed before seeing any eggs.`;
+                    text += this.interpolate(assessment.positive_delay ?? '', {
+                        months: r.layingDelayMonths,
+                        cost: this.formatUsd(r.nonLayingFeedCost),
+                    });
                 }
+
                 if (r.paybackPeriod && r.paybackPeriod > 0) {
-                    text += ` Your ${this.formatUsd(this.startingCost)} investment will pay for itself in ${r.paybackPeriod.toFixed(1)} months.`;
+                    text += this.interpolate(assessment.positive_payback ?? '', {
+                        investment: this.formatUsd(this.startingCost),
+                        months: r.paybackPeriod.toFixed(1),
+                    });
                 }
+
                 return text;
             }
 
-            let text = `With ${this.birdCount} chickens using ${acq}, ${feed}, and ${prod}, you'll lose ${this.formatUsd(Math.abs(r.monthlyProfit))}/month once laying begins.`;
+            let text = this.interpolate(assessment.negative_base ?? '', {
+                count: this.birdCount,
+                acquisition: acq,
+                feed,
+                production: prod,
+                loss: this.formatUsd(Math.abs(r.monthlyProfit)),
+            });
+
             if (r.layingDelayMonths > 0) {
-                text += ` With baby chicks, you'd also spend ${r.layingDelayMonths} months feeding them before any egg production.`;
+                text += this.interpolate(assessment.negative_delay ?? '', {
+                    months: r.layingDelayMonths,
+                });
             }
-            text += ' Consider reducing costs, choosing laying hens for faster returns, or increasing egg production to make it viable.';
+
+            text += assessment.negative_suffix ?? '';
+
             return text;
         },
 
         get recommendationText() {
             if (this.results.monthlyProfit > 0) {
-                return 'This looks like a viable chicken-keeping venture! Consider starting with a small flock and expanding as you gain experience.';
+                return this.i18n.recommendations?.positive ?? '';
             }
-            return 'Consider starting with fewer chickens, using a more budget-friendly feeding approach, or increasing your egg prices to make this viable.';
+
+            return this.i18n.recommendations?.negative ?? '';
         },
 
         init() {

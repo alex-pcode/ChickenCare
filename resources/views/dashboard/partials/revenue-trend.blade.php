@@ -1,24 +1,40 @@
-@if(auth()->user()->isPremium())
+@php($skel = $skel ?? false)
+@if($skel || auth()->user()->isPremium())
     <section class="dashboard__section dashboard__section--animate" style="animation-delay: 0.4s">
-        <h2 class="dashboard__section-title">Analytics</h2>
-        
+        <h2 class="dashboard__section-title">
+            @if ($skel) <x-ui.skel block="title" /> @else {{ __('dashboard.analytics.heading') }} @endif
+        </h2>
+
         {{-- Desktop: 12 weeks --}}
         <div class="dashboard__revenue-trend--desktop glass-card">
-            <p class="dashboard__revenue-subtitle">Weekly revenue over last 12 weeks</p>
+            <p class="dashboard__revenue-subtitle">
+                @if ($skel) <x-ui.skel block="body" /> @else {{ __('dashboard.analytics.desktop_subtitle') }} @endif
+            </p>
             <div class="dashboard__revenue-canvas-wrap dashboard__revenue-canvas-wrap--desktop">
-                <canvas id="revenue-trend-desktop" aria-label="Weekly revenue trend for last 12 weeks" role="img"></canvas>
+                @if ($skel)
+                    <x-ui.skel block="block" style="width:100%;height:100%;" />
+                @else
+                    <canvas id="revenue-trend-desktop" aria-label="{{ __('dashboard.analytics.desktop_aria_label') }}" role="img"></canvas>
+                @endif
             </div>
         </div>
 
         {{-- Mobile: 6 weeks --}}
         <div class="dashboard__revenue-trend--mobile glass-card">
-            <p class="dashboard__revenue-subtitle">Weekly revenue over last 6 weeks</p>
+            <p class="dashboard__revenue-subtitle">
+                @if ($skel) <x-ui.skel block="body" /> @else {{ __('dashboard.analytics.mobile_subtitle') }} @endif
+            </p>
             <div class="dashboard__revenue-canvas-wrap dashboard__revenue-canvas-wrap--mobile">
-                <canvas id="revenue-trend-mobile" aria-label="Weekly revenue trend for last 6 weeks" role="img"></canvas>
+                @if ($skel)
+                    <x-ui.skel block="block" style="width:100%;height:100%;" />
+                @else
+                    <canvas id="revenue-trend-mobile" aria-label="{{ __('dashboard.analytics.mobile_aria_label') }}" role="img"></canvas>
+                @endif
             </div>
         </div>
     </section>
 
+    @if (! $skel)
     @push('scripts')
     <script>
     (function initRevenueTrend() {
@@ -26,6 +42,7 @@
             document.addEventListener('DOMContentLoaded', initRevenueTrend, { once: true });
             return;
         }
+        const weekOfLabel = @js(__('dashboard.analytics.week_of'));
         const isDark = document.documentElement.classList.contains('dark');
         const chartConfig = (canvasId, chartData) => {
             const ctx = document.getElementById(canvasId);
@@ -48,7 +65,7 @@
                             cornerRadius: 12,
                             callbacks: {
                                 title: function(items) {
-                                    return 'Week of ' + items[0].label;
+                                    return weekOfLabel + ' ' + items[0].label;
                                 },
                                 label: function(context) {
                                     return '$' + context.parsed.y.toFixed(2);
@@ -84,4 +101,5 @@
     })();
     </script>
     @endpush
+    @endif
 @endif

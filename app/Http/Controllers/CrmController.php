@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
-use App\Models\Sale;
 use App\Services\CrmReportsService;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
@@ -17,22 +15,46 @@ class CrmController extends Controller
     {
         $tab = $request->query('tab', 'quick-sale');
 
-        $allowedTabs = ['quick-sale', 'customers', 'reports'];
+        $allowedTabs = ['quick-sale', 'customers'];
         if (! in_array($tab, $allowedTabs, true)) {
             $tab = 'quick-sale';
         }
 
-        $data = $this->loadTabData($request, $tab, $reportsService);
+        $data = $this->loadTabData($request, $tab);
         $data['activeTab'] = $tab;
+        $data['heroStats'] = $reportsService->monthlySalesSummary($request->user());
 
-        if ($this->isHtmx($request) && $request->header('HX-Target') === 'crm-tab-content') {
-            return view("crm.partials.tab-{$tab}", $data);
+        if ($this->isHtmx($request)) {
+            $target = $request->header('HX-Target');
+
+            if ($target === 'crm-customers-table') {
+                return view('crm.partials.customers-table', $data);
+            }
+
+            if ($target === 'crm-tab-content') {
+                return view("crm.partials.tab-{$tab}", $data);
+            }
         }
 
         return view('crm.index', $data);
     }
 
-    private function loadTabData(Request $request, string $tab, CrmReportsService $reportsService): array
+    public function reports(Request $request, CrmReportsService $reportsService): View
+    {
+        $data = $this->loadReportsData($request, $reportsService);
+
+        if ($this->isHtmx($request) && $request->header('HX-Target') === 'crm-reports-content') {
+            if (($data['reportView'] ?? 'overview') === 'customer') {
+                return view('crm.partials.tab-reports-customer', $data);
+            }
+
+            return view('crm.partials.tab-reports-overview', $data);
+        }
+
+        return view('crm.reports', $data);
+    }
+
+    private function loadTabData(Request $request, string $tab): array
     {
         $user = $request->user();
 
@@ -41,7 +63,6 @@ class CrmController extends Controller
                 'customers' => $user->customers()->active()->orderBy('name')->get(),
             ],
             'customers' => $this->loadCustomersTabData($request),
-            'reports' => $this->loadReportsTabData($request, $reportsService),
             default => [],
         };
     }
@@ -71,23 +92,23 @@ class CrmController extends Controller
         ];
     }
 
-    private function loadReportsTabData(Request $request, CrmReportsService $reportsService): array
+    private function loadReportsData(Request $request, CrmReportsService $reportsService): array
     {
         $user = $request->user();
         $view = $request->query('view', 'overview');
-        $period = $request->query('period', 'month');
+        $period = $request->query('period', 'all');
         $from = $request->query('from');
         $to = $request->query('to');
         $customerId = $request->query('customer_id');
-
-        $customers = $user->customers()->active()->orderBy('name')->get();
 
         $data = [
             'reportView' => $view,
             'period' => $period,
             'from' => $from,
             'to' => $to,
-            'customers' => $customers,
+            'customers' => $view === 'customer'
+                ? $user->customers()->active()->orderBy('name')->get()
+                : collect(),
             'customerId' => $customerId,
         ];
 
@@ -95,10 +116,10 @@ class CrmController extends Controller
             $data['customerReport'] = $reportsService->perCustomer($user, (int) $customerId);
         } elseif ($view === 'overview' || $view !== 'customer') {
             $data['revenueOverview'] = $reportsService->revenueOverview($user, $period, $from, $to);
-            $data['customerAnalytics'] = $reportsService->customerAnalytics($user);
-            $data['productionPipeline'] = $reportsService->productionPipeline($user);
-            $data['revenueTrend'] = $reportsService->revenueTrend($user);
-            $data['recentSales'] = $reportsService->recentSales($user);
+            $data['customerAnalytics'] = $reportsService->customerAnalytics($user, $period, $from, $to);
+            $data['productionPipeline'] = $reportsService->productionPipeline($user, $period, $from, $to);
+            $data['revenueTrend'] = $reportsService->revenueTrend($user, $period, $from, $to);
+            $data['recentSales'] = $reportsService->recentSales($user, $period, $from, $to);
         }
 
         return $data;

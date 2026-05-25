@@ -30,16 +30,18 @@
 
 <div class="comparison-card {{ $loading ? 'comparison-card--loading' : '' }}" {{ $attributes }}>
     @if($loading)
-        <div style="height: 1rem; width: 40%; background: rgba(0,0,0,0.08); border-radius: 4px; margin-bottom: 1rem;"></div>
-        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center;">
-            <div style="text-align: center;">
-                <div style="height: 1.5rem; width: 60%; background: rgba(0,0,0,0.08); border-radius: 4px; margin: 0 auto 0.25rem;"></div>
-                <div style="height: 0.6rem; width: 40%; background: rgba(0,0,0,0.06); border-radius: 4px; margin: 0 auto;"></div>
+        <div class="comparison-card__header">
+            <h3 class="comparison-card__title"><x-ui.skel block="title" /></h3>
+        </div>
+        <div class="comparison-card__grid">
+            <div class="comparison-card__column">
+                <div class="comparison-card__column-value"><x-ui.skel block="metric" /></div>
+                <div class="comparison-card__column-label"><x-ui.skel block="label" /></div>
             </div>
-            <div style="color: #a3a3a3;">→</div>
-            <div style="text-align: center;">
-                <div style="height: 1.5rem; width: 60%; background: rgba(0,0,0,0.08); border-radius: 4px; margin: 0 auto 0.25rem;"></div>
-                <div style="height: 0.6rem; width: 40%; background: rgba(0,0,0,0.06); border-radius: 4px; margin: 0 auto;"></div>
+            <div class="comparison-card__arrow" aria-hidden="true">→</div>
+            <div class="comparison-card__column">
+                <div class="comparison-card__column-value"><x-ui.skel block="metric" /></div>
+                <div class="comparison-card__column-label"><x-ui.skel block="label" /></div>
             </div>
         </div>
     @else

@@ -1,14 +1,14 @@
-<x-modals.modal title="Delete Feed Entry" size="sm" :id="'delete-confirm-' . $feed->id">
+<x-modals.modal :title="__('feed.delete_modal.title')" size="sm" :id="'delete-confirm-' . $feed->id">
     <p class="confirm-delete__message">
-        Are you sure you want to delete the feed entry for <strong>{{ $feed->brand }}</strong> — {{ $feed->feed_type->label() }}, {{ $feed->quantity }} {{ $feed->unit }} (@usd($feed->total_cost))? This action cannot be undone.
+        {{ __('feed.delete_modal.message', ['brand' => $feed->brand, 'type' => $feed->feed_type->label(), 'quantity' => $feed->quantity, 'unit' => $feed->unit, 'amount' => \App\Support\Money::usd($feed->total_cost)]) }}
     </p>
     <div class="confirm-delete__actions">
-        <button @click="close()" class="btn btn--secondary">Cancel</button>
+        <button @click="close()" class="btn btn--secondary">{{ __('ui.confirm_dialog.cancel') }}</button>
         <button hx-delete="{{ route('app.feed.destroy', $feed) }}"
                 hx-target="#feed-{{ $feed->id }}"
                 hx-swap="outerHTML swap:500ms"
                 class="btn btn--danger">
-            Delete
+            {{ __('feed.delete_modal.confirm') }}
         </button>
     </div>
 </x-modals.modal>

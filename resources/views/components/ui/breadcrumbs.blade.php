@@ -1,6 +1,6 @@
 @props(['items' => []])
 
-<nav class="breadcrumbs" aria-label="Breadcrumb">
+<nav class="breadcrumbs" aria-label="{{ __('ui.breadcrumbs.aria_label') }}">
     <ol class="breadcrumbs__list">
         @foreach($items as $item)
             <li class="breadcrumbs__item">

@@ -338,8 +338,11 @@ class ExpenseControllerTest extends TestCase
         $response = $this->actingAs($user)->get('/app/expenses?category=Feed');
 
         $response->assertStatus(200);
-        $response->assertSee('Feed expense');
-        $response->assertDontSee('Medical expense');
+        $response->assertViewHas('expenses', function ($expenses) {
+            return $expenses->count() === 1
+                && $expenses->first()->description === 'Feed expense'
+                && $expenses->first()->category === 'Feed';
+        });
     }
 
     public function test_index_paginates_at_5_items(): void

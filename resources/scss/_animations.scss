@@ -16,6 +16,20 @@
   transition: opacity $transition-duration-slow ease-in;
 }
 
+body.htmx-swapping,
+body.htmx-settling,
+body.htmx-added,
+.has-loading-skeleton.htmx-swapping,
+.has-loading-skeleton.htmx-settling,
+.has-loading-skeleton.htmx-added {
+  opacity: 1;
+}
+
+body.htmx-swapping,
+.has-loading-skeleton.htmx-swapping {
+  transition: none;
+}
+
 // Fade in
 .fade-in {
   animation: fadeIn $transition-duration-base ease-in forwards;
@@ -67,6 +81,6 @@
 
 // Skeleton loading shimmer
 @keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }

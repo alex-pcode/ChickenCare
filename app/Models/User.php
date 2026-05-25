@@ -30,6 +30,7 @@ class User extends Authenticatable
         'yearly_egg_goal',
         'egg_price',
         'chicken_goal',
+        'locale',
     ];
 
     /**
@@ -91,6 +92,11 @@ class User extends Authenticatable
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
+    }
+
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
     }
 
     public function isPremium(): bool

@@ -38,7 +38,7 @@
 
 .shiny-cta {
     --animation: gradient-angle linear infinite;
-    --duration: 3s;
+    --duration: 6s;
     --shadow-size: 2px;
     isolation: isolate;
     position: relative;
@@ -55,19 +55,11 @@
     font-size: 0.95rem;
     font-weight: $font-weight-semibold;
     line-height: 1;
-    border: 1px solid transparent;
+    border: none;
     border-radius: 360px;
+    clip-path: inset(0 round 360px);
     color: var(--shiny-cta-fg);
-    background:
-        linear-gradient(var(--shiny-cta-bg), var(--shiny-cta-bg)) padding-box,
-        conic-gradient(
-            from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
-            transparent,
-            var(--shiny-cta-highlight) var(--gradient-percent),
-            var(--gradient-shine) calc(var(--gradient-percent) * 2),
-            var(--shiny-cta-highlight) calc(var(--gradient-percent) * 3),
-            transparent calc(var(--gradient-percent) * 4)
-        ) border-box;
+    background: linear-gradient(var(--shiny-cta-bg), var(--shiny-cta-bg));
     box-shadow: inset 0 0 0 1px var(--shiny-cta-bg-subtle);
     text-decoration: none;
 
@@ -87,29 +79,8 @@
         translate: 0 1px;
     }
 
-    // Dots pattern
     &::before {
-        --size: calc(100% - var(--shadow-size) * 3);
-        --position: 2px;
-        --space: calc(var(--position) * 2);
-        width: var(--size);
-        height: var(--size);
-        background:
-            radial-gradient(
-                circle at var(--position) var(--position),
-                white calc(var(--position) / 4),
-                transparent 0
-            ) padding-box;
-        background-size: var(--space) var(--space);
-        background-repeat: space;
-        mask-image: conic-gradient(
-            from calc(var(--gradient-angle) + 45deg),
-            black,
-            transparent 10% 90%,
-            black
-        );
-        border-radius: inherit;
-        opacity: 0.4;
+        display: none;
     }
 
     // Shimmer overlay
@@ -124,7 +95,8 @@
             transparent
         );
         mask-image: radial-gradient(circle at bottom, transparent 40%, black);
-        opacity: 0.6;
+        border-radius: inherit;
+        opacity: 0.85;
     }
 
     span {

@@ -18,12 +18,12 @@ class ComponentsTest extends TestCase
         parent::setUp();
 
         // Share an empty error bag so @error directive works in Blade::render()
-        $this->app['view']->share('errors', new ViewErrorBag());
+        $this->app['view']->share('errors', new ViewErrorBag);
     }
 
     private function shareErrors(array $errors): void
     {
-        $bag = new ViewErrorBag();
+        $bag = new ViewErrorBag;
         $bag->put('default', new MessageBag($errors));
         $this->app['view']->share('errors', $bag);
     }
@@ -206,6 +206,29 @@ class ComponentsTest extends TestCase
 
         $this->assertStringContainsString('method="POST"', $html);
         $this->assertStringContainsString('_method', $html);
+    }
+
+    public function test_form_card_applies_hx_attributes_to_the_form_only(): void
+    {
+        $html = Blade::render(
+            <<<'BLADE'
+<x-forms.form-card
+    title="Test Form"
+    action="/test"
+    hx-post="/test"
+    hx-target="#rows"
+    :hx-headers='json_encode(["Accept" => "application/json"])'
+>
+    <p>Fields</p>
+</x-forms.form-card>
+BLADE
+        );
+
+        $this->assertMatchesRegularExpression('/<form[^>]*hx-post="\/test"/', $html);
+        $this->assertMatchesRegularExpression('/<form[^>]*hx-target="#rows"/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<div class="form-card"[^>]*hx-post=/', $html);
+        $this->assertSame(1, substr_count($html, 'hx-post="/test"'));
+        $this->assertStringContainsString('hx-headers="{&quot;Accept&quot;:&quot;application\/json&quot;}"', $html);
     }
 
     public function test_section_component_renders(): void

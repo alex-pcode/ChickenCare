@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Support\SavingsPeriod;
 use Carbon\Carbon;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class SavingsPeriodTest extends TestCase
 {

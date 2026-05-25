@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BatchEvent;
+use App\Models\DeathRecord;
 use App\Models\User;
 use App\Support\WeekStart;
 use Carbon\Carbon;
@@ -92,7 +93,7 @@ class DashboardService
             ->first();
 
         // Single query for mortality across active batches using a subquery
-        $totalMortality = (int) \App\Models\DeathRecord::whereIn(
+        $totalMortality = (int) DeathRecord::whereIn(
             'batch_id',
             (clone $activeBatches)->select('id')
         )->sum('count');
@@ -105,7 +106,7 @@ class DashboardService
         ];
     }
 
-    private function getRecentActivity(User $user): Collection
+    public function getRecentActivity(User $user): Collection
     {
         $items = collect();
 
@@ -115,7 +116,7 @@ class DashboardService
             $items->push([
                 'date' => $e->date,
                 'type' => 'egg',
-                'description' => "{$e->count} eggs collected",
+                'description' => __('dashboard.recent_activity.items.egg', ['count' => $e->count]),
             ]);
         }
 
@@ -126,7 +127,7 @@ class DashboardService
                 $items->push([
                     'date' => $s->sale_date,
                     'type' => 'sale',
-                    'description' => "Sale: \${$s->total_amount}",
+                    'description' => __('dashboard.recent_activity.items.sale', ['amount' => number_format((float) $s->total_amount, 2)]),
                 ]);
             }
         }
@@ -204,18 +205,29 @@ class DashboardService
     }
 
     /**
+     * @return Collection<string, mixed>
+     */
+    private function getThirtyDayEggEntries(User $user): Collection
+    {
+        return once(function () use ($user) {
+            $startDate = now()->subDays(29)->startOfDay();
+
+            return $user->eggEntries()
+                ->where('date', '>=', $startDate->toDateString())
+                ->orderBy('date')
+                ->get()
+                ->keyBy(fn ($entry) => $entry->date->format('Y-m-d'));
+        });
+    }
+
+    /**
      * @return array{labels: array, datasets: array}
      */
     public function getEggChartData(User $user): array
     {
         $startDate = now()->subDays(29)->startOfDay();
         $endDate = now()->endOfDay();
-
-        $entries = $user->eggEntries()
-            ->where('date', '>=', $startDate->toDateString())
-            ->orderBy('date')
-            ->get()
-            ->keyBy(fn ($entry) => $entry->date->format('Y-m-d'));
+        $entries = $this->getThirtyDayEggEntries($user);
 
         $labels = [];
         $data = [];
@@ -242,12 +254,7 @@ class DashboardService
     {
         $startDate = now()->subDays(29)->startOfDay();
         $endDate = now()->endOfDay();
-
-        $entries = $user->eggEntries()
-            ->where('date', '>=', $startDate->toDateString())
-            ->orderBy('date')
-            ->get()
-            ->keyBy(fn ($entry) => $entry->date->format('Y-m-d'));
+        $entries = $this->getThirtyDayEggEntries($user);
 
         $labels = [];
         $data = [];

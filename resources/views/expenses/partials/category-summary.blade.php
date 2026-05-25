@@ -3,23 +3,23 @@
 @endphp
 <div class="glass-card">
     <div class="expenses__summary-header">
-        <h3 class="expenses__summary-title">Category Summary</h3>
+        <h3 class="expenses__summary-title">{{ __('expenses.summary.title') }}</h3>
         <div class="expenses__summary-total">
             <div class="expenses__summary-total-amount">@usd($stats['grandTotal'])</div>
-            <div class="expenses__summary-total-label">Total</div>
+            <div class="expenses__summary-total-label">{{ __('expenses.summary.total') }}</div>
         </div>
     </div>
-    <p class="expenses__summary-subtitle">Click a category to see its biggest line items</p>
+    <p class="expenses__summary-subtitle">{{ __('expenses.summary.subtitle') }}</p>
 
     @empty(collect($stats['breakdown'])->filter(fn($cat) => $cat['total'] > 0))
         <div class="expenses__summary-empty">
-            <p>No expenses recorded yet</p>
-            <p class="expenses__summary-percentage" style="margin-top: 0.25rem;">Add your first expense above to see the breakdown</p>
+            <p>{{ __('expenses.summary.empty_title') }}</p>
+            <p class="expenses__summary-percentage" style="margin-top: 0.25rem;">{{ __('expenses.summary.empty_description') }}</p>
         </div>
     @else
         <div class="expenses__summary-rows"
              role="tablist"
-             aria-label="Expense categories"
+             aria-label="{{ __('expenses.summary.categories_aria_label') }}"
              x-data="{ selected: @js($selectedCategory) }">
             @foreach(collect($stats['breakdown'])->filter(fn($cat) => $cat['total'] > 0) as $cat)
                 <a href="#"
@@ -37,14 +37,14 @@
                         <div>
                             <div class="expenses__summary-category">{{ $cat['name'] }}</div>
                             <div class="expenses__summary-percentage">
-                                {{ number_format($cat['percentage'], 1) }}% of total
+                                {{ __('expenses.summary.percentage_of_total', ['percentage' => number_format($cat['percentage'], 1)]) }}
                             </div>
                         </div>
                     </div>
                     <div class="expenses__summary-row-right">
                         <div class="expenses__summary-amount">@usd($cat['total'])</div>
                         <div class="expenses__summary-count">
-                            {{ $cat['transactionCount'] }} transaction{{ $cat['transactionCount'] !== 1 ? 's' : '' }}
+                            {{ trans_choice('expenses.summary.transactions', $cat['transactionCount'], ['count' => $cat['transactionCount']]) }}
                         </div>
                     </div>
                 </a>

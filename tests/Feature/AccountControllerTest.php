@@ -20,6 +20,7 @@ class AccountControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('account.index');
         $response->assertSee('Account Settings');
+        $response->assertSee('data-loading-skeleton="account-tab"', false);
         $response->assertSee('role="tablist"', false);
     }
 
@@ -106,8 +107,8 @@ class AccountControllerTest extends TestCase
         $user = User::factory()->create();
         $response = $this->actingAs($user)->get('/app/account?tab=security');
         $response->assertStatus(200);
-        $response->assertSee('Security Status');
         $response->assertSee('Password Reset');
+        $response->assertSee('Reset Password');
     }
 
     public function test_password_reset_link_dispatched(): void
@@ -175,9 +176,9 @@ class AccountControllerTest extends TestCase
         $user = User::factory()->create(['chicken_goal' => ChickenGoal::Hobby]);
         $response = $this->actingAs($user)->get('/app/account?tab=goals');
         $response->assertStatus(200);
-        $response->assertSee('Your Chicken Goals');
-        $response->assertSee('Production Goals');
-        $response->assertSee('Pricing Configuration');
+        $response->assertSee('Farm Preferences');
+        $response->assertSee('Yearly Egg Production Goal');
+        $response->assertSee('Price per Egg ($)');
     }
 
     public function test_preferences_update_happy_path(): void
@@ -187,13 +188,34 @@ class AccountControllerTest extends TestCase
             'chicken_goal' => 'hobby',
             'yearly_egg_goal' => 1200,
             'egg_price' => 0.50,
+            'locale' => 'sr',
         ]);
         $response->assertRedirect(route('app.account.index', ['tab' => 'goals']));
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'chicken_goal' => 'hobby',
             'yearly_egg_goal' => 1200,
+            'locale' => 'sr',
         ]);
+    }
+
+    public function test_full_page_locale_change_renders_success_flash_in_new_locale(): void
+    {
+        $user = User::factory()->create(['locale' => 'en']);
+
+        $response = $this->actingAs($user)
+            ->followingRedirects()
+            ->patch('/app/account/preferences', [
+                'chicken_goal' => 'hobby',
+                'yearly_egg_goal' => 1200,
+                'egg_price' => 0.50,
+                'locale' => 'sr',
+            ]);
+
+        $response->assertOk();
+        $response->assertSee('<html lang="sr">', false);
+        $response->assertSee('Podešavanja su uspešno ažurirana!');
+        $response->assertDontSee('Preferences updated successfully!');
     }
 
     public function test_preferences_update_via_htmx(): void
@@ -208,6 +230,30 @@ class AccountControllerTest extends TestCase
             ]);
         $response->assertStatus(200);
         $response->assertHeader('HX-Trigger', 'account-preferences-updated');
+        $response->assertHeaderMissing('HX-Redirect');
+    }
+
+    public function test_htmx_locale_change_returns_hx_redirect_for_full_shell_refresh(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->withHeaders(['HX-Request' => 'true'])
+            ->patch('/app/account/preferences', [
+                'chicken_goal' => 'business',
+                'yearly_egg_goal' => 5000,
+                'egg_price' => 1.25,
+                'locale' => 'sr',
+            ]);
+
+        $response->assertStatus(200);
+        $response->assertHeader('HX-Redirect', route('app.account.index', ['tab' => 'goals']));
+        $response->assertHeaderMissing('HX-Trigger');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'locale' => 'sr',
+        ]);
     }
 
     public function test_preferences_validation_failure_invalid_goal(): void
@@ -232,6 +278,42 @@ class AccountControllerTest extends TestCase
         $response->assertSessionHasErrors('egg_price');
     }
 
+    public function test_preferences_validation_failure_invalid_locale(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->patch('/app/account/preferences', [
+            'chicken_goal' => 'hobby',
+            'yearly_egg_goal' => 1200,
+            'egg_price' => 0.50,
+            'locale' => 'de',
+        ]);
+
+        $response->assertSessionHasErrors('locale');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'locale' => null,
+        ]);
+    }
+
+    public function test_htmx_preferences_validation_failure_uses_serbian_messages(): void
+    {
+        $user = User::factory()->create(['locale' => 'sr']);
+
+        $response = $this->actingAs($user)
+            ->withHeaders(['HX-Request' => 'true'])
+            ->patch('/app/account/preferences', [
+                'chicken_goal' => 'hobby',
+                'yearly_egg_goal' => 1200,
+                'egg_price' => 0.50,
+                'locale' => 'de',
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.locale.0', 'Izabrana vrednost za polje jezik nije ispravna.');
+        $response->assertDontSee('validation.in', false);
+    }
+
     public function test_historical_data_hidden_when_no_entries(): void
     {
         $user = User::factory()->create();
@@ -245,5 +327,87 @@ class AccountControllerTest extends TestCase
         EggEntry::factory()->create(['user_id' => $user->id]);
         $response = $this->actingAs($user)->get('/app/account?tab=goals');
         $response->assertSee('Historical Data');
+    }
+
+    public function test_account_page_renders_serbian_labels_when_locale_is_serbian(): void
+    {
+        $user = User::factory()->create(['locale' => 'sr']);
+
+        $response = $this->actingAs($user)->get('/app/account');
+
+        $response->assertOk();
+        $response->assertSee('Podešavanja naloga');
+        $response->assertSee('Profil');
+        $response->assertSee('Bezbednost');
+        $response->assertSee('Naplata');
+        $response->assertSee('Ciljevi i podešavanja');
+        $response->assertSee('Podešavanja naloga');
+    }
+
+    public function test_account_billing_htmx_partial_renders_serbian_copy(): void
+    {
+        $user = User::factory()->create(['locale' => 'sr', 'tier' => 'free']);
+
+        $response = $this->actingAs($user)
+            ->withHeaders(['HX-Request' => 'true'])
+            ->get('/app/account?tab=billing');
+
+        $response->assertOk();
+        $response->assertDontSee('<!DOCTYPE html>', false);
+        $response->assertSee('Trenutni paket');
+        $response->assertSee('Besplatni');
+        $response->assertSee('Dostupne su osnovne funkcije');
+        $response->assertSee('Predjite na Premium (uskoro)');
+        $response->assertDontSee('account.billing.current_plan', false);
+    }
+
+    public function test_security_tab_renders_serbian_copy(): void
+    {
+        $user = User::factory()->create(['locale' => 'sr']);
+
+        $response = $this->actingAs($user)->get('/app/account?tab=security');
+
+        $response->assertOk();
+        $response->assertSee('Resetovanje lozinke');
+        $response->assertSee('Resetujte lozinku tako sto cete dobiti bezbedan link putem e-poste');
+        $response->assertSee('Resetuj lozinku');
+    }
+
+    public function test_password_reset_failure_message_is_localized_for_serbian_locale(): void
+    {
+        Password::shouldReceive('sendResetLink')
+            ->once()
+            ->andReturn(Password::RESET_THROTTLED);
+
+        $user = User::factory()->create(['locale' => 'sr']);
+
+        $response = $this->actingAs($user)
+            ->withHeaders(['HX-Request' => 'true'])
+            ->post('/app/account/password-reset-link');
+
+        $response->assertOk();
+
+        $payload = json_decode((string) $response->headers->get('HX-Trigger'), true, flags: JSON_THROW_ON_ERROR);
+
+        $this->assertSame('Sačekajte pre nego što pokušate ponovo.', $payload['account-password-reset-failed']['message']);
+    }
+
+    public function test_serbian_goals_progress_copy_is_translated(): void
+    {
+        $user = User::factory()->create([
+            'locale' => 'sr',
+            'yearly_egg_goal' => 100,
+        ]);
+        EggEntry::factory()->create([
+            'user_id' => $user->id,
+            'date' => now()->startOfWeek(),
+            'count' => 10,
+        ]);
+
+        $response = $this->actingAs($user)->get('/app/account?tab=goals');
+
+        $response->assertOk();
+        $response->assertSee('Samo nastavite!');
+        $response->assertSee('Potrebno vam je još 90 jaja');
     }
 }

@@ -524,32 +524,137 @@
 .expenses-hero {
     position: relative;
     width: 100%;
-    height: 14rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    margin-bottom: 0;
+    max-width: 1200px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    align-items: stretch;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+    overflow: visible;
 
-    &__welcome-row {
-        display: flex;
-        justify-content: flex-start;
-        padding-left: 1rem;
-        margin-top: 0.5rem;
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 0;
+
+        .dark & {
+            background: rgba(30, 30, 30, 0.9);
+        }
     }
 
-    &__welcome-text {
-        font-size: $font-size-lg;
-        font-weight: $font-weight-medium;
-        color: #111827;
+    > * {
+        position: relative;
+        z-index: 1;
+    }
 
-        .dark & { color: $color-neutral-200; }
+    @media (max-width: 768px) {
+        grid-template-columns: 3fr 2fr;
+        grid-template-rows: auto auto;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem 0.75rem 0.5rem;
+        align-items: center;
+    }
+
+    &__corner-badge {
+        $curve: 1.25rem;
+        $btn-size: 4.375rem;
+
+        display: grid;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: $btn-size;
+        width: $btn-size;
+        place-items: center;
+        background: $neu-bg;
+        border-radius: $curve 0 $curve 0;
+        z-index: 3;
+
+        .dark & {
+            background: #1a1a1a;
+        }
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        &::before {
+            top: 100%;
+            left: 0;
+            width: $curve;
+            height: $curve * 3;
+            border-radius: $curve 0 0 0;
+            box-shadow: 0 (-$curve * 2) 0 $neu-bg;
+
+            .dark & {
+                box-shadow: 0 (-$curve * 2) 0 #1a1a1a;
+            }
+        }
+
+        &::after {
+            top: 0;
+            left: 100%;
+            width: $curve * 3;
+            height: $curve;
+            border-radius: $curve 0 0 0;
+            box-shadow: (-$curve * 2) 0 0 $neu-bg;
+
+            .dark & {
+                box-shadow: (-$curve * 2) 0 0 #1a1a1a;
+            }
+        }
+    }
+
+    &__corner-badge-icon {
+        height: 3.125rem;
+        width: 3.125rem;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        border-radius: $radius-base;
+        font-size: 1.5rem;
+        line-height: 1;
+        animation: hero-badge-pop 0.4s ease-out 0.8s both;
+    }
+
+    &__media {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 16rem;
+        overflow: hidden;
+
+        @media (max-width: 768px) {
+            order: 2;
+            grid-row: 1;
+            grid-column: 2;
+            height: 7rem;
+            overflow: visible;
+        }
     }
 
     &__image {
         width: auto;
         height: 100%;
         object-fit: contain;
+
+        @media (max-width: 768px) {
+            height: 140%;
+            max-width: none;
+        }
     }
 
     &__image--animated {
@@ -558,35 +663,83 @@
             hero-coin-wobble 4s ease-in-out 1s infinite;
     }
 
-    &__badge {
-        position: absolute;
-        top: 0.5rem;
-        right: 1rem;
-        background: #3b82f6;
-        color: #fff;
-        padding: 0.25rem 0.75rem;
-        border-radius: $radius-pill;
-        font-size: $font-size-sm;
-        font-weight: $font-weight-medium;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        animation: hero-badge-pop 0.4s ease-out 0.8s both;
+    &__side {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            order: 1;
+            display: contents;
+        }
     }
 
-    &__welcome {
+    &__status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: $radius-base;
         background: rgba(255, 255, 255, 0.9);
         -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
-        border-radius: $radius-base;
-        padding: 0.5rem 1rem;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border: 1px solid $color-neutral-200;
-        animation: hero-welcome-slide-in 0.5s ease-out 0.5s both;
+        border-left: 4px solid transparent;
+        animation: slide-in-left 0.5s ease-out 0.5s both;
+
+        @media (max-width: 768px) {
+            padding: 3.25rem 0 0 0.5rem;
+            background: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            border-left: none;
+            grid-row: 1;
+            grid-column: 1;
+        }
+
+        &--success { border-left-color: #10b981; }
+        &--warning { border-left-color: #f97316; }
+        &--neutral { border-left-color: #9ca3af; }
     }
 
-    .dark &__welcome {
-        background: rgba(17, 24, 39, 0.9);
-        border-color: #374151;
-        color: $color-neutral-200;
+    &__status-text {
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            flex: 1;
+        }
+    }
+
+    &__status-title {
+        margin: 0 0 0.25rem;
+        padding-top: 1rem;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: #1f2937;
+
+        .dark & {
+            color: #f3f4f6;
+        }
+    }
+
+    &__status-detail {
+        margin: 0;
+        font-size: $font-size-sm;
+        color: #6b7280;
+
+        .dark & {
+            color: #9ca3af;
+        }
+    }
+
+    .comparison-card {
+        @media (max-width: 768px) {
+            grid-row: 2;
+            grid-column: 1 / -1;
+        }
     }
 }
 
@@ -616,7 +769,7 @@
 @media (prefers-reduced-motion: reduce) {
     .expenses-hero__image--animated,
     .expenses-hero__badge,
-    .expenses-hero__welcome {
+    .expenses-hero__status {
         animation: none;
         opacity: 1;
         transform: none;

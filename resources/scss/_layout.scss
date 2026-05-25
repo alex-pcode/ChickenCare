@@ -30,6 +30,13 @@
     @include mobile {
       padding-bottom: calc(#{$space-6} + 72px); // space for mobile dock
     }
+
+    &--narrow {
+      @include desktop {
+        padding-left: 10%;
+        padding-right: 10%;
+      }
+    }
   }
 }
 
@@ -97,7 +104,6 @@
     color: $color-neutral-500;
     margin: 0;
     line-height: 1.3;
-    white-space: nowrap;
   }
 
   &__nav {
@@ -806,5 +812,20 @@
         border-color: rgba($color-indigo-600, 0.3);
       }
     }
+  }
+}
+
+// Responsive display utilities
+.d-none-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.d-only-mobile {
+  display: none !important;
+
+  @media (max-width: 768px) {
+    display: inline !important;
   }
 }

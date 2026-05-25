@@ -1,7 +1,7 @@
 <div class="egg-counter__duplicate-confirm" role="alertdialog" aria-labelledby="duplicate-title" aria-describedby="duplicate-desc">
-    <p id="duplicate-title" class="egg-counter__duplicate-confirm-title">Duplicate Entry Detected</p>
+    <p id="duplicate-title" class="egg-counter__duplicate-confirm-title">{{ __('eggs.duplicate.title') }}</p>
     <p id="duplicate-desc" class="egg-counter__duplicate-confirm-desc">
-        An entry for {{ $existing->date->format('M d, Y') }} already exists with {{ $existing->count }} eggs. Update it?
+        {{ __('eggs.duplicate.message', ['date' => $existing->date->format('M d, Y'), 'count' => $existing->count]) }}
     </p>
     <div class="egg-counter__duplicate-confirm-actions">
         <button type="button" class="btn btn--sm btn--primary"
@@ -10,11 +10,11 @@
             hx-swap="afterbegin"
             hx-vals='@json(array_merge($formData, ["confirm_update" => 1]))'
             hx-on::after-request="document.getElementById('duplicate-confirm-area').innerHTML = ''">
-            Update Existing
+            {{ __('eggs.duplicate.confirm') }}
         </button>
         <button type="button" class="btn btn--sm btn--secondary"
             onclick="document.getElementById('duplicate-confirm-area').innerHTML = ''">
-            Cancel
+            {{ __('eggs.duplicate.cancel') }}
         </button>
     </div>
 </div>

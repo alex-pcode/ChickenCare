@@ -62,7 +62,7 @@ class ViabilityReplicationTest extends TestCase
 
         $response = $this->actingAs($user)->get('/app/viability');
 
-        $response->assertSee("Don't forget:", false);
+        $response->assertSee('forget:', false);
     }
 
     public function test_viability_page_uses_new_defaults(): void

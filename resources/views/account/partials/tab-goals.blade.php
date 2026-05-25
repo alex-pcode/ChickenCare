@@ -1,4 +1,7 @@
 <div class="account-goals" x-data="{ goal: '{{ $user->chicken_goal?->value ?? 'hobby' }}' }">
+    @php
+        $selectedLocale = old('locale', $user->locale ?? app()->getLocale());
+    @endphp
     <form hx-patch="{{ route('app.account.update-preferences') }}"
           hx-target="#account-tab-content"
           hx-swap="innerHTML"
@@ -8,36 +11,36 @@
         {{-- Farm Preferences (merged card) --}}
         <div class="form-card">
             <div class="form-card__header">
-                <h2 class="form-card__title">Farm Preferences</h2>
-                <p class="form-card__subtitle">Customize your goals and pricing</p>
+                <h2 class="form-card__title">{{ __('account.preferences.title') }}</h2>
+                <p class="form-card__subtitle">{{ __('account.preferences.subtitle') }}</p>
             </div>
 
             <div class="form-card__form">
                 <div class="account-goals__prefs-grid">
                     {{-- Chicken Goal --}}
                     <div class="form-group">
-                        <label for="chicken_goal" class="form-label">Primary goal with raising chickens</label>
+                        <label for="chicken_goal" class="form-label">{{ __('account.preferences.chicken_goal') }}</label>
                         <select id="chicken_goal" name="chicken_goal" class="form-select" required
                                 x-model="goal">
-                            <option value="hobby" {{ ($user->chicken_goal?->value ?? 'hobby') === 'hobby' ? 'selected' : '' }}>Hobby / Family Use</option>
-                            <option value="business" {{ ($user->chicken_goal?->value ?? '') === 'business' ? 'selected' : '' }}>Business / Profit</option>
+                            <option value="hobby" {{ ($user->chicken_goal?->value ?? 'hobby') === 'hobby' ? 'selected' : '' }}>{{ __('account.goal_options.hobby') }}</option>
+                            <option value="business" {{ ($user->chicken_goal?->value ?? '') === 'business' ? 'selected' : '' }}>{{ __('account.goal_options.business') }}</option>
                         </select>
                         @error('chicken_goal')
                             <p class="form-error" role="alert">{{ $message }}</p>
                         @enderror
                         <p class="form-help-text"
-                           x-show="goal === 'hobby'" x-cloak>We'll show savings vs. buying store eggs.</p>
+                           x-show="goal === 'hobby'" x-cloak>{{ __('account.preferences.chicken_goal_help_hobby') }}</p>
                         <p class="form-help-text"
-                           x-show="goal === 'business'" x-cloak>We'll show revenue vs. expenses.</p>
+                           x-show="goal === 'business'" x-cloak>{{ __('account.preferences.chicken_goal_help_business') }}</p>
                     </div>
 
                     {{-- Yearly Egg Goal --}}
                     <x-forms.input
                         name="yearly_egg_goal"
-                        label="Yearly Egg Production Goal"
+                        :label="__('account.preferences.yearly_egg_goal')"
                         type="number"
-                        :value="$user->yearly_egg_goal ?? 0"
-                        placeholder="e.g. 1200"
+                        :value="old('yearly_egg_goal', $user->yearly_egg_goal ?? 0)"
+                        :placeholder="__('account.preferences.yearly_egg_goal_placeholder')"
                         min="0"
                         max="1000000"
                         :required="true"
@@ -46,15 +49,28 @@
                     {{-- Price per Egg --}}
                     <x-forms.input
                         name="egg_price"
-                        label="Price per Egg ($)"
+                        :label="__('account.preferences.egg_price')"
                         type="number"
-                        :value="$user->egg_price ?? '0.30'"
+                        :value="old('egg_price', $user->egg_price ?? '0.30')"
                         placeholder="0.30"
                         step="0.01"
                         min="0"
                         max="999.99"
                         :required="true"
                     />
+
+                    <div class="form-group">
+                        <label for="locale" class="form-label">{{ __('account.preferences.language') }}</label>
+                        <select id="locale" name="locale" class="form-select" required>
+                            @foreach(config('app.supported_locales', ['en']) as $locale)
+                                <option value="{{ $locale }}" @selected($selectedLocale === $locale)>{{ __('account.locales.'.$locale) }}</option>
+                            @endforeach
+                        </select>
+                        @error('locale')
+                            <p class="form-error" role="alert">{{ $message }}</p>
+                        @enderror
+                        <p class="form-help-text">{{ __('account.preferences.language_help') }}</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,16 +83,16 @@
                 $overGoal = $yearProgress > $user->yearly_egg_goal;
             @endphp
             <div class="account-goals__progress-section">
-                <h3 class="account-goals__progress-heading">Your progress</h3>
+                <h3 class="account-goals__progress-heading">{{ __('account.progress.heading') }}</h3>
 
                 <div class="account-production__progress-panel">
                     @if($overGoal)
                         <p class="account-production__progress-label account-production__progress-label--over">
-                            {{ number_format($yearProgress) }} eggs collected &mdash; {{ $percentage }}% over your annual goal of {{ number_format($user->yearly_egg_goal) }}! Consider raising your target.
+                            {{ __('account.progress.over_goal', ['count' => number_format($yearProgress), 'percentage' => $percentage, 'goal' => number_format($user->yearly_egg_goal)]) }}
                         </p>
                     @else
                         <p class="account-production__progress-label">
-                            {{ number_format($yearProgress) }} of {{ number_format($user->yearly_egg_goal) }} eggs ({{ $percentage }}% of goal)
+                            {{ __('account.progress.summary', ['count' => number_format($yearProgress), 'goal' => number_format($user->yearly_egg_goal), 'percentage' => $percentage]) }}
                         </p>
                     @endif
                     <div class="account-production__progress-bar{{ $overGoal ? ' account-production__progress-bar--over' : '' }}"
@@ -88,15 +104,15 @@
 
                 <div class="account-production__mini-stats">
                     <x-ui.stat-card
-                        title="This Month"
+                        :title="__('account.progress.this_month')"
                         :total="$thisMonthEggs"
-                        label="eggs collected"
+                        :label="__('account.progress.eggs_collected')"
                         icon="📅"
                     />
                     <x-ui.stat-card
-                        title="This Week"
+                        :title="__('account.progress.this_week')"
                         :total="$thisWeekEggs"
-                        label="eggs collected"
+                        :label="__('account.progress.eggs_collected')"
                         icon="📊"
                     />
                 </div>
@@ -104,8 +120,8 @@
                 @if($yearProgress > 0 && !$overGoal)
                     <div class="account-production__keep-going">
                         <div>
-                            <h3>Keep Going!</h3>
-                            <p>You need {{ number_format($remaining) }} more eggs to reach your annual goal.</p>
+                            <h3>{{ __('account.progress.keep_going_title') }}</h3>
+                            <p>{{ __('account.progress.keep_going_body', ['remaining' => number_format($remaining)]) }}</p>
                         </div>
                     </div>
                 @endif
@@ -116,14 +132,14 @@
         @if($hasEggEntries)
             <div class="form-card" style="margin-top: 2rem;">
                 <div class="form-card__header">
-                    <h2 class="form-card__title">Historical Data</h2>
-                    <p class="form-card__subtitle">Import historical egg tracking data</p>
+                    <h2 class="form-card__title">{{ __('account.historical.title') }}</h2>
+                    <p class="form-card__subtitle">{{ __('account.historical.subtitle') }}</p>
                 </div>
 
                 <div class="account-historical__info">
                     <div>
-                        <strong>Backfill Historical Data</strong>
-                        <p>Add egg production data for dates before you started using ChickenCare. This helps create more accurate analytics and trends.</p>
+                        <strong>{{ __('account.historical.info_title') }}</strong>
+                        <p>{{ __('account.historical.info_body') }}</p>
                     </div>
                 </div>
 
@@ -132,14 +148,18 @@
                         hx-get="{{ route('app.eggs.backfill-form') }}"
                         hx-target="body"
                         hx-swap="beforeend">
-                    Import Historical Data
+                    {{ __('account.historical.action') }}
                 </button>
             </div>
         @endif
 
         {{-- Save Preferences --}}
         <div style="margin-top: 2rem;">
-            <x-forms.submit-button label="Save Preferences" />
+            <x-forms.submit-button
+                :label="__('account.preferences.save')"
+                :saving-label="__('ui.submit_button.saving')"
+                :saved-label="__('ui.submit_button.saved')"
+            />
         </div>
     </form>
 </div>

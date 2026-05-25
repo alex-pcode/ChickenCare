@@ -64,6 +64,28 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
     &--striped .data-table__body .data-table__row:nth-child(even) {
       background-color: rgba(255, 255, 255, 0.03);
     }
+
+    // Mobile stacked-card layout: each row becomes a card — override the light glass styles
+    @media (max-width: 768px) {
+      tr {
+        background: $dm-card-bg;
+        border-color: $dm-card-border !important;
+        box-shadow: $dm-card-shadow;
+      }
+
+      .data-table__cell {
+        border-bottom-color: $dm-border;
+        color: $dm-text-secondary;
+
+        &::before {
+          color: $dm-text-muted;
+        }
+      }
+
+      &--striped .data-table__body .data-table__row:nth-child(even) {
+        background-color: $dm-card-bg;
+      }
+    }
   }
 
   // ======================================================================
@@ -924,16 +946,6 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
       }
     }
 
-    &__preferences-save {
-      background-color: $dm-surface-elevated;
-      color: $dm-text-secondary;
-      border: 1px solid $dm-border-solid;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.08);
-        color: $dm-text;
-      }
-    }
   }
 
   // ======================================================================

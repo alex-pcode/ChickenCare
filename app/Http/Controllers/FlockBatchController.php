@@ -9,6 +9,8 @@ use App\Http\Requests\UpdateLayingDateRequest;
 use App\Models\FlockBatch;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class FlockBatchController extends Controller
 {
@@ -20,17 +22,17 @@ class FlockBatchController extends Controller
 
         $query = match ($filter) {
             'archived' => $request->user()->flockBatches()->archived(),
-            'all'      => $request->user()->flockBatches(),
-            default    => $request->user()->flockBatches()->active(),
+            'all' => $request->user()->flockBatches(),
+            default => $request->user()->flockBatches()->active(),
         };
 
         $allowedSorts = ['batch_name', 'current_count', 'initial_count', 'acquisition_date', 'source'];
         $sort = in_array($request->query('sort'), $allowedSorts, true) ? $request->query('sort') : 'acquisition_date';
-        $dir  = in_array($request->query('dir'), ['asc', 'desc'], true) ? $request->query('dir') : 'desc';
+        $dir = in_array($request->query('dir'), ['asc', 'desc'], true) ? $request->query('dir') : 'desc';
 
-        $batches = $query->orderBy($sort, $dir)->paginate(15)->appends($request->query());
+        $batches = $query->orderBy($sort, $dir)->paginate(10)->appends($request->query());
 
-        if ($this->isHtmx($request) && !$request->hasHeader('HX-Boosted')) {
+        if ($this->isHtmx($request) && ! $request->hasHeader('HX-Boosted')) {
             return view('batches.partials.batches-table', compact('batches', 'sort', 'dir'));
         }
 
@@ -46,15 +48,15 @@ class FlockBatchController extends Controller
     {
         $validated = $request->validated();
 
-        $hens     = (int) ($validated['hens_count'] ?? 0);
+        $hens = (int) ($validated['hens_count'] ?? 0);
         $brooding = (int) ($validated['brooding_count'] ?? 0);
         $roosters = (int) ($validated['roosters_count'] ?? 0);
-        $chicks   = (int) ($validated['chicks_count'] ?? 0);
-        $total    = $hens + $brooding + $roosters + $chicks;
+        $chicks = (int) ($validated['chicks_count'] ?? 0);
+        $total = $hens + $brooding + $roosters + $chicks;
 
         $batch = $request->user()->flockBatches()->create([
             ...$validated,
-            'type'          => FlockBatch::resolveType($hens, $roosters, $chicks, $brooding),
+            'type' => FlockBatch::resolveType($hens, $roosters, $chicks, $brooding),
             'initial_count' => $total,
             'current_count' => $total,
         ]);
@@ -64,7 +66,7 @@ class FlockBatchController extends Controller
         }
 
         return redirect()->route('app.batches.show', $batch)
-            ->with('success', 'Batch created successfully.');
+            ->with('success', __('batches.messages.created'));
     }
 
     public function show(Request $request, FlockBatch $batch)
@@ -96,7 +98,7 @@ class FlockBatchController extends Controller
         }
 
         return redirect()->route('app.batches.show', $batch)
-            ->with('success', 'Batch updated successfully.');
+            ->with('success', __('batches.messages.updated'));
     }
 
     public function destroy(Request $request, FlockBatch $batch)
@@ -110,50 +112,50 @@ class FlockBatchController extends Controller
         }
 
         return redirect()->route('app.batches.index')
-            ->with('success', 'Batch archived successfully.');
+            ->with('success', __('batches.messages.archived'));
     }
 
-    public function compositionModal(Request $request, FlockBatch $batch): \Illuminate\View\View
+    public function compositionModal(Request $request, FlockBatch $batch): View
     {
         $this->authorize('update', $batch);
 
         return view('batches.partials.composition-modal', compact('batch'));
     }
 
-    public function layingDateModal(Request $request, FlockBatch $batch): \Illuminate\View\View
+    public function layingDateModal(Request $request, FlockBatch $batch): View
     {
         $this->authorize('update', $batch);
 
         return view('batches.partials.laying-date-modal', compact('batch'));
     }
 
-    public function updateComposition(UpdateCompositionRequest $request, FlockBatch $batch): \Illuminate\Http\Response
+    public function updateComposition(UpdateCompositionRequest $request, FlockBatch $batch): Response
     {
         $this->authorize('update', $batch);
 
-        $hens     = (int) $request->hens_count;
+        $hens = (int) $request->hens_count;
         $roosters = (int) $request->roosters_count;
-        $chicks   = (int) $request->chicks_count;
+        $chicks = (int) $request->chicks_count;
         $brooding = (int) $request->brooding_count;
 
         $batch->update([
-            'hens_count'     => $hens,
+            'hens_count' => $hens,
             'roosters_count' => $roosters,
-            'chicks_count'   => $chicks,
+            'chicks_count' => $chicks,
             'brooding_count' => $brooding,
-            'current_count'  => $hens + $roosters + $chicks + $brooding,
-            'type'           => FlockBatch::resolveType($hens, $roosters, $chicks, $brooding),
+            'current_count' => $hens + $roosters + $chicks + $brooding,
+            'type' => FlockBatch::resolveType($hens, $roosters, $chicks, $brooding),
         ]);
 
         return response('', 200)
             ->header('HX-Trigger', json_encode([
                 'flock:changed' => true,
-                'flock:success' => 'Batch composition updated.',
-                'modal:close'   => true,
+                'flock:success' => __('batches.messages.composition_updated'),
+                'modal:close' => true,
             ]));
     }
 
-    public function updateLayingDate(UpdateLayingDateRequest $request, FlockBatch $batch): \Illuminate\Http\Response
+    public function updateLayingDate(UpdateLayingDateRequest $request, FlockBatch $batch): Response
     {
         $this->authorize('update', $batch);
 
@@ -165,9 +167,9 @@ class FlockBatchController extends Controller
             ->header('HX-Trigger', json_encode([
                 'flock:changed' => true,
                 'flock:success' => $request->actual_laying_start_date
-                    ? 'Laying date set.'
-                    : 'Laying date cleared.',
-                'modal:close'   => true,
+                    ? __('batches.messages.laying_date_set')
+                    : __('batches.messages.laying_date_cleared'),
+                'modal:close' => true,
             ]));
     }
 }

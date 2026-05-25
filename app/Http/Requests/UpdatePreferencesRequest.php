@@ -21,7 +21,17 @@ class UpdatePreferencesRequest extends FormRequest
             'chicken_goal' => ['required', Rule::enum(ChickenGoal::class)],
             'yearly_egg_goal' => ['required', 'integer', 'min:0', 'max:1000000'],
             'egg_price' => ['required', 'numeric', 'min:0', 'max:999.99'],
+            'locale' => ['sometimes', 'nullable', 'string', Rule::in(config('app.supported_locales', ['en']))],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('locale'))) {
+            $this->merge([
+                'locale' => strtolower($this->string('locale')->toString()),
+            ]);
+        }
     }
 
     protected function failedValidation(Validator $validator): void

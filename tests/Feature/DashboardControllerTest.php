@@ -7,6 +7,7 @@ use App\Models\Expense;
 use App\Models\FlockBatch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -92,12 +93,13 @@ class DashboardControllerTest extends TestCase
 
         $response->assertStatus(200);
         $data = $response->viewData('summary');
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $data['recent_activity']);
+        $this->assertInstanceOf(Collection::class, $data['recent_activity']);
     }
 
     public function test_htmx_request_for_recent_activity_returns_partial(): void
     {
         $user = User::factory()->create();
+        EggEntry::factory()->create(['user_id' => $user->id, 'date' => now()->toDateString(), 'count' => 4]);
 
         $response = $this->actingAs($user)
             ->withHeaders([
@@ -108,6 +110,7 @@ class DashboardControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('dashboard.partials.recent-activity');
+        $this->assertInstanceOf(Collection::class, $response->viewData('recentActivity'));
     }
 
     public function test_dashboard_queries_are_below_ten_for_free_user(): void
@@ -151,5 +154,49 @@ class DashboardControllerTest extends TestCase
 
         $freeResponse->assertStatus(200);
         $premiumResponse->assertStatus(200);
+    }
+
+    public function test_free_user_sees_serbian_dashboard_labels_and_premium_teaser(): void
+    {
+        $user = User::factory()->create(['tier' => 'free', 'locale' => 'sr', 'name' => 'Aleks']);
+
+        $response = $this->actingAs($user)->get('/app/');
+
+        $response->assertOk();
+        $response->assertSee('Dobro dosli, Aleks');
+        $response->assertSee('Metrike proizvodnje');
+        $response->assertSee('Nedavne aktivnosti');
+        $response->assertSee('Premium funkcija');
+        $response->assertSee('Nema nedavnih aktivnosti');
+    }
+
+    public function test_premium_user_sees_serbian_financial_and_analytics_sections(): void
+    {
+        $user = User::factory()->premium()->create(['locale' => 'sr']);
+        Expense::factory()->create(['user_id' => $user->id, 'date' => now()->toDateString(), 'amount' => 50.00]);
+
+        $response = $this->actingAs($user)->get('/app/');
+
+        $response->assertOk();
+        $response->assertSee('Finansijski pregled');
+        $response->assertSee('Analitika');
+        $response->assertSee('Vrednost jaja');
+    }
+
+    public function test_serbian_recent_activity_partial_uses_localized_empty_state(): void
+    {
+        $user = User::factory()->create(['locale' => 'sr']);
+
+        $response = $this->actingAs($user)
+            ->withHeaders([
+                'HX-Request' => 'true',
+                'HX-Target' => 'dashboard-activity',
+            ])
+            ->get('/app/');
+
+        $response->assertOk();
+        $response->assertViewIs('dashboard.partials.recent-activity');
+        $response->assertSee('Nema nedavnih aktivnosti');
+        $response->assertDontSee('dashboard.recent_activity.empty_title', false);
     }
 }

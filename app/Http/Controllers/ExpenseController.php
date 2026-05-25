@@ -174,7 +174,7 @@ class ExpenseController extends Controller
         }
 
         return redirect()->route('app.expenses.index')
-            ->with('success', 'Expense recorded.');
+            ->with('success', __('expenses.messages.recorded'));
     }
 
     public function show(Request $request, Expense $expense)
@@ -201,7 +201,7 @@ class ExpenseController extends Controller
         }
 
         return redirect()->route('app.expenses.index')
-            ->with('success', 'Expense updated.');
+            ->with('success', __('expenses.messages.updated'));
     }
 
     public function destroy(Request $request, Expense $expense)
@@ -213,12 +213,12 @@ class ExpenseController extends Controller
             return response('', 200)->header('HX-Trigger', json_encode([
                 'closeModal' => true,
                 'expenses:changed' => true,
-                'toast:success' => 'Expense deleted.',
+                'toast:success' => __('expenses.messages.deleted'),
             ]));
         }
 
         return redirect()->route('app.expenses.index')
-            ->with('success', 'Expense deleted.');
+            ->with('success', __('expenses.messages.deleted'));
     }
 
     public function deleteConfirm(Request $request, Expense $expense)

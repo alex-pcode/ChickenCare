@@ -8,7 +8,7 @@
 
     {{-- Header --}}
     <header class="batches__detail-header">
-        <a href="{{ route('app.batches.index') }}" class="batches__back-link">← Back to Batches</a>
+        <a href="{{ route('app.batches.index') }}" class="batches__back-link">← {{ __('batches.actions.back_to_batches') }}</a>
 
         <div class="batches__detail-header-row">
             <div class="batches__detail-identity">
@@ -163,7 +163,7 @@
                 hx-target="#batch-timeline-events"
                 hx-swap="afterbegin"
                 hx-on::before-request="submitting = true"
-                hx-on::after-request="submitting = false; if(event.detail.successful) { $el.reset(); }">
+                hx-on::after-request="submitting = false; if (event.detail.successful) { window.ChickenCare.htmx.resetForm(event); }">
                 @csrf
 
                 <div class="batches__form-grid">
