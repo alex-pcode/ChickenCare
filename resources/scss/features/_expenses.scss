@@ -689,6 +689,11 @@
         border-left: 4px solid transparent;
         animation: slide-in-left 0.5s ease-out 0.5s both;
 
+        .dark & {
+            background: rgba(31, 31, 31, 0.9);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
         @media (max-width: 768px) {
             padding: 3.25rem 0 0 0.5rem;
             background: none;
@@ -698,6 +703,11 @@
             border-left: none;
             grid-row: 1;
             grid-column: 1;
+
+            .dark & {
+                background: none;
+                box-shadow: none;
+            }
         }
 
         &--success { border-left-color: #10b981; }

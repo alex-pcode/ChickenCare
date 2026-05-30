@@ -10,6 +10,13 @@ return [
         'add_batch' => 'Add Batch',
         'back_to_batches' => 'Back to Batches',
     ],
+    'hero' => [
+        'image_alt' => 'Illustration of a flock batch',
+        'title' => 'Manage your flock batches',
+        'title_short' => 'Flock Batches',
+        'detail' => 'Group your birds into batches to track counts, laying status, and history at a glance.',
+        'detail_short' => 'Track counts, laying status, and history.',
+    ],
     'filters' => [
         'label' => 'Filter batches',
         'active' => 'Active',
@@ -40,6 +47,9 @@ return [
             'source' => 'Source',
             'laying_since' => 'Laying Since',
         ],
+    ],
+    'events' => [
+        'acquired' => 'Acquired :count birds from :source',
     ],
     'messages' => [
         'created' => 'Batch created successfully.',

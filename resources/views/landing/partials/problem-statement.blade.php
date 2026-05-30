@@ -26,14 +26,7 @@
                 style="animation-delay: 0s"
             >
                 <span class="landing__problem-card-icon" aria-hidden="true">
-                    {{-- Head with scribbled / drifting numbers inside --}}
-                    <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 26 C14 16, 22 8, 32 8 C42 8, 48 16, 48 24 C48 30, 44 32, 42 34 L42 42 C42 46, 38 48, 34 48 L26 48"/>
-                        <path d="M22 22 C24 20, 26 22, 26 24 M30 28 C32 26, 34 28, 34 30 M22 34 C24 32, 26 34, 26 36"/>
-                        <circle cx="35" cy="20" r="0.9" fill="currentColor"/>
-                        <circle cx="40" cy="32" r="0.9" fill="currentColor"/>
-                        <circle cx="20" cy="40" r="0.9" fill="currentColor"/>
-                    </svg>
+                    <img src="{{ asset('images/cute-chicken-thought-bubble-icon.webp') }}" alt="" class="landing__problem-card-icon-img" loading="lazy" width="56" height="56">
                 </span>
                 <h3 class="landing__problem-card-title">Numbers Drift in Your Head</h3>
                 <p class="landing__problem-card-desc">
@@ -47,12 +40,7 @@
                 style="animation-delay: 0.15s"
             >
                 <span class="landing__problem-card-icon" aria-hidden="true">
-                    {{-- Coin with dollar sign --}}
-                    <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="28" cy="28" r="18"/>
-                        <path d="M28 16 L28 40"/>
-                        <path d="M34 21 C34 19, 32 17, 28 17 C24 17, 22 19, 22 22 C22 25, 25 26, 28 27 C31 28, 34 29, 34 32 C34 35, 32 37, 28 37 C24 37, 22 35, 22 33"/>
-                    </svg>
+                    <img src="{{ asset('images/cute-chicken-wallet-icon.webp') }}" alt="" class="landing__problem-card-icon-img" loading="lazy" width="56" height="56">
                 </span>
                 <h3 class="landing__problem-card-title">Flying Blind on Costs</h3>
                 <p class="landing__problem-card-desc">
@@ -66,12 +54,7 @@
                 style="animation-delay: 0.3s"
             >
                 <span class="landing__problem-card-icon" aria-hidden="true">
-                    {{-- Egg with question mark --}}
-                    <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M28 8 C18 8, 12 22, 12 34 C12 44, 19 50, 28 50 C37 50, 44 44, 44 34 C44 22, 38 8, 28 8 Z"/>
-                        <path d="M24 26 C24 22, 26 20, 28 20 C30 20, 32 22, 32 24 C32 26, 30 27, 28 29 L28 32"/>
-                        <circle cx="28" cy="38" r="1.2" fill="currentColor"/>
-                    </svg>
+                    <img src="{{ asset('images/cute-chicken-dont-know-icon.webp') }}" alt="" class="landing__problem-card-icon-img" loading="lazy" width="56" height="56">
                 </span>
                 <h3 class="landing__problem-card-title">Guessing at Problems</h3>
                 <p class="landing__problem-card-desc">

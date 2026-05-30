@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/costs', [LandingController::class, 'costs'])->name('costs');
+Route::get('/privacy', [LandingController::class, 'privacy'])->name('privacy');
 Route::view('/offline', 'app.offline')->name('offline');
 Route::middleware('auth')->get('/csrf-token', function () {
     return response()->json(['token' => csrf_token()]);

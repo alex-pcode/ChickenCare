@@ -460,13 +460,56 @@
 .landing__hero-content {
     position: relative;
     z-index: 1;
-    max-width: 56rem;
+    max-width: 64rem;
     margin: 0 auto;
     padding: 0 $space-4;
     text-align: center;
 
     @include desktop {
         padding: 0 $space-8;
+    }
+}
+
+// Two-column top: icon left, copy right
+.landing__hero-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-4;
+
+    @include desktop {
+        flex-direction: row;
+        align-items: center;
+        gap: $space-8;
+        text-align: left;
+    }
+}
+
+.landing__hero-icon {
+    flex-shrink: 0;
+    opacity: 0;
+    transform: translateY(1.5rem);
+
+    &--visible {
+        animation: landing-fade-in-up 0.7s $transition-easing forwards;
+    }
+}
+
+.landing__hero-icon-img {
+    width: 13rem;
+    height: auto;
+    display: block;
+
+    @include desktop {
+        width: 24rem;
+    }
+}
+
+.landing__hero-copy {
+    min-width: 0;
+
+    @include desktop {
+        flex: 1;
     }
 }
 
@@ -544,6 +587,8 @@
 
     @include desktop {
         font-size: $font-size-lg;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     &--visible {
@@ -858,11 +903,11 @@
 }
 
 .landing__problem-card-icon {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 10rem;
+    height: 10rem;
     margin: 0 auto $space-4;
     color: $color-purple-600;
     transition: transform $transition-duration-base $transition-easing;
@@ -874,6 +919,12 @@
 
     .landing__problem-card:hover & {
         animation: landing-icon-bounce 0.5s $transition-easing;
+    }
+
+    &-img {
+        width: 10rem;
+        height: 10rem;
+        object-fit: contain;
     }
 
     .dark & {
@@ -1078,17 +1129,23 @@
 }
 
 .landing__persona-card-icon {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    margin-bottom: $space-4;
+    width: 14rem;
+    height: 14rem;
+    margin: 0 auto $space-4;
     color: $color-purple-600;
 
     svg {
         width: 100%;
         height: 100%;
+    }
+
+    &-img {
+        width: 14rem;
+        height: 14rem;
+        object-fit: contain;
     }
 
     .dark & {
@@ -1830,12 +1887,46 @@
     margin: 0 auto;
 }
 
+.landing__social-proof-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-4;
+
+    @include desktop {
+        flex-direction: row;
+        justify-content: center;
+        gap: $space-8;
+        text-align: left;
+    }
+}
+
+.landing__social-proof-heading {
+    min-width: 0;
+}
+
+.landing__social-proof-icon {
+    display: block;
+    flex-shrink: 0;
+    width: 9rem;
+    height: auto;
+    object-fit: contain;
+
+    @include desktop {
+        width: 14rem;
+    }
+}
+
 .landing__social-proof-title {
     margin: 0;
     text-align: center;
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     font-weight: $font-weight-bold;
     color: $color-neutral-900;
+
+    @include desktop {
+        text-align: left;
+    }
 
     .dark & {
         color: $color-neutral-50;
@@ -1848,6 +1939,12 @@
     text-align: center;
     line-height: 1.7;
     color: $color-neutral-600;
+
+    @include desktop {
+        margin-left: 0;
+        margin-right: 0;
+        text-align: left;
+    }
 
     .dark & {
         color: $color-neutral-300;
@@ -2483,6 +2580,7 @@
         animation: none;
     }
 
+    .landing__hero-icon,
     .landing__hero-headline,
     .landing__hero-sub,
     .landing__hero-cta,

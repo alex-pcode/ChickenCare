@@ -29,13 +29,7 @@
                 style="animation-delay: 0s"
             >
                 <span class="landing__persona-card-icon" aria-hidden="true">
-                    {{-- House sketch --}}
-                    <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 28 L28 10 L48 28"/>
-                        <path d="M12 26 L12 48 L44 48 L44 26"/>
-                        <path d="M22 48 L22 34 L34 34 L34 48"/>
-                        <path d="M36 14 L36 20"/>
-                    </svg>
+                    <img src="{{ asset('images/cute-chicken-family-icon.webp') }}" alt="" class="landing__persona-card-icon-img" loading="lazy" width="56" height="56">
                 </span>
                 <h3 class="landing__persona-card-title">Family &amp; Hobby</h3>
                 <ul class="landing__persona-card-features">
@@ -55,13 +49,7 @@
                 style="animation-delay: 0.15s"
             >
                 <span class="landing__persona-card-icon" aria-hidden="true">
-                    {{-- Briefcase sketch --}}
-                    <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 18 L48 18 L48 46 L8 46 Z"/>
-                        <path d="M20 18 L20 12 L36 12 L36 18"/>
-                        <path d="M8 30 L48 30"/>
-                        <path d="M24 28 L32 28 L32 32 L24 32 Z"/>
-                    </svg>
+                    <img src="{{ asset('images/cute-chicken-business.webp') }}" alt="" class="landing__persona-card-icon-img" loading="lazy" width="56" height="56">
                 </span>
                 <h3 class="landing__persona-card-title">Business &amp; Profit</h3>
                 <ul class="landing__persona-card-features">

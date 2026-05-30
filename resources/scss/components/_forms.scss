@@ -16,10 +16,13 @@
     }
 }
 
-.form-label {
+.form-label,
+.form-group__label {
+    display: block;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
     color: $color-neutral-700;
+    margin-bottom: $space-2;
 
     &__required {
         color: $color-error;
@@ -29,7 +32,8 @@
 
 .form-input,
 .form-select,
-.form-textarea {
+.form-textarea,
+.form-group__input {
     width: 100%;
     height: 3rem;
     padding: 0 $space-6;
@@ -52,7 +56,8 @@
     }
 }
 
-.form-select {
+.form-select,
+select.form-group__input {
     appearance: none;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23737373' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right $space-3 center;
@@ -61,7 +66,8 @@
     padding-right: $space-8;
 }
 
-.form-textarea {
+.form-textarea,
+textarea.form-group__input {
     height: auto;
     padding: $space-3 $space-4;
     resize: vertical;

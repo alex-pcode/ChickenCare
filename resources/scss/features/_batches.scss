@@ -43,6 +43,11 @@
             animation: none;
             opacity: 1;
         }
+
+        // Keep the submit button at its natural pill width, centered
+        .submit-button {
+            align-self: center;
+        }
     }
 
     &__deaths-form,
@@ -88,12 +93,12 @@
         gap: 0.25rem;
 
         &:hover {
-            color: $color-primary;
+            color: var(--color-primary, #6366f1);
         }
 
         &--active {
             font-weight: $font-weight-semibold;
-            color: $color-primary;
+            color: var(--color-primary, #6366f1);
         }
     }
 
@@ -129,7 +134,7 @@
     &__count-value {
         font-size: 1rem;
         font-weight: $font-weight-bold;
-        color: $color-primary;
+        color: var(--color-primary, #6366f1);
     }
 
     &__status {
@@ -175,7 +180,7 @@
         font-size: 0.9rem;
 
         &:hover {
-            background: rgba($color-primary, 0.08);
+            background: rgba(99, 102, 241, 0.08);
         }
     }
 
@@ -195,9 +200,9 @@
         }
 
         &--active {
-            background: $color-primary;
+            background: var(--color-primary, #6366f1);
             color: #fff;
-            border-color: $color-primary;
+            border-color: var(--color-primary, #6366f1);
         }
     }
 
@@ -374,12 +379,12 @@
         transition: all $transition-duration-base ease;
 
         &:hover {
-            color: $color-primary;
+            color: var(--color-primary, #6366f1);
         }
 
         &--active {
-            color: $color-primary;
-            border-bottom-color: $color-primary;
+            color: var(--color-primary, #6366f1);
+            border-bottom-color: var(--color-primary, #6366f1);
         }
     }
 
@@ -601,8 +606,8 @@
         transition: background 0.15s ease, color 0.15s ease;
 
         &:hover {
-            background: rgba($color-primary, 0.08);
-            color: $color-primary;
+            background: rgba(99, 102, 241, 0.08);
+            color: var(--color-primary, #6366f1);
         }
     }
 
@@ -845,6 +850,27 @@
         font-size: $font-size-sm;
     }
 
+    &__form-hint-inline {
+        font-weight: $font-weight-normal;
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
+    }
+
+    &__composition-note {
+        margin-top: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: $radius-lg;
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, $color-neutral-500);
+        background: var(--color-surface, $color-neutral-50);
+        border: 1px solid var(--color-border, $color-neutral-200);
+
+        strong {
+            font-weight: $font-weight-semibold;
+            color: var(--color-text, $color-neutral-900);
+        }
+    }
+
     &__timeline-empty {
         text-align: center;
         padding: 2rem 1rem;
@@ -857,6 +883,251 @@
             margin-bottom: 0.5rem;
         }
     }
+}
+
+// ==========================================================================
+// Batches Hero — concave-corner card (matches feed/expenses/savings heroes)
+// ==========================================================================
+.batches-hero {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    align-items: stretch;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+    overflow: visible;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 0;
+
+        .dark & {
+            background: rgba(30, 30, 30, 0.9);
+        }
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 3fr 2fr;
+        grid-template-rows: auto auto;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem 0.75rem 0.5rem;
+        align-items: center;
+    }
+
+    &__corner-badge {
+        $curve: 1.25rem;
+        $btn-size: 4.375rem;
+
+        display: grid;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: $btn-size;
+        width: $btn-size;
+        place-items: center;
+        background: $neu-bg;
+        border-radius: $curve 0 $curve 0;
+        z-index: 3;
+
+        .dark & {
+            background: #1a1a1a;
+        }
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        &::before {
+            top: 100%;
+            left: 0;
+            width: $curve;
+            height: $curve * 3;
+            border-radius: $curve 0 0 0;
+            box-shadow: 0 (-$curve * 2) 0 $neu-bg;
+
+            .dark & {
+                box-shadow: 0 (-$curve * 2) 0 #1a1a1a;
+            }
+        }
+
+        &::after {
+            top: 0;
+            left: 100%;
+            width: $curve * 3;
+            height: $curve;
+            border-radius: $curve 0 0 0;
+            box-shadow: (-$curve * 2) 0 0 $neu-bg;
+
+            .dark & {
+                box-shadow: (-$curve * 2) 0 0 #1a1a1a;
+            }
+        }
+    }
+
+    &__corner-badge-icon {
+        height: 3.125rem;
+        width: 3.125rem;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        border-radius: $radius-base;
+        font-size: 1.5rem;
+        line-height: 1;
+        animation: batches-badge-pop 0.4s ease-out 0.8s both;
+    }
+
+    &__media {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 16rem;
+        overflow: hidden;
+
+        @media (max-width: 768px) {
+            order: 2;
+            grid-row: 1;
+            grid-column: 2;
+            height: 7rem;
+            overflow: visible;
+        }
+    }
+
+    &__image {
+        width: auto;
+        height: 100%;
+        object-fit: contain;
+        transform-origin: center bottom;
+        animation: batches-hero-image 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+        @media (max-width: 768px) {
+            height: 140%;
+            max-width: none;
+        }
+    }
+
+    &__side {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            order: 1;
+            display: contents;
+        }
+    }
+
+    &__status {
+        display: flex;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-radius: $radius-base;
+        background: rgba(255, 255, 255, 0.9);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--color-primary, #6366f1);
+        animation: batches-hero-status 0.5s ease-out 0.5s both;
+
+        .dark & {
+            background: rgba(31, 31, 31, 0.9);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            padding: 3.25rem 0.5rem 0.5rem 0.5rem;
+            background: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            border-left: none;
+            grid-row: 1;
+            grid-column: 1;
+            align-self: start;
+            animation: none;
+            position: relative;
+            z-index: 1;
+
+            .dark & {
+                background: none;
+                box-shadow: none;
+            }
+        }
+    }
+
+    &__status-text {
+        min-width: 0;
+
+        @media (max-width: 768px) {
+            flex: 1;
+        }
+    }
+
+    &__status-title {
+        margin: 0 0 0.25rem;
+        padding-top: 1rem;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: var(--color-text, #1f2937);
+    }
+
+    &__status-detail {
+        margin: 0;
+        font-size: $font-size-sm;
+        color: var(--color-text-muted, #6b7280);
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        animation: batches-hero-status 0.5s 0.5s backwards;
+
+        @media (max-width: 768px) {
+            grid-row: 2;
+            grid-column: 1 / -1;
+            padding: 0 0.5rem 0.5rem;
+            position: relative;
+            z-index: 1;
+            justify-content: center;
+        }
+    }
+}
+
+@keyframes batches-hero-image {
+    from { opacity: 0; transform: scale(0.8) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes batches-hero-status {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes batches-badge-pop {
+    from { opacity: 0; transform: scale(0); }
+    to   { opacity: 1; transform: scale(1); }
 }
 
 // Card entrance + timeline animations shared by /flock overview and /batches/{batch} detail

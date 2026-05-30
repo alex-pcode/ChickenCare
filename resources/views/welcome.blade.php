@@ -12,6 +12,7 @@
     @include('landing.partials.social-proof')
     @include('landing.partials.pricing')
     @include('landing.partials.final-cta')
+    @include('landing.partials.footer')
     @include('landing.partials.fullscreen-modal')
 </div>
 @endsection

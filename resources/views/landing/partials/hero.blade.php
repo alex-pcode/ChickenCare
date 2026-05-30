@@ -40,25 +40,39 @@
     </div>
 
     <div class="landing__hero-content">
-        {{-- Headline --}}
-        <h1 class="landing__hero-headline" x-intersect.once="$el.classList.add('landing__hero-headline--visible')">
-            Know what your chickens
-            <span class="landing__hero-headline-underline-wrap">
-                really cost.
-                <svg class="landing__hero-headline-underline" viewBox="0 0 240 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
-                    <path d="M4 8 C50 2, 100 12, 150 4 C190 -2, 220 8, 236 4"/>
-                </svg>
-            </span>
-            <span class="landing__hero-headline-aside">Not because they have to justify it.</span>
-        </h1>
+        {{-- Two-column top: icon left, copy right --}}
+        <div class="landing__hero-top">
+            <div class="landing__hero-icon" x-intersect.once="$el.classList.add('landing__hero-icon--visible')">
+                <img
+                    src="{{ asset('images/cute-chicken-sidelook-icon.webp') }}"
+                    alt="ChickenCare mascot"
+                    class="landing__hero-icon-img"
+                    loading="eager"
+                    width="320"
+                    height="320"
+                >
+            </div>
 
-        {{-- Subheadline --}}
-        <p class="landing__hero-sub" x-intersect.once="$el.classList.add('landing__hero-sub--visible')">
-            Every backyard hen is one less in a cage. This just helps you stop guessing the numbers.
-        </p>
+            <div class="landing__hero-copy">
+                {{-- Headline --}}
+                <h1 class="landing__hero-headline" x-intersect.once="$el.classList.add('landing__hero-headline--visible')">
+                    Know what your chickens
+                    <span class="landing__hero-headline-underline-wrap">
+                        really cost.
+                        <svg class="landing__hero-headline-underline" viewBox="0 0 240 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
+                            <path d="M4 8 C50 2, 100 12, 150 4 C190 -2, 220 8, 236 4"/>
+                        </svg>
+                    </span>
+                    <span class="landing__hero-headline-aside">Not because they have to justify it.</span>
+                </h1>
 
-        {{-- CTA --}}
-        <div class="landing__hero-cta" x-intersect.once="$el.classList.add('landing__hero-cta--visible')">
+                {{-- Subheadline --}}
+                <p class="landing__hero-sub" x-intersect.once="$el.classList.add('landing__hero-sub--visible')">
+                    Every backyard hen is one less in a cage. This just helps you stop guessing the numbers.
+                </p>
+
+                {{-- CTA --}}
+                <div class="landing__hero-cta" x-intersect.once="$el.classList.add('landing__hero-cta--visible')">
             <button
                 type="button"
                 class="shiny-cta"
@@ -71,7 +85,9 @@
                 </span>
                 <span>See the app — 60-second tour</span>
             </button>
-        </div>
+                </div>
+            </div>{{-- /landing__hero-copy --}}
+        </div>{{-- /landing__hero-top --}}
 
         {{-- Dashboard screenshot --}}
         <div

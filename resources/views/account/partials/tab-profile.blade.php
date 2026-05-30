@@ -45,6 +45,17 @@
         </form>
     </div>
 
+    <div class="form-card">
+        <div class="form-card__header">
+            <h2 class="form-card__title">{{ __('account.appearance.title') }}</h2>
+            <p class="form-card__subtitle">{{ __('account.appearance.subtitle') }}</p>
+        </div>
+
+        <div class="form-card__form">
+            <x-ui.theme-toggle />
+        </div>
+    </div>
+
     <section class="form-card" x-data="window.ChickenCare.offlineQueue.failedItemsPanel()">
         <div class="form-card__header">
             <h2 class="form-card__title">{{ __('account.offline_queue.title') }}</h2>

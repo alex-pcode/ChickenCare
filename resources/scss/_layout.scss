@@ -88,6 +88,21 @@
     flex-shrink: 0;
   }
 
+  &__brand-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  &__nav-icon {
+    display: block;
+    width: 11rem;
+    height: auto;
+    margin: 2rem 0 0 -#{$space-3};
+    object-fit: contain;
+  }
+
   &__brand-title {
     font-size: $font-size-xl;
     font-weight: $font-weight-semibold;
@@ -130,13 +145,20 @@
     text-align: center;
   }
 
+  &__icon-img {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    object-fit: contain;
+  }
+
   &__link {
     display: flex;
     align-items: center;
     gap: $space-3;
     padding: $space-3 $space-4;
     color: $color-neutral-600;
-    font-size: $font-size-sm;
+    font-size: $font-size-base;
     text-decoration: none;
     border-radius: $radius-lg;
     margin-bottom: $space-1;

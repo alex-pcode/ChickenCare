@@ -15,4 +15,9 @@ class LandingController extends Controller
     {
         return view('landing.costs');
     }
+
+    public function privacy(): View
+    {
+        return view('landing.privacy');
+    }
 }

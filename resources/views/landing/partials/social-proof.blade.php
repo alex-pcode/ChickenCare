@@ -10,16 +10,21 @@
     </svg>
 
     <div class="landing__social-proof-inner">
-        <h2 class="landing__social-proof-title">
-            Trusted by
-            <span class="landing__social-proof-title-underline-wrap">
-                25 Chickens
-                <svg class="landing__social-proof-title-underline" viewBox="0 0 220 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
-                    <path d="M4 8 C44 2, 88 12, 132 4 C166 -2, 198 8, 216 4"/>
-                </svg>
-            </span>
-        </h2>
-        <p class="landing__social-proof-subtitle">Even the chickens approve of this app (we asked them personally)</p>
+        <div class="landing__social-proof-header">
+            <img src="{{ asset('images/cute-chicken-interview-icon.webp') }}" alt="" class="landing__social-proof-icon" loading="lazy" width="160" height="160">
+            <div class="landing__social-proof-heading">
+                <h2 class="landing__social-proof-title">
+                    Trusted by
+                    <span class="landing__social-proof-title-underline-wrap">
+                        25 Chickens
+                        <svg class="landing__social-proof-title-underline" viewBox="0 0 220 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
+                            <path d="M4 8 C44 2, 88 12, 132 4 C166 -2, 198 8, 216 4"/>
+                        </svg>
+                    </span>
+                </h2>
+                <p class="landing__social-proof-subtitle">Even the chickens approve of this app (we asked them personally)</p>
+            </div>
+        </div>
 
         <div class="landing__stats">
             <div class="landing__stat">

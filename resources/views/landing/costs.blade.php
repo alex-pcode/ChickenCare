@@ -26,5 +26,6 @@
 
     @include('landing.partials.pricing')
     @include('landing.partials.final-cta')
+    @include('landing.partials.footer')
 </div>
 @endsection

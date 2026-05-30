@@ -39,6 +39,7 @@
 
 // Pages
 @use 'pages/landing';
+@use 'pages/privacy';
 
 // Dark mode overrides (must be last to win specificity)
 @use 'dark-mode';

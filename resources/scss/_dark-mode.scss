@@ -18,8 +18,8 @@ $dm-text-secondary: $color-neutral-300;
 $dm-text-muted: $color-neutral-400;
 $dm-text-faint: $color-neutral-500;
 $dm-input-bg: #1f1f1f;
-$dm-input-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5), inset -2px -2px 4px rgba(50, 50, 50, 0.3);
-$dm-input-shadow-deep: inset 4px 4px 6px rgba(0, 0, 0, 0.5), inset -4px -4px 6px rgba(50, 50, 50, 0.3);
+$dm-input-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5), inset -2px -2px 4px rgba(50, 50, 50, 0.12);
+$dm-input-shadow-deep: inset 4px 4px 6px rgba(0, 0, 0, 0.5), inset -4px -4px 6px rgba(50, 50, 50, 0.12);
 $dm-card-bg: rgba(30, 30, 30, 0.9);
 $dm-card-border: rgba(255, 255, 255, 0.08);
 $dm-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
@@ -31,6 +31,11 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
   // ======================================================================
   a {
     color: $color-primary-light;
+  }
+
+  // Shiny CTA links keep their own white text (the `a` rule above would tint them green)
+  .shiny-cta {
+    color: var(--shiny-cta-fg);
   }
 
   // ======================================================================
@@ -91,7 +96,8 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
   // ======================================================================
   // FORMS
   // ======================================================================
-  .form-label {
+  .form-label,
+  .form-group__label {
     color: $dm-text-secondary;
 
     &__required {
@@ -101,9 +107,11 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
 
   .form-input,
   .form-select,
-  .form-textarea {
+  .form-textarea,
+  .form-group__input {
     color: $dm-text;
     background-color: $dm-input-bg;
+    border: none;
     box-shadow: $dm-input-shadow;
 
     &:focus {
@@ -115,7 +123,8 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
     }
   }
 
-  .form-select {
+  .form-select,
+  select.form-group__input {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   }
 
@@ -401,6 +410,27 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
   }
 
   // ======================================================================
+  // BUTTONS — outline
+  // ======================================================================
+  .btn--outline {
+    background-color: transparent;
+    color: $dm-text-secondary;
+    border: 2px solid $dm-border-solid;
+    box-shadow: none;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: var(--color-primary, #818cf8);
+      color: var(--color-primary, #818cf8);
+      box-shadow: none;
+    }
+
+    &:active {
+      box-shadow: none;
+    }
+  }
+
+  // ======================================================================
   // AUTH
   // ======================================================================
   .auth-layout {
@@ -447,7 +477,7 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
     }
 
     &__count-value {
-      color: $color-primary-light;
+      color: var(--color-primary, #818cf8);
     }
 
     &__status {
@@ -527,9 +557,9 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
       }
 
       &--active {
-        background: $color-primary;
+        background: var(--color-primary, #818cf8);
         color: #fff;
-        border-color: $color-primary;
+        border-color: var(--color-primary, #818cf8);
       }
     }
 
@@ -554,8 +584,8 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
       }
 
       &--active {
-        color: $color-primary-light;
-        border-bottom-color: $color-primary-light;
+        color: var(--color-primary, #818cf8);
+        border-bottom-color: var(--color-primary, #818cf8);
       }
     }
 

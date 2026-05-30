@@ -1,0 +1,302 @@
+@use 'sass:color';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ==========================================================================
+// Privacy Policy Page
+//
+// Reuses the homepage landing classes (.landing__problems, .landing__problem-card,
+// .landing__cta, underline-wraps, doodles) for an identical look & feel.
+// This file only adds the privacy-specific pieces layered on top.
+// ==========================================================================
+
+// First section sits under the fixed navbar, with extra breathing room on top.
+.privacy__hero {
+    padding-top: calc(#{$space-16} + #{$space-16});
+
+    @include desktop {
+        padding-top: calc(#{$space-16} * 2 + #{$space-12});
+    }
+}
+
+// Two-column header: mascot beside the copy on desktop, stacked on mobile.
+.privacy__hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-6;
+
+    @include desktop {
+        flex-direction: row;
+        align-items: center;
+        gap: $space-12;
+        text-align: left;
+    }
+}
+
+.privacy__hero-media {
+    flex-shrink: 0;
+}
+
+.privacy__hero-copy {
+    @include desktop {
+        flex: 1;
+
+        // Override the centered defaults inherited from .landing__problems.
+        .landing__problems-subtitle {
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+}
+
+.privacy__hero-icon {
+    width: 12rem;
+    height: 12rem;
+    object-fit: contain;
+    margin: 0 auto $space-4;
+    opacity: 0;
+    transform: translateY(1rem) scale(0.92);
+    transition:
+        opacity $transition-duration-slow $transition-easing,
+        transform $transition-duration-slow $transition-easing;
+
+    &--visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        animation: landing-float 4s ease-in-out 0.6s infinite;
+    }
+
+    @include desktop {
+        width: 17rem;
+        height: 17rem;
+    }
+}
+
+.privacy__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    margin-bottom: $space-3;
+
+    .dark & {
+        color: $color-primary-light;
+    }
+}
+
+.privacy__updated {
+    margin-top: $space-6;
+    font-size: $font-size-sm;
+    color: $color-neutral-400;
+}
+
+// Let the longer privacy headlines wrap (homepage phrases are short/nowrap).
+.privacy__underline-wrap {
+    white-space: normal;
+}
+
+// ---------- Privacy-specific doodles (match the homepage doodle styling) ----------
+
+.privacy__doodle {
+    color: $color-primary;
+    opacity: 0.2;
+
+    .dark & {
+        color: $color-primary-light;
+        opacity: 0.18;
+    }
+
+    &--key {
+        top: 4.5rem;
+        left: 3rem;
+        width: 4rem;
+        height: auto;
+        transform: rotate(-9deg);
+    }
+
+    &--shield {
+        bottom: 3rem;
+        right: 3.5rem;
+        width: 4.5rem;
+        height: auto;
+        transform: rotate(8deg);
+    }
+
+    &--no {
+        top: 3.5rem;
+        right: 3.5rem;
+        width: 4.5rem;
+        height: auto;
+        transform: rotate(-6deg);
+    }
+}
+
+// ---------- Pledge grid: two even rows of three ----------
+
+.privacy__pledge-grid {
+    @include desktop {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+// ---------- Formal policy "paper" ----------
+
+.privacy__formal {
+    text-align: left;
+}
+
+.privacy__formal-inner {
+    max-width: 52rem;
+    margin: 0 auto;
+}
+
+.privacy__formal-head {
+    text-align: center;
+}
+
+.privacy__paper {
+    @include card-detailed;
+
+    margin-top: $space-8;
+    opacity: 0;
+    transform: translateY(1.5rem);
+
+    &.is-visible {
+        animation: landing-fade-in-up 0.6s $transition-easing forwards;
+    }
+
+    // The card mixin lifts on hover; a long document should sit still.
+    &:hover {
+        transform: none;
+    }
+
+    .dark & {
+        background: rgba(30, 30, 30, 0.85);
+        border-color: $color-neutral-700;
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
+
+        &:hover {
+            background: rgba(30, 30, 30, 0.85);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
+        }
+    }
+}
+
+.privacy__article {
+    & + & {
+        margin-top: $space-8;
+        padding-top: $space-8;
+        border-top: 1px solid $color-neutral-200;
+
+        .dark & {
+            border-top-color: $color-neutral-700;
+        }
+    }
+}
+
+.privacy__article-title {
+    font-family: $font-family-base;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $color-neutral-900;
+
+    .dark & {
+        color: $color-neutral-50;
+    }
+}
+
+.privacy__article-text {
+    margin-top: $space-3;
+    line-height: 1.7;
+    color: $color-neutral-600;
+
+    .dark & {
+        color: $color-neutral-300;
+    }
+}
+
+.privacy__article-list {
+    margin: $space-4 0 0;
+    padding-left: $space-6;
+
+    li {
+        margin-top: $space-2;
+        line-height: 1.65;
+        color: $color-neutral-600;
+
+        &::marker {
+            color: $color-primary;
+        }
+
+        .dark & {
+            color: $color-neutral-300;
+        }
+    }
+}
+
+// ---------- Contact: reuses .landing__cta; make the email a pill button ----------
+
+.privacy__contact {
+    .landing__cta-btn {
+        text-decoration: none;
+    }
+}
+
+// ==========================================================================
+// Landing footer (shared across landing pages)
+// ==========================================================================
+
+.landing__footer {
+    background: $color-neutral-900;
+    color: $color-neutral-300;
+    padding: $space-8 $space-4;
+}
+
+.landing__footer-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-4;
+
+    @include desktop {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+.landing__footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    text-decoration: none;
+    color: #fff;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-lg;
+}
+
+.landing__footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $space-4 $space-6;
+}
+
+.landing__footer-link {
+    color: $color-neutral-300;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    transition: color $transition-duration-base $transition-easing;
+
+    &:hover {
+        color: #fff;
+    }
+}
+
+.landing__footer-copy {
+    font-size: $font-size-sm;
+    color: $color-neutral-500;
+}

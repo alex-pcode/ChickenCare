@@ -6,11 +6,7 @@
 <div class="batches"
      @modal:close.window="document.getElementById('modal-container').innerHTML = ''">
 
-    <x-layout.page-header :title="__('batches.page.header')">
-        <x-slot:actions>
-            <a href="{{ route('app.batches.create') }}" class="btn btn--primary">{{ __('batches.actions.add_batch') }}</a>
-        </x-slot:actions>
-    </x-layout.page-header>
+    @include('batches.partials.hero')
 
     <div class="batches__filter-bar" role="group" aria-label="{{ __('batches.filters.label') }}">
         <a href="{{ route('app.batches.index', ['filter' => 'active']) }}"

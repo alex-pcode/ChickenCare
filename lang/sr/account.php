@@ -35,6 +35,10 @@ return [
         'email_readonly' => 'Adresa e-poste ne moze da se menja',
         'save' => 'Sacuvaj profil',
     ],
+    'appearance' => [
+        'title' => 'Izgled',
+        'subtitle' => 'Izaberite kako ChickenCare izgleda',
+    ],
     'security' => [
         'title' => 'Resetovanje lozinke',
         'subtitle' => 'Resetujte lozinku tako sto cete dobiti bezbedan link putem e-poste',

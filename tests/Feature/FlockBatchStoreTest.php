@@ -14,16 +14,16 @@ class FlockBatchStoreTest extends TestCase
     private function validPayload(): array
     {
         return [
-            'batch_name'         => 'Test Batch',
-            'breed'              => 'Rhode Island Red',
-            'hens_count'         => 10,
-            'brooding_count'     => 0,
-            'roosters_count'     => 0,
-            'chicks_count'       => 0,
+            'batch_name' => 'Test Batch',
+            'breed' => 'Rhode Island Red',
+            'hens_count' => 10,
+            'brooding_count' => 0,
+            'roosters_count' => 0,
+            'chicks_count' => 0,
             'age_at_acquisition' => 'adult',
-            'acquisition_date'   => now()->format('Y-m-d'),
-            'source'             => 'Local Farm',
-            'cost'               => 50.00,
+            'acquisition_date' => now()->format('Y-m-d'),
+            'source' => 'Local Farm',
+            'cost' => 50.00,
         ];
     }
 
@@ -37,7 +37,7 @@ class FlockBatchStoreTest extends TestCase
         $this->assertNotNull($batch);
         $response->assertRedirect(route('app.batches.show', $batch));
         $this->assertDatabaseHas('flock_batches', [
-            'user_id'    => $user->id,
+            'user_id' => $user->id,
             'batch_name' => 'Test Batch',
         ]);
     }
@@ -50,7 +50,7 @@ class FlockBatchStoreTest extends TestCase
 
         $this->assertDatabaseHas('flock_batches', [
             'user_id' => $user->id,
-            'type'    => 'hens',
+            'type' => 'hens',
         ]);
     }
 
@@ -66,7 +66,7 @@ class FlockBatchStoreTest extends TestCase
 
     public function test_store_sets_initial_count_and_current_count(): void
     {
-        $user    = User::factory()->premium()->create();
+        $user = User::factory()->premium()->create();
         $payload = array_merge($this->validPayload(), ['hens_count' => 5, 'roosters_count' => 2, 'chicks_count' => 3]);
 
         $this->actingAs($user)->post(route('app.batches.store'), $payload);
@@ -76,9 +76,32 @@ class FlockBatchStoreTest extends TestCase
         $this->assertEquals(10, $batch->current_count);
     }
 
+    public function test_store_creates_acquired_timeline_event(): void
+    {
+        $user = User::factory()->premium()->create();
+
+        $this->actingAs($user)->post(route('app.batches.store'), $this->validPayload());
+
+        $batch = FlockBatch::where('user_id', $user->id)->first();
+
+        $this->assertDatabaseHas('batch_events', [
+            'batch_id' => $batch->id,
+            'user_id' => $user->id,
+            'type' => 'flock_added',
+            'affected_count' => 10,
+            'description' => 'Acquired 10 birds from Local Farm',
+        ]);
+
+        $event = $batch->batchEvents()->first();
+        $this->assertEquals(
+            $batch->acquisition_date->toDateString(),
+            $event->date->toDateString(),
+        );
+    }
+
     public function test_store_fails_validation_when_zero_birds(): void
     {
-        $user    = User::factory()->premium()->create();
+        $user = User::factory()->premium()->create();
         $payload = array_merge($this->validPayload(), ['hens_count' => 0]);
 
         $response = $this->actingAs($user)
@@ -90,7 +113,7 @@ class FlockBatchStoreTest extends TestCase
 
     public function test_store_fails_validation_for_future_acquisition_date(): void
     {
-        $user    = User::factory()->premium()->create();
+        $user = User::factory()->premium()->create();
         $payload = array_merge($this->validPayload(), ['acquisition_date' => now()->addDays(5)->format('Y-m-d')]);
 
         $response = $this->actingAs($user)

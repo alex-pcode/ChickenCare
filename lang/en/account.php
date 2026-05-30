@@ -35,6 +35,10 @@ return [
         'email_readonly' => 'Email address cannot be changed',
         'save' => 'Save Profile',
     ],
+    'appearance' => [
+        'title' => 'Appearance',
+        'subtitle' => 'Choose how ChickenCare looks to you',
+    ],
     'security' => [
         'title' => 'Password Reset',
         'subtitle' => 'Reset your password by receiving a secure link via email',

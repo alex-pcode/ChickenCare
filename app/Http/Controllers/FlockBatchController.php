@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BatchEventType;
 use App\Http\Requests\StoreFlockBatchRequest;
 use App\Http\Requests\UpdateCompositionRequest;
 use App\Http\Requests\UpdateFlockBatchRequest;
@@ -10,6 +11,7 @@ use App\Models\FlockBatch;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class FlockBatchController extends Controller
@@ -54,12 +56,27 @@ class FlockBatchController extends Controller
         $chicks = (int) ($validated['chicks_count'] ?? 0);
         $total = $hens + $brooding + $roosters + $chicks;
 
-        $batch = $request->user()->flockBatches()->create([
-            ...$validated,
-            'type' => FlockBatch::resolveType($hens, $roosters, $chicks, $brooding),
-            'initial_count' => $total,
-            'current_count' => $total,
-        ]);
+        $batch = DB::transaction(function () use ($request, $validated, $hens, $brooding, $roosters, $chicks, $total): FlockBatch {
+            $batch = $request->user()->flockBatches()->create([
+                ...$validated,
+                'type' => FlockBatch::resolveType($hens, $roosters, $chicks, $brooding),
+                'initial_count' => $total,
+                'current_count' => $total,
+            ]);
+
+            $batch->batchEvents()->create([
+                'user_id' => $request->user()->id,
+                'date' => $batch->acquisition_date,
+                'type' => BatchEventType::FlockAdded,
+                'description' => __('batches.events.acquired', [
+                    'count' => $total,
+                    'source' => $batch->source,
+                ]),
+                'affected_count' => $total,
+            ]);
+
+            return $batch;
+        });
 
         if ($this->isHtmx($request)) {
             return $this->htmxRedirect(route('app.batches.show', $batch));

@@ -1,7 +1,7 @@
 @php
     $menuLinks = [
         ['route' => 'app.dashboard', 'pattern' => 'app.dashboard', 'label' => __('navigation.menu.dashboard'), 'emoji' => '🏠'],
-        ['route' => 'app.eggs.index', 'pattern' => 'app.eggs.*', 'label' => __('navigation.menu.eggs'), 'emoji' => '🥚'],
+        ['route' => 'app.eggs.index', 'pattern' => 'app.eggs.*', 'label' => __('navigation.menu.eggs'), 'emoji' => '🥚', 'icon' => 'images/hen-on-eggs.webp'],
         ['route' => 'app.account.index', 'pattern' => 'app.account.*', 'label' => __('navigation.menu.account'), 'emoji' => '⚙️'],
     ];
 
@@ -22,7 +22,7 @@
     <div class="sidebar-overlay" :class="{ 'sidebar-overlay--visible': open }" @click="open = false"></div>
 
     <div class="sidebar__brand">
-        <span class="sidebar__brand-emoji" role="img" aria-label="ChickenCare">🐔</span>
+        <img src="{{ asset('images/cute-chicken-icon.webp') }}" class="sidebar__brand-icon" alt="ChickenCare" width="40" height="40" />
         <div>
             <h1 class="sidebar__brand-title">ChickenCare</h1>
             <p class="sidebar__brand-subtitle">{{ __('navigation.brand.tagline') }}</p>
@@ -38,12 +38,20 @@
             <a href="{{ route($link['route']) }}"
                class="sidebar__link {{ request()->routeIs($link['pattern']) ? 'sidebar__link--active' : '' }}"
                @if(request()->routeIs($link['pattern'])) aria-current="page" @endif>
+                @if(!empty($link['icon']))
+                <img src="{{ asset($link['icon']) }}" class="sidebar__icon-img" alt="" aria-hidden="true" width="28" height="28" />
+                @else
                 <span class="sidebar__emoji" role="img" aria-hidden="true">{{ $link['emoji'] }}</span>
+                @endif
                 {{ $link['label'] }}
             </a>
             @else
             <span class="sidebar__link" aria-disabled="true">
+                @if(!empty($link['icon']))
+                <img src="{{ asset($link['icon']) }}" class="sidebar__icon-img" alt="" aria-hidden="true" width="28" height="28" />
+                @else
                 <span class="sidebar__emoji" role="img" aria-hidden="true">{{ $link['emoji'] }}</span>
+                @endif
                 {{ $link['label'] }}
             </span>
             @endif
@@ -69,6 +77,8 @@
             @endif
         @endforeach
         @endif
+
+        <img src="{{ asset('images/cute-chicken-icon.webp') }}" class="sidebar__nav-icon" alt="" aria-hidden="true" width="96" height="96" />
     </nav>
 
     <div class="sidebar__footer">

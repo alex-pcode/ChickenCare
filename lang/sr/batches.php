@@ -10,6 +10,13 @@ return [
         'add_batch' => 'Dodaj grupu',
         'back_to_batches' => 'Nazad na grupe',
     ],
+    'hero' => [
+        'image_alt' => 'Ilustracija grupe jata',
+        'title' => 'Upravljajte grupama jata',
+        'title_short' => 'Grupe jata',
+        'detail' => 'Grupišite ptice u grupe da pratite broj, status nošenja i istoriju na jednom mestu.',
+        'detail_short' => 'Pratite broj, status nošenja i istoriju.',
+    ],
     'filters' => [
         'label' => 'Filtriraj grupe',
         'active' => 'Aktivne',
@@ -40,6 +47,9 @@ return [
             'source' => 'Izvor',
             'laying_since' => 'Nosi od',
         ],
+    ],
+    'events' => [
+        'acquired' => 'Nabavljeno :count ptica iz :source',
     ],
     'messages' => [
         'created' => 'Grupa je uspesno kreirana.',

@@ -3,7 +3,7 @@
 Production: **https://koke.svetpiva.rs** (Plesk shared host, PaukHost)
 
 Server path: `/var/www/vhosts/budipobednik.rs/koke.svetpiva.rs/`
-PHP CLI: `/opt/plesk/php/8.3/bin/php`
+PHP CLI: `php` (Plesk resolves to 8.3; `/opt/plesk/php/8.3/bin/php` does not exist on PaukHost)
 
 ---
 
@@ -20,10 +20,10 @@ Plesk auto-pulls from `main` (or click **Websites & Domains → koke.svetpiva.rs
 Plesk's Additional Deploy Actions auto-run:
 
 ```
-/opt/plesk/php/8.3/bin/php artisan config:cache
-/opt/plesk/php/8.3/bin/php artisan route:cache
-/opt/plesk/php/8.3/bin/php artisan view:cache
-/opt/plesk/php/8.3/bin/php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan migrate --force
 ```
 
 Done.
@@ -215,7 +215,7 @@ Already done — kept here for disaster recovery.
 9. Build frontend locally: `pnpm run build`, upload `public/build/`
 10. Add Plesk scheduler cron for Laravel scheduler:
     ```
-    * * * * * /opt/plesk/php/8.3/bin/php /var/www/vhosts/budipobednik.rs/koke.svetpiva.rs/artisan schedule:run >> /dev/null 2>&1
+    * * * * * php /var/www/vhosts/budipobednik.rs/koke.svetpiva.rs/artisan schedule:run >> /dev/null 2>&1
     ```
 
 ---
