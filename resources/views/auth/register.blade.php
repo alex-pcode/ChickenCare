@@ -53,7 +53,7 @@
                 {{ __('auth.pages.register.already_registered') }}
             </a>
 
-            <button type="submit" class="btn btn--primary">{{ __('auth.pages.register.submit') }}</button>
+            <button type="submit" class="shiny-cta"><span>{{ __('auth.pages.register.submit') }}</span></button>
         </div>
     </form>
 @endsection

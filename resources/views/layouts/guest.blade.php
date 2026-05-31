@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#4a7c59">
+    <meta name="theme-color" content="#4F46E5">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/images/pwa/apple-touch-icon.png">
     <title>{{ config('app.name', 'ChickenCare') }} — @yield('title', __('auth.guest.default_title'))</title>

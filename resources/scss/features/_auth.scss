@@ -85,7 +85,7 @@
         }
 
         &:focus {
-            outline: 2px solid $color-primary;
+            outline: 2px solid var(--color-primary, #6366f1);
             outline-offset: 2px;
         }
 
@@ -145,7 +145,7 @@
 
     &__link {
         font-size: $font-size-sm;
-        color: $color-primary;
+        color: var(--color-primary, #6366f1);
         text-decoration: underline;
         background: none;
         border: none;
@@ -153,7 +153,7 @@
         padding: 0;
 
         &:hover {
-            color: $color-primary-dark;
+            color: $color-indigo-700;
         }
     }
 }
@@ -185,6 +185,8 @@
 
     &:focus {
         @include form-focus;
+        outline-color: var(--color-primary, #6366f1);
+        border-color: var(--color-primary, #6366f1);
     }
 
     &[aria-invalid="true"] {

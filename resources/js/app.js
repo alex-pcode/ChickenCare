@@ -6,6 +6,9 @@ import { createOfflineQueueManager } from './offline-queue.js';
 import './viability-calculator.js';
 
 window.htmx = htmx;
+// Crossfade/morph between pages on boosted navigation instead of a hard cut,
+// using the browser's View Transitions API (no-op in browsers without support).
+htmx.config.globalViewTransitions = true;
 window.Alpine = Alpine;
 window.Chart = Chart;
 window.ChickenCare = window.ChickenCare || {};
@@ -299,6 +302,19 @@ window.ChickenCare.skeletons = (() => {
         '/app/account': '/app/account/__skeleton',
     };
 
+    // Only show the loading skeleton if a boosted navigation is still pending after
+    // this delay. Fast/warmed pages resolve first and swap with a clean view
+    // transition (no placeholder flash); genuinely slow pages still get a skeleton.
+    const SHOW_DELAY_MS = 180;
+    let pendingTimer = null;
+
+    function clearPending() {
+        if (pendingTimer !== null) {
+            window.clearTimeout(pendingTimer);
+            pendingTimer = null;
+        }
+    }
+
     function templateFor(variant) {
         return document.getElementById(`skeleton-template-${variant}`);
     }
@@ -383,7 +399,7 @@ window.ChickenCare.skeletons = (() => {
         target.append(host);
     }
 
-    function show(event) {
+    function render(event) {
         const target = resolveTarget(event);
         const variant = target?.dataset.loadingSkeleton;
 
@@ -414,6 +430,22 @@ window.ChickenCare.skeletons = (() => {
         if (fallback) mount(target, fallback);
     }
 
+    function show(event) {
+        // Inline partial requests (forms, pagination) keep showing their skeleton
+        // immediately. Boosted page navigations defer it past SHOW_DELAY_MS so fast
+        // swaps stay flash-free and only slow ones reveal a skeleton.
+        if (!event.detail?.requestConfig?.boosted) {
+            render(event);
+            return;
+        }
+
+        clearPending();
+        pendingTimer = window.setTimeout(() => {
+            pendingTimer = null;
+            render(event);
+        }, SHOW_DELAY_MS);
+    }
+
     function hide(target) {
         if (!(target instanceof HTMLElement)) {
             return;
@@ -425,12 +457,15 @@ window.ChickenCare.skeletons = (() => {
     }
 
     function hideAll() {
+        clearPending();
         document.querySelectorAll('[data-loading-skeleton].is-loading-skeleton').forEach((element) => {
             hide(element);
         });
     }
 
     function hideFromEvent(event) {
+        clearPending();
+
         if (event.detail?.target instanceof HTMLElement) {
             hide(event.detail.target);
         }

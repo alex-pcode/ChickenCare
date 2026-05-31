@@ -54,7 +54,7 @@
                 </a>
             @endif
 
-            <button type="submit" class="btn btn--primary">{{ __('auth.pages.login.submit') }}</button>
+            <button type="submit" class="shiny-cta"><span>{{ __('auth.pages.login.submit') }}</span></button>
         </div>
     </form>
 @endsection

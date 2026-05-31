@@ -450,6 +450,35 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
     &__description {
       color: $dm-text-muted;
     }
+
+    // Override the generic `.dark a` green tint so the link stays on the purple theme
+    &__link {
+      color: var(--color-primary, #818cf8);
+
+      &:hover {
+        color: $color-indigo-lighter;
+      }
+    }
+
+    &__social-button {
+      color: $dm-text-secondary;
+      background-color: $dm-input-bg;
+      border-color: $dm-border-solid;
+
+      &:hover {
+        background-color: $dm-hover-bg;
+        border-color: $dm-border;
+      }
+    }
+
+    &__separator {
+      color: $dm-text-muted;
+
+      &::before,
+      &::after {
+        background-color: $dm-border-solid;
+      }
+    }
   }
 
   // ======================================================================
