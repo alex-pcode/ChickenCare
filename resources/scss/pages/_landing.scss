@@ -2719,3 +2719,19 @@
         animation: none;
     }
 }
+
+// ==========================================================================
+// Public cost calculator (embeds the shared viability calculator on /costs)
+// ==========================================================================
+.landing__calculator {
+    padding: 3rem 1.5rem;
+
+    @media (max-width: $breakpoint-mobile) {
+        padding: 2rem 1rem;
+    }
+}
+
+.landing__calculator-inner {
+    max-width: 1200px;
+    margin-inline: auto;
+}

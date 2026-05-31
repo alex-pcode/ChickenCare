@@ -24,6 +24,12 @@
         </div>
     </section>
 
+    <section class="landing__calculator" id="calculator">
+        <div class="landing__calculator-inner">
+            @include('viability.partials.calculator', ['newDefaults' => $newDefaults])
+        </div>
+    </section>
+
     @include('landing.partials.pricing')
     @include('landing.partials.final-cta')
     @include('landing.partials.footer')

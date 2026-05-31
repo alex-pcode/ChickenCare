@@ -37,6 +37,16 @@ class ViabilityControllerTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_costs_page_is_public_and_renders_the_calculator(): void
+    {
+        // The same calculator is available publicly at /costs (no auth required).
+        $response = $this->get('/costs');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('landing.costs');
+        $response->assertSee('viabilityCalculator(', false);
+    }
+
     public function test_calculator_shows_placeholder_when_no_inputs(): void
     {
         $user = User::factory()->premium()->create();
@@ -52,7 +62,7 @@ class ViabilityControllerTest extends TestCase
     {
         $user = User::factory()->premium()->create();
 
-        $response = $this->actingAs($user)->get('/app/viability?' . http_build_query([
+        $response = $this->actingAs($user)->get('/app/viability?'.http_build_query([
             'birds' => 10,
             'laying_rate' => 0.7,
             'price_per_dozen' => 3.00,
@@ -71,7 +81,7 @@ class ViabilityControllerTest extends TestCase
 
         $response = $this->actingAs($user)
             ->withHeaders(['HX-Request' => 'true'])
-            ->get('/app/viability?' . http_build_query([
+            ->get('/app/viability?'.http_build_query([
                 'birds' => 10,
                 'laying_rate' => 0.7,
                 'price_per_dozen' => 3.00,
@@ -86,7 +96,7 @@ class ViabilityControllerTest extends TestCase
     {
         $user = User::factory()->premium()->create();
 
-        $response = $this->actingAs($user)->get('/app/viability?' . http_build_query([
+        $response = $this->actingAs($user)->get('/app/viability?'.http_build_query([
             'birds' => 'notanumber',
             'laying_rate' => 0.7,
         ]));

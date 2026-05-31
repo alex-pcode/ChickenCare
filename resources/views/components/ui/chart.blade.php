@@ -27,6 +27,6 @@
                 maintainAspectRatio: false,
             }, userOptions),
         });
-        requestAnimationFrame(() => chart.resize());
+        requestAnimationFrame(() => { if (chart.canvas) chart.resize(); });
     })();
 </script>

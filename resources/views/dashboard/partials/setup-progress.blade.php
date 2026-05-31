@@ -5,13 +5,6 @@
     </h2>
 
     <div class="glass-card dashboard__setup">
-        <div class="dashboard__setup-header">
-            <div>
-                <span class="dashboard__setup-phase">{{ $progress['phase']['label'] }}</span>
-                <p class="dashboard__setup-message">{{ $progress['phase']['message'] }}</p>
-            </div>
-        </div>
-
         <x-ui.progress-card
             :title="__('dashboard.setup.progress_title')"
             :value="$progress['percentage']"
@@ -31,9 +24,7 @@
                         @if($item['completed'])
                             ✓
                         @else
-                            <a href="{{ $item['action_href'] }}" class="btn btn--primary btn--sm">
-                                {{ $item['action'] }}
-                            </a>
+                            <a href="{{ $item['action_href'] }}" class="shiny-cta shiny-cta--sm"><span>{{ $item['action'] }}</span></a>
                         @endif
                     </div>
                 </div>

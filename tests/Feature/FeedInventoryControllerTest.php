@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\FeedType;
 use App\Models\Expense;
 use App\Models\FeedInventory;
 use App\Models\User;
@@ -65,6 +64,7 @@ class FeedInventoryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('feed-');
+        $response->assertHeader('HX-Trigger', 'feed:changed');
         $this->assertDatabaseHas('feed_inventory', [
             'user_id' => $user->id,
             'brand' => 'Scratch Grains',
@@ -108,6 +108,7 @@ class FeedInventoryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('feed-');
+        $response->assertHeader('HX-Trigger', 'feed:changed');
     }
 
     public function test_premium_user_can_delete_feed_entry(): void
@@ -132,6 +133,7 @@ class FeedInventoryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEmpty($response->getContent());
+        $this->assertArrayHasKey('feed:changed', json_decode($response->headers->get('HX-Trigger'), true));
         $this->assertDatabaseMissing('feed_inventory', ['id' => $feed->id]);
     }
 
@@ -540,6 +542,7 @@ class FeedInventoryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('feed.partials.entry-row');
+        $response->assertHeader('HX-Trigger', 'feed:changed');
         $feed->refresh();
         $this->assertNotNull($feed->depleted_date);
     }
@@ -688,39 +691,5 @@ class FeedInventoryControllerTest extends TestCase
             'depletedCost' => 0,
             'feedCycles' => 0,
         ]);
-    }
-
-    public function test_stats_includes_breakdown(): void
-    {
-        $user = User::factory()->premium()->create();
-        FeedInventory::factory()->depleted()->create(['user_id' => $user->id]);
-
-        $response = $this->actingAs($user)->getJson('/app/feed/stats');
-
-        $response->assertOk();
-        $response->assertJsonStructure(['breakdown']);
-    }
-
-    public function test_breakdown_includes_period_details(): void
-    {
-        $user = User::factory()->premium()->create();
-        $feed = FeedInventory::factory()->depleted()->create([
-            'user_id' => $user->id,
-            'brand' => 'Test Brand',
-            'total_cost' => 50.00,
-        ]);
-
-        $response = $this->actingAs($user)->getJson('/app/feed/stats');
-
-        $response->assertOk();
-        $data = $response->json();
-
-        if (count($data['breakdown']) > 0) {
-            $period = $data['breakdown'][0];
-            $this->assertArrayHasKey('brand', $period);
-            $this->assertArrayHasKey('costPerBirdPerMonth', $period);
-            $this->assertArrayHasKey('hasFlockChanges', $period);
-            $this->assertArrayHasKey('flockChanges', $period);
-        }
     }
 }

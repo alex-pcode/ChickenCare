@@ -9,6 +9,7 @@
     @include('dashboard.partials.welcome-header', [
         'displayName' => $displayName,
         'recentActivity' => $summary['recent_activity'] ?? collect(),
+        'progress' => $progress,
         'skel' => $skel,
     ])
 

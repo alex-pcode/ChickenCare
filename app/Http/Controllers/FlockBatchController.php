@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BatchEventType;
+use App\Enums\ExpenseCategory;
 use App\Http\Requests\StoreFlockBatchRequest;
 use App\Http\Requests\UpdateCompositionRequest;
 use App\Http\Requests\UpdateFlockBatchRequest;
@@ -74,6 +75,34 @@ class FlockBatchController extends Controller
                 ]),
                 'affected_count' => $total,
             ]);
+
+            $flockProfile = $request->user()->flockProfile
+                ?? $request->user()->flockProfile()->create();
+
+            $flockProfile->flockEvents()->create([
+                'date' => $batch->acquisition_date,
+                'type' => 'acquisition',
+                'description' => __('batches.events.acquired', [
+                    'count' => $total,
+                    'source' => $batch->source,
+                ]),
+                'affected_birds' => $total,
+            ]);
+
+            // Log the acquisition cost as a Birds expense so it flows into the
+            // financial overview. Only when a cost was actually provided.
+            if ((float) $batch->cost > 0) {
+                $request->user()->expenses()->create([
+                    'date' => $batch->acquisition_date,
+                    'category' => ExpenseCategory::Birds->value,
+                    'description' => __('batches.events.acquired_expense', [
+                        'name' => $batch->batch_name,
+                        'count' => $total,
+                        'source' => $batch->source,
+                    ]),
+                    'amount' => $batch->cost,
+                ]);
+            }
 
             return $batch;
         });

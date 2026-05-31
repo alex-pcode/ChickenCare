@@ -37,7 +37,7 @@ class SetupProgressService
      */
     private function buildItems(User $user): array
     {
-        $hasFlockProfile = $user->flockProfile()->exists() || $user->flockBatches()->exists();
+        $hasSetUpFlock = $user->flockBatches()->exists() || $this->hasMeaningfulFlockProfile($user);
         $hasRecordedProduction = $user->eggEntries()->exists();
         $hasRecordedExpense = $user->expenses()->exists();
         $hasFeedTracking = $user->feedInventory()->exists();
@@ -48,7 +48,7 @@ class SetupProgressService
                 'label' => __('dashboard.setup.items.setup-flock.label'),
                 'points' => 50,
                 'icon' => '🐔',
-                'completed' => $hasFlockProfile,
+                'completed' => $hasSetUpFlock,
                 'action' => __('dashboard.setup.items.setup-flock.action'),
                 'action_href' => route('app.flock.index'),
             ],
@@ -80,6 +80,24 @@ class SetupProgressService
                 'action_href' => route('app.feed.index'),
             ],
         ];
+    }
+
+    /**
+     * A flock profile row is auto-created (empty) the first time a user opens the
+     * flock page, so its mere existence is not proof of setup. Only count it once
+     * it holds real flock data.
+     */
+    private function hasMeaningfulFlockProfile(User $user): bool
+    {
+        return $user->flockProfile()
+            ->where(function ($query): void {
+                $query->where('flock_size', '>', 0)
+                    ->orWhere('hens', '>', 0)
+                    ->orWhere('roosters', '>', 0)
+                    ->orWhere('chicks', '>', 0)
+                    ->orWhere('brooding', '>', 0);
+            })
+            ->exists();
     }
 
     /**

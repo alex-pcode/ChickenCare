@@ -218,6 +218,10 @@ class CrmReportsService
             $this->cacheKey($user, sprintf('revenue_trend_%s_%s_%s', $period, $from ?? 'null', $to ?? 'null')),
             now()->addMinutes(5),
             function () use ($user, $period, $from, $to) {
+                if ($period === 'month') {
+                    return $this->dailyRevenueTrend($user, now());
+                }
+
                 [$rangeStart, $rangeEnd, $monthCount] = $this->resolveChartRange($period, $from, $to, 12);
                 $saleDateExpr = $this->monthKeyExpression('sale_date');
 
@@ -493,11 +497,50 @@ class CrmReportsService
         ];
     }
 
+    /**
+     * Daily revenue points across the current month, so the "This Month" trend
+     * renders a real line instead of a single monthly bucket.
+     *
+     * @return array<int, array{month: string, revenue: float}>
+     */
+    private function dailyRevenueTrend(User $user, Carbon $now): array
+    {
+        $rangeStart = $now->copy()->startOfMonth();
+        $rangeEnd = $now->copy()->endOfMonth();
+        $dayKeyExpr = $this->dayKeyExpression('sale_date');
+
+        $revenueByDay = $user->sales()
+            ->where('sale_date', '>=', $rangeStart->toDateString())
+            ->where('sale_date', '<=', $rangeEnd->toDateString())
+            ->selectRaw("{$dayKeyExpr} as day_key, COALESCE(SUM(total_amount), 0) as revenue")
+            ->groupByRaw($dayKeyExpr)
+            ->pluck('revenue', 'day_key');
+
+        $trend = [];
+        for ($i = 0; $i < $rangeStart->daysInMonth; $i++) {
+            $date = $rangeStart->copy()->addDays($i);
+            $key = $date->format('Y-m-d');
+            $trend[] = [
+                'month' => $date->translatedFormat('j M'),
+                'revenue' => round((float) ($revenueByDay[$key] ?? 0), 2),
+            ];
+        }
+
+        return $trend;
+    }
+
     private function monthKeyExpression(string $column): string
     {
         return DB::getDriverName() === 'sqlite'
             ? "strftime('%Y-%m', {$column})"
             : "DATE_FORMAT({$column}, '%Y-%m')";
+    }
+
+    private function dayKeyExpression(string $column): string
+    {
+        return DB::getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m-%d', {$column})"
+            : "DATE_FORMAT({$column}, '%Y-%m-%d')";
     }
 
     private function cacheKey(User $user, string $suffix): string

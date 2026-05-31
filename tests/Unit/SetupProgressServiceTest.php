@@ -60,6 +60,23 @@ class SetupProgressServiceTest extends TestCase
         $this->assertTrue($result['items'][0]['completed']);
     }
 
+    public function test_empty_placeholder_flock_profile_does_not_complete_setup_flock_item(): void
+    {
+        // Visiting the flock page auto-creates an empty profile; it must not count as setup.
+        FlockProfile::factory()->create([
+            'user_id' => $this->user->id,
+            'flock_size' => 0,
+            'hens' => 0,
+            'roosters' => 0,
+            'chicks' => 0,
+            'brooding' => 0,
+        ]);
+
+        $result = $this->service->compute($this->user);
+
+        $this->assertFalse($result['items'][0]['completed']);
+    }
+
     public function test_egg_entry_completes_add_eggs_item(): void
     {
         EggEntry::factory()->create(['user_id' => $this->user->id]);

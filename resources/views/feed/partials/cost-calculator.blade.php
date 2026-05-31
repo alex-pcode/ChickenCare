@@ -1,6 +1,7 @@
 <section class="feed__calculator"
     x-data="feedCostCalculator()"
-    x-init="fetchStats()">
+    x-init="fetchStats()"
+    @feed:changed.window="fetchStats()">
     
     <div class="feed__calculator-header">
         <div>

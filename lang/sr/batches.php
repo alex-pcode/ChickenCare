@@ -50,6 +50,7 @@ return [
     ],
     'events' => [
         'acquired' => 'Nabavljeno :count ptica iz :source',
+        'acquired_expense' => 'Kupovina serije „:name" (:count ptica iz :source)',
     ],
     'messages' => [
         'created' => 'Grupa je uspesno kreirana.',

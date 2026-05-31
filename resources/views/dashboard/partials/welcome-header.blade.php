@@ -24,7 +24,10 @@
                 @if ($skel)
                     <h1 class="dashboard-hero__status-title"><x-ui.skel block="hero" /></h1>
                 @else
+                    @php($percentage = $progress['percentage'] ?? 0)
+                    @php($welcomeKey = $percentage >= 100 ? 'complete' : ($percentage > 0 ? 'progress' : 'start'))
                     <h1 class="dashboard-hero__status-title gradient-text">{{ __('dashboard.welcome.heading', ['name' => $displayName]) }}</h1>
+                    <p class="dashboard-hero__status-message">{{ __('dashboard.welcome.messages.' . $welcomeKey, ['percentage' => $percentage]) }}</p>
                 @endif
             </div>
         </div>

@@ -95,17 +95,6 @@
         </div>
     </div>
 
-    @if (! $skel && $entries->total() === 0)
-        <div class="page-header__actions">
-            <button type="button" class="btn btn--sm btn--secondary egg-counter__backfill-btn"
-                hx-get="{{ route('app.eggs.backfill-form') }}"
-                hx-target="#backfill-modal"
-                hx-swap="innerHTML">
-                {{ __('eggs.backfill.button') }}
-            </button>
-        </div>
-    @endif
-
     {{-- Neumorphic Form --}}
     <form @if(! $skel) action="{{ route('app.eggs.store') }}"
           method="POST"
@@ -195,19 +184,20 @@
         @endunless
     @endif
 
-    @if (! $skel && $entries->isEmpty())
-        <x-ui.empty-state
-            :title="__('eggs.empty_state.title')"
-            :description="__('eggs.empty_state.description')"
-            icon="🥚"
-        />
-    @else
+    @php($isEmpty = ! $skel && $entries->isEmpty())
+
+    {{-- The table (and #egg-entries-body) is always rendered so the logging form
+         has a resolvable hx-target. Without it, htmx aborts the first submit with
+         htmx:targetError and the server-side "first entry" redirect never runs. --}}
+    @unless ($isEmpty)
         <h2 class="egg-counter__table-header-title">
             @if ($skel) <x-ui.skel block="title" /> @else {{ __('eggs.table.header') }} @endif
         </h2>
+    @endunless
 
         <div class="data-table-wrapper">
-            <table class="data-table data-table--striped">
+            <table class="data-table {{ $isEmpty ? '' : 'data-table--striped' }}">
+                @unless ($isEmpty)
                 <thead class="data-table__head">
                     <tr>
                         <th scope="col" class="data-table__header">{{ __('eggs.table.columns.date') }}</th>
@@ -218,6 +208,7 @@
                         <th scope="col" class="data-table__header">{{ __('eggs.table.columns.actions') }}</th>
                     </tr>
                 </thead>
+                @endunless
                 <tbody id="egg-entries-body" class="data-table__body">
                     @if ($skel)
                         @for ($i = 0; $i < 8; $i++)
@@ -231,18 +222,35 @@
                             </tr>
                         @endfor
                     @else
-                        @foreach($entries as $entry)
+                        @forelse($entries as $entry)
                             @include('eggs.partials.entry-row', ['entry' => $entry])
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="6" class="data-table__cell">
+                                    <x-ui.empty-state
+                                        :title="__('eggs.empty_state.title')"
+                                        :description="__('eggs.empty_state.description')"
+                                        icon="🥚"
+                                    >
+                                        <button type="button" class="shiny-cta"
+                                                hx-get="{{ route('app.eggs.backfill-form') }}"
+                                                hx-target="#backfill-modal"
+                                                hx-swap="innerHTML">
+                                            <span>{{ __('eggs.backfill.button') }}</span>
+                                        </button>
+                                    </x-ui.empty-state>
+                                </td>
+                            </tr>
+                        @endforelse
                     @endif
                 </tbody>
             </table>
         </div>
 
-        @if (! $skel)
+        @if (! $skel && $entries->hasPages())
             <x-tables.pagination :paginator="$entries" />
         @endif
-    @endif
+
     <div id="backfill-modal"></div>
 </div>
 @endsection

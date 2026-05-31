@@ -6,6 +6,11 @@ return [
     ],
     'welcome' => [
         'heading' => 'Dobro dosli, :name',
+        'messages' => [
+            'start' => 'Hajde da podesimo vase jato.',
+            'progress' => 'Podeseno :percentage% — zavrsimo podesavanje vaseg jata.',
+            'complete' => 'Vase jato je potpuno podeseno. Evo danasnjeg pregleda.',
+        ],
     ],
     'setup' => [
         'phase_headings' => [

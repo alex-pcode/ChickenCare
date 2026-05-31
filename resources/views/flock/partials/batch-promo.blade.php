@@ -6,5 +6,5 @@
         <li>Production analysis</li>
         <li>Mortality tracking</li>
     </ul>
-    <a href="{{ route('app.batches.index') }}" class="btn btn--primary">View Batch Manager</a>
+    <a href="{{ route('app.batches.index') }}" class="shiny-cta"><span>View Batch Manager</span></a>
 </div>

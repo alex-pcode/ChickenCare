@@ -14,6 +14,24 @@ window.Chart = Chart;
 window.ChickenCare = window.ChickenCare || {};
 window.ChickenCare.offlineQueue = createOfflineQueueManager();
 
+// Select the whole value of numeric "value" inputs on focus and click so a
+// pre-filled number (e.g. 0 or 0.30) can be overwritten by just typing.
+// Delegated on document so htmx-swapped and Alpine-rendered inputs are covered.
+(function registerValueInputSelectAll() {
+    const isValueInput = (el) =>
+        el instanceof HTMLInputElement &&
+        (el.type === 'number' || el.inputMode === 'numeric' || el.inputMode === 'decimal');
+
+    const selectAll = (event) => {
+        if (isValueInput(event.target)) {
+            event.target.select();
+        }
+    };
+
+    document.addEventListener('focusin', selectAll);
+    document.addEventListener('click', selectAll);
+})();
+
 window.ChickenCare.pwa = (() => {
     const installDismissedKey = 'chickencare:pwa-install-dismissed';
     const state = {
@@ -616,6 +634,15 @@ htmxEventTarget.addEventListener('htmx:beforeSwap', function(evt) {
     if (evt.detail.xhr.status === 422) {
         evt.detail.shouldSwap = true;
         evt.detail.isError = false;
+    }
+
+    // Destroy Chart.js instances inside content about to be removed, so their
+    // ResizeObservers don't fire on detached canvases (TypeError: ...ownerDocument).
+    const target = evt.detail.target;
+    if (target && window.Chart) {
+        target.querySelectorAll('canvas').forEach(function(canvas) {
+            window.Chart.getChart(canvas)?.destroy();
+        });
     }
 });
 

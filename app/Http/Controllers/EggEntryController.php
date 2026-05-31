@@ -11,6 +11,7 @@ use App\Traits\HandlesHtmx;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
@@ -195,13 +196,37 @@ class EggEntryController extends Controller
 
     public function backfill(BackfillEggEntriesRequest $request)
     {
-        $entries = $request->validated()['entries'];
+        $validated = $request->validated();
+        $start = Carbon::parse($validated['start_date'])->startOfDay();
+        $end = Carbon::parse($validated['end_date'])->startOfDay();
+        $average = (int) $validated['average'];
 
-        foreach ($entries as $entryData) {
+        // Spread each day around the average to mimic real laying patterns.
+        // ~30% swing (at least 1), but no variance for a zero average.
+        $variance = $average === 0 ? 0 : max(1, (int) round($average * 0.3));
+
+        // Skip days that already have an entry so re-running doesn't duplicate.
+        $existing = $request->user()->eggEntries()
+            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+            ->pluck('date')
+            ->map(fn ($date) => $date->toDateString())
+            ->flip();
+
+        $created = 0;
+
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            if ($existing->has($date->toDateString())) {
+                continue;
+            }
+
+            $count = max(0, $average + random_int(-$variance, $variance));
+
             $request->user()->eggEntries()->create([
-                'date' => $entryData['date'],
-                'count' => $entryData['count'],
+                'date' => $date->toDateString(),
+                'count' => $count,
             ]);
+
+            $created++;
         }
 
         if ($this->isHtmx($request)) {
@@ -209,7 +234,7 @@ class EggEntryController extends Controller
         }
 
         return redirect()->route('app.eggs.index')
-            ->with('success', __('eggs.messages.backfilled', ['count' => count($entries)]));
+            ->with('success', __('eggs.messages.backfilled', ['count' => $created]));
     }
 
     public function destroy(Request $request, EggEntry $egg)

@@ -44,6 +44,7 @@ return [
             'placeholders' => [
                 'price_per_egg' => '0.30',
                 'customer' => 'Select a customer',
+                'customer_empty' => 'No customers yet — add one in the Customers tab',
                 'eggs_count' => 'Enter egg count',
                 'notes' => 'Any notes about this sale...',
             ],

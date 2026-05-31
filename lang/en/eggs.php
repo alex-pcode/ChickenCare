@@ -54,12 +54,13 @@ return [
     'backfill' => [
         'button' => 'Backfill History',
         'modal_title' => 'Backfill History',
-        'description' => 'Enter historical egg counts (up to 90 days in the past).',
-        'date_label' => 'Date',
-        'count_label' => 'Count',
-        'add_row' => 'Add Row',
+        'description' => 'Pick a date range and an average daily count. We\'ll create one entry per day, varied slightly to mimic real laying (up to 90 days in the past).',
+        'start_date_label' => 'Start date',
+        'end_date_label' => 'End date',
+        'average_label' => 'Average eggs per day',
+        'average_hint' => 'Daily counts will vary around this number.',
         'cancel' => 'Cancel',
-        'save' => 'Save Entries',
+        'save' => 'Generate Entries',
     ],
     'form' => [
         'title' => 'Log Daily Eggs',
@@ -108,7 +109,7 @@ return [
     ],
     'empty_state' => [
         'title' => 'No egg entries yet',
-        'description' => 'Start tracking your daily egg production.',
+        'description' => 'Start tracking your daily egg production. Already had your flock for a while? Backfill your history to fill in past days at once.',
     ],
     'actions' => [
         'edit' => 'Edit',

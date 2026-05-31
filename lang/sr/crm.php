@@ -44,6 +44,7 @@ return [
             'placeholders' => [
                 'price_per_egg' => '0.30',
                 'customer' => 'Izaberite kupca',
+                'customer_empty' => 'Još nema kupaca — dodajte ih u kartici Kupci',
                 'eggs_count' => 'Unesite broj jaja',
                 'notes' => 'Bilo kakve napomene o ovoj prodaji...',
             ],

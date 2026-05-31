@@ -19,8 +19,12 @@
                 <label for="qs-customer" class="form-label">
                     {{ __('crm.quick_sale.form.fields.customer') }} <span class="form-label__required" aria-hidden="true">*</span>
                 </label>
-                <select id="qs-customer" class="form-select" x-model="customer_id" required>
-                    <option value="">{{ __('crm.quick_sale.form.placeholders.customer') }}</option>
+                <select id="qs-customer" class="form-select" x-model="customer_id" required @disabled($customers->isEmpty())>
+                    <option value="">
+                        {{ $customers->isEmpty()
+                            ? __('crm.quick_sale.form.placeholders.customer_empty')
+                            : __('crm.quick_sale.form.placeholders.customer') }}
+                    </option>
                     @foreach($customers as $customer)
                         <option value="{{ $customer->id }}">{{ $customer->name }}</option>
                     @endforeach

@@ -99,6 +99,84 @@ class FlockBatchStoreTest extends TestCase
         );
     }
 
+    public function test_store_creates_flock_acquisition_event(): void
+    {
+        $user = User::factory()->premium()->create();
+
+        $this->actingAs($user)->post(route('app.batches.store'), $this->validPayload());
+
+        $batch = FlockBatch::where('user_id', $user->id)->first();
+        $profile = $user->fresh()->flockProfile;
+
+        $this->assertNotNull($profile);
+        $this->assertDatabaseHas('flock_events', [
+            'flock_profile_id' => $profile->id,
+            'type' => 'acquisition',
+            'affected_birds' => 10,
+            'description' => 'Acquired 10 birds from Local Farm',
+        ]);
+
+        $event = $profile->flockEvents()->first();
+        $this->assertEquals(
+            $batch->acquisition_date->toDateString(),
+            $event->date->toDateString(),
+        );
+    }
+
+    public function test_store_reuses_existing_flock_profile_for_acquisition_event(): void
+    {
+        $user = User::factory()->premium()->create();
+        $profile = $user->flockProfile()->create();
+
+        $this->actingAs($user)->post(route('app.batches.store'), $this->validPayload());
+
+        $this->assertEquals(1, $user->fresh()->flockProfile()->count());
+        $this->assertEquals(1, $profile->flockEvents()->count());
+    }
+
+    public function test_store_logs_cost_as_birds_expense(): void
+    {
+        $user = User::factory()->premium()->create();
+
+        $this->actingAs($user)->post(route('app.batches.store'), $this->validPayload());
+
+        $batch = FlockBatch::where('user_id', $user->id)->first();
+
+        $this->assertDatabaseHas('expenses', [
+            'user_id' => $user->id,
+            'category' => 'Birds',
+            'amount' => '50.00',
+            'description' => 'Purchase of batch "Test Batch" (10 birds from Local Farm)',
+        ]);
+
+        $expense = $user->expenses()->first();
+        $this->assertEquals(
+            $batch->acquisition_date->toDateString(),
+            $expense->date->toDateString(),
+        );
+    }
+
+    public function test_store_does_not_log_expense_when_cost_is_zero(): void
+    {
+        $user = User::factory()->premium()->create();
+        $payload = array_merge($this->validPayload(), ['cost' => 0]);
+
+        $this->actingAs($user)->post(route('app.batches.store'), $payload);
+
+        $this->assertDatabaseMissing('expenses', ['user_id' => $user->id]);
+    }
+
+    public function test_store_does_not_log_expense_when_cost_omitted(): void
+    {
+        $user = User::factory()->premium()->create();
+        $payload = $this->validPayload();
+        unset($payload['cost']);
+
+        $this->actingAs($user)->post(route('app.batches.store'), $payload);
+
+        $this->assertDatabaseMissing('expenses', ['user_id' => $user->id]);
+    }
+
     public function test_store_fails_validation_when_zero_birds(): void
     {
         $user = User::factory()->premium()->create();

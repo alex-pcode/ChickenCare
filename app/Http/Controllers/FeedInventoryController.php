@@ -73,7 +73,9 @@ class FeedInventoryController extends Controller
         }
 
         if ($this->isHtmx($request)) {
-            return view('feed.partials.entry-row', compact('feed'));
+            return response()
+                ->view('feed.partials.entry-row', compact('feed'))
+                ->header('HX-Trigger', 'feed:changed');
         }
 
         return redirect()->route('app.feed.index')
@@ -108,7 +110,9 @@ class FeedInventoryController extends Controller
         }
 
         if ($this->isHtmx($request)) {
-            return view('feed.partials.entry-row', compact('feed'));
+            return response()
+                ->view('feed.partials.entry-row', compact('feed'))
+                ->header('HX-Trigger', 'feed:changed');
         }
 
         return redirect()->route('app.feed.index')
@@ -125,6 +129,9 @@ class FeedInventoryController extends Controller
         if ($this->isHtmx($request)) {
             return response('', 200)
                 ->header('HX-Trigger', json_encode([
+                    // Dispatch before closeModal: closeModal clears #modal-container,
+                    // detaching the trigger element so later events can't bubble to window.
+                    'feed:changed' => true,
                     'closeModal' => true,
                     'toast:success' => __('feed.messages.deleted'),
                 ]));
@@ -147,7 +154,9 @@ class FeedInventoryController extends Controller
         $feed->markDepleted();
 
         if ($this->isHtmx($request)) {
-            return view('feed.partials.entry-row', compact('feed'));
+            return response()
+                ->view('feed.partials.entry-row', compact('feed'))
+                ->header('HX-Trigger', 'feed:changed');
         }
 
         return redirect()->route('app.feed.index')

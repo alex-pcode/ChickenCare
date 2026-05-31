@@ -50,12 +50,13 @@ return [
     'backfill' => [
         'button' => 'Dodaj istoriju',
         'modal_title' => 'Dodaj istoriju',
-        'description' => 'Unesite istorijske brojeve jaja (do 90 dana unazad).',
-        'date_label' => 'Datum',
-        'count_label' => 'Broj',
-        'add_row' => 'Dodaj red',
+        'description' => 'Izaberite period i prosecan dnevni broj. Napravicemo po jedan unos za svaki dan, uz blagu varijaciju da podseca na stvarno nosenje (do 90 dana unazad).',
+        'start_date_label' => 'Datum pocetka',
+        'end_date_label' => 'Datum kraja',
+        'average_label' => 'Prosecan broj jaja dnevno',
+        'average_hint' => 'Dnevni brojevi ce varirati oko ovog broja.',
         'cancel' => 'Otkazi',
-        'save' => 'Sacuvaj unose',
+        'save' => 'Generisi unose',
     ],
     'form' => [
         'title' => 'Evidentiraj dnevna jaja',
@@ -104,7 +105,7 @@ return [
     ],
     'empty_state' => [
         'title' => 'Jos nema unosa jaja',
-        'description' => 'Pocnite da pratite dnevnu produkciju jaja.',
+        'description' => 'Pocnite da pratite dnevnu produkciju jaja. Vec duze imate jato? Dodajte istoriju da popunite protekle dane odjednom.',
     ],
     'actions' => [
         'edit' => 'Izmeni',

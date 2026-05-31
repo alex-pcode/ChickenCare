@@ -63,6 +63,9 @@ class EggEntryControllerTest extends TestCase
     public function test_user_can_store_egg_entry_via_htmx(): void
     {
         $user = User::factory()->create();
+        // Existing entry → list region is already on the page, so the new entry
+        // is swapped in as a row partial (not a full redirect).
+        EggEntry::factory()->create(['user_id' => $user->id, 'date' => '2026-04-09']);
 
         $response = $this->actingAs($user)
             ->withHeaders(['HX-Request' => 'true'])
@@ -79,6 +82,39 @@ class EggEntryControllerTest extends TestCase
             'user_id' => $user->id,
             'count' => 3,
         ]);
+    }
+
+    public function test_first_egg_entry_via_htmx_returns_redirect(): void
+    {
+        // The very first entry has no list region/#egg-entries-body to swap into,
+        // so the controller returns an HX-Redirect to re-render the full page.
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->withHeaders(['HX-Request' => 'true'])
+            ->post('/app/eggs', [
+                'date' => '2026-04-10',
+                'count' => 3,
+            ]);
+
+        $response->assertStatus(200);
+        $response->assertHeader('HX-Redirect', route('app.eggs.index'));
+        $this->assertDatabaseHas('egg_entries', [
+            'user_id' => $user->id,
+            'count' => 3,
+        ]);
+    }
+
+    public function test_empty_index_still_renders_egg_entries_body_target(): void
+    {
+        // Regression: the logging form's hx-target (#egg-entries-body) must exist
+        // even with no entries, or htmx aborts the first submit with targetError.
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/app/eggs');
+
+        $response->assertStatus(200);
+        $response->assertSee('id="egg-entries-body"', false);
     }
 
     public function test_user_can_update_egg_entry(): void
@@ -525,33 +561,84 @@ class EggEntryControllerTest extends TestCase
         $response->assertSee('Backfill History');
     }
 
-    public function test_backfill_post_creates_multiple_entries(): void
+    public function test_backfill_post_creates_one_entry_per_day_in_range(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post('/app/eggs/backfill', [
-            'entries' => [
-                ['date' => now()->subDays(1)->format('Y-m-d'), 'count' => 3],
-                ['date' => now()->subDays(2)->format('Y-m-d'), 'count' => 5],
-                ['date' => now()->subDays(3)->format('Y-m-d'), 'count' => 2],
-            ],
+            'start_date' => now()->subDays(6)->format('Y-m-d'),
+            'end_date' => now()->format('Y-m-d'),
+            'average' => 10,
         ]);
 
         $response->assertRedirect(route('app.eggs.index'));
-        $this->assertDatabaseCount('egg_entries', 3);
+        // 6 days ago .. today inclusive = 7 days
+        $this->assertDatabaseCount('egg_entries', 7);
     }
 
-    public function test_backfill_rejects_dates_over_90_days_ago(): void
+    public function test_backfill_counts_vary_around_the_average(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/app/eggs/backfill', [
+            'start_date' => now()->subDays(6)->format('Y-m-d'),
+            'end_date' => now()->format('Y-m-d'),
+            'average' => 10,
+        ]);
+
+        // variance = max(1, round(10 * 0.3)) = 3, so counts stay within [7, 13].
+        $counts = $user->eggEntries()->pluck('count');
+        $this->assertCount(7, $counts);
+        foreach ($counts as $count) {
+            $this->assertGreaterThanOrEqual(7, $count);
+            $this->assertLessThanOrEqual(13, $count);
+        }
+    }
+
+    public function test_backfill_skips_days_that_already_have_an_entry(): void
+    {
+        $user = User::factory()->create();
+        $existingDate = now()->subDays(3)->format('Y-m-d');
+        EggEntry::factory()->create(['user_id' => $user->id, 'date' => $existingDate, 'count' => 99]);
+
+        $this->actingAs($user)->post('/app/eggs/backfill', [
+            'start_date' => now()->subDays(6)->format('Y-m-d'),
+            'end_date' => now()->format('Y-m-d'),
+            'average' => 10,
+        ]);
+
+        // 7 days in range, 1 already had an entry → 6 created + the original = 7 total.
+        $this->assertDatabaseCount('egg_entries', 7);
+        // The pre-existing entry is untouched (still a single row at count 99).
+        $this->assertSame(1, $user->eggEntries()->whereDate('date', $existingDate)->count());
+        $this->assertSame(99, $user->eggEntries()->whereDate('date', $existingDate)->value('count'));
+    }
+
+    public function test_backfill_rejects_start_date_over_90_days_ago(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post('/app/eggs/backfill', [
-            'entries' => [
-                ['date' => now()->subDays(91)->format('Y-m-d'), 'count' => 3],
-            ],
+            'start_date' => now()->subDays(91)->format('Y-m-d'),
+            'end_date' => now()->format('Y-m-d'),
+            'average' => 10,
         ]);
 
-        $response->assertSessionHasErrors('entries.0.date');
+        $response->assertSessionHasErrors('start_date');
+        $this->assertDatabaseCount('egg_entries', 0);
+    }
+
+    public function test_backfill_rejects_end_date_before_start_date(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/app/eggs/backfill', [
+            'start_date' => now()->subDays(2)->format('Y-m-d'),
+            'end_date' => now()->subDays(5)->format('Y-m-d'),
+            'average' => 10,
+        ]);
+
+        $response->assertSessionHasErrors('end_date');
         $this->assertDatabaseCount('egg_entries', 0);
     }
 
@@ -561,7 +648,7 @@ class EggEntryControllerTest extends TestCase
 
         $response = $this->actingAs($user)->post('/app/eggs/backfill', []);
 
-        $response->assertSessionHasErrors('entries');
+        $response->assertSessionHasErrors(['start_date', 'end_date', 'average']);
     }
 
     public function test_backfill_entries_scoped_to_authenticated_user(): void
@@ -569,15 +656,13 @@ class EggEntryControllerTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)->post('/app/eggs/backfill', [
-            'entries' => [
-                ['date' => now()->subDays(1)->format('Y-m-d'), 'count' => 4],
-            ],
+            'start_date' => now()->subDays(1)->format('Y-m-d'),
+            'end_date' => now()->format('Y-m-d'),
+            'average' => 4,
         ]);
 
-        $this->assertDatabaseHas('egg_entries', [
-            'user_id' => $user->id,
-            'count' => 4,
-        ]);
+        $this->assertDatabaseCount('egg_entries', 2);
+        $this->assertEquals($user->id, $user->eggEntries()->first()->user_id);
     }
 
     public function test_backfill_button_shows_when_entries_empty(): void
@@ -996,7 +1081,7 @@ class EggEntryControllerTest extends TestCase
         $response->assertSee('form.addEventListener(\'htmx:beforeRequest\'', false);
         $response->assertSee('form.addEventListener(\'htmx:afterRequest\'', false);
         $response->assertSee('setTimeout(() => { success = false; }, 2500);', false);
-        $response->assertSee('this.reset(); detailed = false', false);
+        $response->assertSee('$el.reset(); detailed = false', false);
     }
 
     public function test_page_contains_recent_entries_header(): void

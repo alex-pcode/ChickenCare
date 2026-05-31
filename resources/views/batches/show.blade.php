@@ -24,12 +24,12 @@
             </div>
 
             <button type="button"
-                    class="btn btn--primary btn--sm"
+                    class="shiny-cta shiny-cta--sm"
                     hx-get="{{ route('app.batches.composition-modal', $batch) }}"
                     hx-target="#modal-container"
                     hx-swap="innerHTML"
                     aria-label="Edit batch composition">
-                ✏️ Edit Composition
+                <span>✏️ Edit Composition</span>
             </button>
         </div>
     </header>
@@ -214,7 +214,7 @@
                 </div>
 
                 <div class="batches__form-actions">
-                    <button type="submit" class="btn btn--primary" :disabled="submitting">
+                    <button type="submit" class="shiny-cta" :disabled="submitting">
                         <span x-show="!submitting">Add Event</span>
                         <span x-show="submitting" x-cloak>Adding...</span>
                     </button>
@@ -227,20 +227,19 @@
     <section class="batches__section" id="batch-timeline">
         <h2 class="batches__section-title">Timeline</h2>
         <div class="batches__details-card">
-            <div id="batch-timeline-events">
-                @if($batch->batchEvents->isEmpty())
-                    <div class="batches__timeline-empty">
-                        <span aria-hidden="true">📅</span>
-                        No events recorded yet. Add a timeline event above to track health checks, vaccinations, and more.
-                    </div>
-                @else
-                    @foreach($batch->batchEvents as $index => $event)
-                        @include('batches.partials.timeline-event-row', [
-                            'event' => $event,
-                            'index' => $index,
-                        ])
-                    @endforeach
-                @endif
+            <div id="batch-timeline-events" class="event-timeline">
+                @foreach($batch->batchEvents as $index => $event)
+                    @include('batches.partials.timeline-event-row', [
+                        'event' => $event,
+                        'index' => $index,
+                    ])
+                @endforeach
+                {{-- Kept in the DOM and hidden via CSS when entries exist, so the
+                     first event added via hx-swap="afterbegin" auto-hides it. --}}
+                <div class="batches__timeline-empty">
+                    <span aria-hidden="true">📅</span>
+                    No events recorded yet. Add a timeline event above to track health checks, vaccinations, and more.
+                </div>
             </div>
         </div>
     </section>

@@ -883,6 +883,13 @@
             margin-bottom: 0.5rem;
         }
     }
+
+    // Hide the placeholder once at least one event is present (e.g. after the
+    // first event is prepended via hx-swap="afterbegin"). The timeline itself
+    // uses the shared .event-timeline component (see components/_timeline.scss).
+    .event-timeline:has(.event-timeline__entry) &__timeline-empty {
+        display: none;
+    }
 }
 
 // ==========================================================================

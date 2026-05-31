@@ -50,6 +50,7 @@ return [
     ],
     'events' => [
         'acquired' => 'Acquired :count birds from :source',
+        'acquired_expense' => 'Purchase of batch ":name" (:count birds from :source)',
     ],
     'messages' => [
         'created' => 'Batch created successfully.',

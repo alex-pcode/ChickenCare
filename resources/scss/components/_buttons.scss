@@ -54,12 +54,13 @@
     }
 
     &--danger {
-        background: linear-gradient(135deg, $color-error, color.adjust($color-error, $lightness: -10%));
+        // Softer, less saturated red than $color-error (#c53030) with a lighter glow.
+        background: linear-gradient(135deg, #f87171, #ef4444);
         color: #fff;
-        box-shadow: $shadow-md, 0 4px 15px rgba($color-error, 0.3);
+        box-shadow: $shadow-sm, 0 3px 10px rgba(239, 68, 68, 0.15);
 
         &:hover {
-            box-shadow: $shadow-lg, 0 6px 20px rgba($color-error, 0.35);
+            box-shadow: $shadow-md, 0 5px 14px rgba(239, 68, 68, 0.2);
         }
     }
 

@@ -30,11 +30,12 @@
     </div>
 
     <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-        <button class="btn btn--primary">Primary</button>
+        <button type="button" class="shiny-cta"><span>Primary</span></button>
+        <button type="button" class="shiny-cta shiny-cta--sm"><span>Primary Small</span></button>
         <button class="btn btn--secondary">Secondary</button>
+        <button class="btn btn--secondary btn--sm">Secondary Small</button>
         <button class="btn btn--danger">Danger</button>
-        <button class="btn btn--primary btn--sm">Small</button>
-        <button class="btn btn--primary btn--lg">Large</button>
+        <button class="btn btn--danger btn--sm">Danger Small</button>
     </div>
 </div>
 

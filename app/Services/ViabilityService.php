@@ -91,9 +91,11 @@ class ViabilityService
     /**
      * @return array{birdCount: int, eggPrice: float, startingCost: int}
      */
-    public function getNewDefaults(User $user): array
+    public function getNewDefaults(?User $user = null): array
     {
-        $activeBirds = (int) $user->flockBatches()->where('is_active', true)->sum('hens_count');
+        $activeBirds = $user
+            ? (int) $user->flockBatches()->where('is_active', true)->sum('hens_count')
+            : 0;
 
         return [
             'birdCount' => $activeBirds > 0 ? $activeBirds : 5,

@@ -31,7 +31,6 @@
 
     <x-forms.form-card
         title="Log New Loss"
-        icon="💀"
         action="{{ route('app.batches.deaths.store', $batch) }}"
         hx-post="{{ route('app.batches.deaths.store', $batch) }}"
         hx-target="#deaths-form-region"

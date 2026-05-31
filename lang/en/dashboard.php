@@ -6,6 +6,11 @@ return [
     ],
     'welcome' => [
         'heading' => 'Welcome :name',
+        'messages' => [
+            'start' => "Let's get your flock set up.",
+            'progress' => "You're :percentage% set up — let's finish getting your flock ready.",
+            'complete' => "Your flock is all set up. Here's today's snapshot.",
+        ],
     ],
     'setup' => [
         'phase_headings' => [

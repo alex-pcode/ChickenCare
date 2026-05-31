@@ -5,9 +5,9 @@
         icon="📅"
     />
 @else
-    <div class="flock__timeline">
-        @foreach($events as $event)
-            @include('flock.partials.event-row', ['event' => $event, 'profile' => $profile])
+    <div class="event-timeline">
+        @foreach($events as $index => $event)
+            @include('flock.partials.event-row', ['event' => $event, 'profile' => $profile, 'index' => $index])
         @endforeach
     </div>
 @endif
