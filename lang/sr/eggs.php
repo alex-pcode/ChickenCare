@@ -59,6 +59,7 @@ return [
     ],
     'form' => [
         'title' => 'Evidentiraj dnevna jaja',
+        'errors_title' => 'Ispravite sledece greske:',
         'date_label' => 'Datum',
         'count_label' => 'Broj jaja',
         'detailed_toggle' => 'Ukljuci detaljno pracenje (velicina i boja)',

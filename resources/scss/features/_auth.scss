@@ -18,6 +18,14 @@
     border-radius: $radius-base;
     @include neumorphic('md');
 
+    &__icon {
+        display: block;
+        width: 15rem;
+        height: 15rem;
+        margin: 0 auto $space-4;
+        object-fit: contain;
+    }
+
     &__title {
         margin: 0 0 $space-6;
         font-size: $font-size-2xl;
@@ -59,8 +67,23 @@
 
     &__social-buttons {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: $space-3;
+    }
+
+    &__social-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: $space-2;
+    }
+
+    &__social-name {
+        text-align: center;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: $color-neutral-700;
     }
 
     &__social-button {

@@ -76,9 +76,21 @@ class EggEntryController extends Controller
         ])->header('Cache-Control', 'private, max-age=300');
     }
 
+    public function stats(Request $request, EggStatsService $eggStatsService)
+    {
+        $stats = $eggStatsService->getStats($request->user());
+        $yearlyGoal = $request->user()->yearly_egg_goal;
+
+        return view('eggs.partials.stats-refresh', compact('stats', 'yearlyGoal'));
+    }
+
     public function store(StoreEggEntryRequest $request)
     {
         $validated = $request->validated();
+
+        // First-ever entry: the table and stats sections aren't rendered yet, so a
+        // partial swap has nothing to target. Fall back to a full page refresh.
+        $wasEmpty = ! $request->user()->eggEntries()->exists();
 
         // Check for duplicate entry with same date + size + color
         $duplicateQuery = $request->user()
@@ -122,7 +134,9 @@ class EggEntryController extends Controller
             ]);
 
             if ($this->isHtmx($request)) {
-                return view('eggs.partials.entry-row', ['entry' => $existing]);
+                return response()
+                    ->view('eggs.partials.entry-row', ['entry' => $existing])
+                    ->header('HX-Trigger', 'eggLogged');
             }
 
             return redirect()->route('app.eggs.index')
@@ -134,7 +148,13 @@ class EggEntryController extends Controller
             ->create($validated);
 
         if ($this->isHtmx($request)) {
-            return view('eggs.partials.entry-row', compact('entry'));
+            if ($wasEmpty) {
+                return $this->htmxRedirect(route('app.eggs.index'));
+            }
+
+            return response()
+                ->view('eggs.partials.entry-row', compact('entry'))
+                ->header('HX-Trigger', 'eggLogged');
         }
 
         return redirect()->route('app.eggs.index')

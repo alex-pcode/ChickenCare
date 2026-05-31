@@ -6,6 +6,8 @@
     <form method="POST" action="{{ route('login') }}" class="auth-form">
         @csrf
 
+        <img src="{{ asset('images/cute chicken sign in icon.webp') }}" alt="" aria-hidden="true" class="auth-form__icon">
+
         <h1 class="auth-form__title">{{ __('auth.pages.login.title') }}</h1>
 
         @if (session('auth_error'))

@@ -15,13 +15,13 @@ return [
     ],
     'pages' => [
         'login' => [
-            'title' => 'Prijavite se',
+            'title' => 'Dobrodosli nazad',
             'remember' => 'Zapamti me',
             'forgot_password' => 'Zaboravili ste lozinku?',
             'submit' => 'Prijavite se',
         ],
         'register' => [
-            'title' => 'Registrujte se',
+            'title' => 'Napravite nalog',
             'already_registered' => 'Vec ste registrovani?',
             'submit' => 'Registrujte se',
         ],

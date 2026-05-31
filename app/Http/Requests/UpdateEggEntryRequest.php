@@ -11,6 +11,19 @@ class UpdateEggEntryRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Normalize an all-digits count (e.g. "05") to a real integer so the
+     * integer rule doesn't reject otherwise-valid leading-zero input.
+     */
+    protected function prepareForValidation(): void
+    {
+        $count = $this->input('count');
+
+        if (is_string($count) && preg_match('/^\d+$/', trim($count))) {
+            $this->merge(['count' => (int) $count]);
+        }
+    }
+
     public function rules(): array
     {
         return [

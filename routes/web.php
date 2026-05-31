@@ -55,6 +55,7 @@ Route::middleware(['auth'])->prefix('app')->name('app.')->group(function () {
 
     Route::get('eggs/backfill-form', [EggEntryController::class, 'backfillForm'])->name('eggs.backfill-form');
     Route::post('eggs/backfill', [EggEntryController::class, 'backfill'])->name('eggs.backfill');
+    Route::get('eggs/stats', [EggEntryController::class, 'stats'])->name('eggs.stats');
     Route::resource('eggs', EggEntryController::class)->except(['create', 'edit', 'show']);
     Route::get('eggs/{egg}/edit-form', [EggEntryController::class, 'editForm'])->name('eggs.edit-form');
     Route::get('eggs/{egg}/row', [EggEntryController::class, 'show'])->name('eggs.show-row');

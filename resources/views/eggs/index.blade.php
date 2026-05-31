@@ -85,6 +85,7 @@
 
                 @if($stats)
                     <x-ui.comparison-card
+                        id="egg-hero-week"
                         :title="__('eggs.comparison.seven_day_title')"
                         :before="['value' => $stats['previousWeekTotal'], 'label' => __('eggs.comparison.previous_7_days')]"
                         :after="['value' => $stats['thisWeekTotal'], 'label' => __('eggs.comparison.last_7_days')]"
@@ -113,8 +114,8 @@
           hx-swap="afterbegin"
           data-offline-queue="eggs"
           x-data="{ detailed: false, submitting: false, success: false }"
-          hx-on::before-request="submitting = true; success = false"
-          hx-on::after-request="if(event.detail.successful) { let c = this.querySelector('[name=count]').value; submitting = false; success = true; setTimeout(() => success = false, 3000); logEggs(c); this.reset(); detailed = false; }" @endif
+          x-on:htmx:before-request="submitting = true; success = false; $el.querySelector('#egg-form-errors')?.replaceChildren()"
+          x-on:htmx:after-request="if ($event.detail.successful) { let c = $el.querySelector('[name=count]').value; submitting = false; success = true; setTimeout(() => success = false, 3000); logEggs(c); $el.reset(); detailed = false; }" @endif
           class="egg-counter__form">
         @if (! $skel) @csrf @endif
 
@@ -122,9 +123,11 @@
             @if ($skel) <x-ui.skel block="title" /> @else {{ __('eggs.form.title') }} @endif
         </h3>
 
+        <div id="egg-form-errors"></div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-forms.input name="date" type="date" :label="__('eggs.form.date_label')" :value="now()->format('Y-m-d')" :required="true" :loading="$skel" />
-            <x-forms.input name="count" type="number" :label="__('eggs.form.count_label')" value="0" :required="true" :loading="$skel" />
+            <x-forms.input name="count" type="number" min="0" step="1" :label="__('eggs.form.count_label')" value="0" :required="true" :loading="$skel" onfocus="this.select()" onclick="this.select()" />
         </div>
 
         @if (! $skel)
@@ -179,42 +182,17 @@
     <div id="duplicate-confirm-area"></div>
 
     @if ($skel || $stats)
-        <div class="egg-counter__stats">
-            @if ($skel)
-                <x-ui.progress-card title="" :value="0" :max="100" :loading="true" variant="detailed" />
-            @elseif($yearlyGoal)
-                <x-ui.progress-card
-                    :title="__('eggs.goal.progress_title')"
-                    :value="$stats['thisMonthTotal']"
-                    :max="round($yearlyGoal / 12)"
-                    :label="__('eggs.goal.monthly_target', ['yearly' => number_format($yearlyGoal)])"
-                    variant="detailed"
-                />
-            @else
-                @include('eggs.partials.set-goal-cta')
-            @endif
+        @include('eggs.partials.stats', ['skel' => $skel, 'stats' => $stats, 'yearlyGoal' => $yearlyGoal])
 
-            <div class="egg-counter__stats-grid egg-counter__stats-grid--comparison">
-                @if ($skel)
-                    <x-ui.comparison-card title="" :before="['value' => 0, 'label' => '']" :after="['value' => 0, 'label' => '']" :loading="true" />
-                    <x-ui.comparison-card title="" :before="['value' => 0, 'label' => '']" :after="['value' => 0, 'label' => '']" :loading="true" />
-                @else
-                    @include('eggs.partials.last-7-days-sparkline', ['days' => $stats['last7Days']])
-                    <x-ui.comparison-card
-                        :title="__('eggs.comparison.monthly_title')"
-                        :before="['value' => $stats['previousMonthTotal'], 'label' => __('eggs.comparison.previous_month')]"
-                        :after="['value' => $stats['thisMonthTotal'], 'label' => __('eggs.comparison.this_month')]"
-                    />
-                @endif
-            </div>
-
-            <div class="egg-counter__stats-grid egg-counter__stats-grid--stat-cards">
-                <x-ui.stat-card :title="__('eggs.stat_cards.total_eggs')" :total="$skel ? 0 : number_format($stats['totalEggs'])" :label="__('eggs.stat_cards.total_eggs_label')" icon="🥚" variant="corner-gradient" :loading="$skel" />
-                <x-ui.stat-card :title="__('eggs.stat_cards.average_daily')" :total="$skel ? 0 : $stats['averageDaily']" :label="__('eggs.stat_cards.average_daily_label')" icon="📈" variant="corner-gradient" :loading="$skel" />
-                <x-ui.stat-card :title="__('eggs.stat_cards.lay_rate')" total="--" :label="__('eggs.stat_cards.lay_rate_label')" icon="🐔" variant="corner-gradient" :loading="$skel" />
-                <x-ui.stat-card :title="__('eggs.stat_cards.protein_generated')" :total="$skel ? 0 : ($stats['proteinLbs'] . ' lbs')" :label="__('eggs.stat_cards.protein_generated_label')" icon="🧙‍♂️" variant="corner-gradient" :loading="$skel" />
-            </div>
-        </div>
+        {{-- Refreshes the stats section (and hero 7-day card, via OOB) whenever an
+             egg entry is logged/updated. Kept out of the skeleton render. --}}
+        @unless ($skel)
+            <div hidden
+                 hx-get="{{ route('app.eggs.stats') }}"
+                 hx-trigger="eggLogged from:body"
+                 hx-target="#egg-stats"
+                 hx-swap="outerHTML"></div>
+        @endunless
     @endif
 
     @if (! $skel && $entries->isEmpty())

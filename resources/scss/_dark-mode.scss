@@ -471,6 +471,10 @@ $dm-hover-bg: rgba(255, 255, 255, 0.04);
       }
     }
 
+    &__social-name {
+      color: $dm-text-secondary;
+    }
+
     &__separator {
       color: $dm-text-muted;
 

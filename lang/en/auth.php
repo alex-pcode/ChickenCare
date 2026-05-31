@@ -28,13 +28,13 @@ return [
     ],
     'pages' => [
         'login' => [
-            'title' => 'Log In',
+            'title' => 'Welcome back',
             'remember' => 'Remember me',
             'forgot_password' => 'Forgot your password?',
             'submit' => 'Log In',
         ],
         'register' => [
-            'title' => 'Register',
+            'title' => 'Create an Account',
             'already_registered' => 'Already registered?',
             'submit' => 'Register',
         ],

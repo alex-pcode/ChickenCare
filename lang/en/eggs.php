@@ -63,6 +63,7 @@ return [
     ],
     'form' => [
         'title' => 'Log Daily Eggs',
+        'errors_title' => 'Please fix the following errors:',
         'date_label' => 'Date',
         'count_label' => 'Number of Eggs',
         'detailed_toggle' => 'Enable detailed tracking (size & color)',
