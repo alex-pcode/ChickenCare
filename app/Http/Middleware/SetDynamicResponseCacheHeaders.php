@@ -18,9 +18,21 @@ class SetDynamicResponseCacheHeaders
             return $response;
         }
 
-        $response->headers->set('Cache-Control', 'private, no-store');
         $response->headers->remove('ETag');
         $response->headers->remove('Last-Modified');
+
+        // Boosted GET navigations may be briefly cached so an hover/touch prefetch
+        // (see window.ChickenCare.prefetch in app.js) can serve the next navigation
+        // from the browser cache instead of a fresh server round-trip. Vary on
+        // HX-Request keeps direct, non-boosted page loads on the no-store path.
+        if ($request->isMethod('GET') && $request->headers->get('HX-Boosted') === 'true') {
+            $response->headers->set('Cache-Control', 'private, max-age=5');
+            $response->headers->set('Vary', 'HX-Request', false);
+
+            return $response;
+        }
+
+        $response->headers->set('Cache-Control', 'private, no-store');
 
         return $response;
     }

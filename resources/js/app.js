@@ -323,7 +323,7 @@ window.ChickenCare.skeletons = (() => {
     // Only show the loading skeleton if a boosted navigation is still pending after
     // this delay. Fast/warmed pages resolve first and swap with a clean view
     // transition (no placeholder flash); genuinely slow pages still get a skeleton.
-    const SHOW_DELAY_MS = 400;
+    const SHOW_DELAY_MS = 200;
     let pendingTimer = null;
 
     function clearPending() {
@@ -603,12 +603,110 @@ window.ChickenCare.routeWarmup = (() => {
     };
 })();
 
+// Intent-based prefetch: on hover / touch-start / focus of a boosted nav link,
+// fetch its page in the background so the boosted GET response lands in the
+// browser cache (boosted nav responses carry a short private max-age — see
+// SetDynamicResponseCacheHeaders). The actual click is then served from cache
+// with no server round-trip, which is what makes navigation feel instant.
+window.ChickenCare.prefetch = (() => {
+    const prefetched = new Map(); // path -> timestamp
+    const TTL_MS = 4000; // just under the server max-age=5 so an expired entry re-warms on the next intent
+
+    function canPrefetch() {
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+        if (connection?.saveData) {
+            return false;
+        }
+
+        return !['slow-2g', '2g'].includes(connection?.effectiveType || '');
+    }
+
+    function eligiblePath(eventTarget) {
+        const link = eventTarget?.closest?.('a[href]');
+
+        if (!link || link.target === '_blank' || link.hasAttribute('download')) {
+            return null;
+        }
+
+        if (link.getAttribute('hx-boost') === 'false' || link.closest('[hx-boost="false"]')) {
+            return null;
+        }
+
+        let url;
+
+        try {
+            url = new URL(link.href, window.location.origin);
+        } catch {
+            return null;
+        }
+
+        if (url.origin !== window.location.origin || !url.pathname.startsWith('/app')) {
+            return null;
+        }
+
+        if (url.pathname === window.location.pathname) {
+            return null;
+        }
+
+        return url.pathname + url.search;
+    }
+
+    function prefetch(path) {
+        if (!canPrefetch()) {
+            return;
+        }
+
+        const now = Date.now();
+        const last = prefetched.get(path);
+
+        if (last && now - last < TTL_MS) {
+            return;
+        }
+
+        prefetched.set(path, now);
+
+        fetch(path, {
+            credentials: 'same-origin',
+            headers: {
+                'HX-Request': 'true',
+                'HX-Boosted': 'true',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+            .then((response) => response.arrayBuffer()) // drain so the browser finishes caching
+            .catch(() => {
+                prefetched.delete(path); // allow a retry on the next intent
+            });
+    }
+
+    function onIntent(event) {
+        const path = eligiblePath(event.target);
+
+        if (path) {
+            prefetch(path);
+        }
+    }
+
+    function initialize() {
+        // pointerover bubbles (covers mouse hover); touchstart fires on tap-start
+        // before the click; focusin covers keyboard navigation. Delegated on the
+        // document so links added by boosted swaps are covered automatically.
+        document.addEventListener('pointerover', onIntent, { passive: true });
+        document.addEventListener('touchstart', onIntent, { passive: true });
+        document.addEventListener('focusin', onIntent);
+    }
+
+    return { initialize, prefetch };
+})();
+
 Alpine.plugin(intersect);
 
 window.ChickenCare.pwa.initialize();
 window.ChickenCare.offlineQueue.initialize();
 
 window.ChickenCare.routeWarmup.warmRoutesFromBody();
+window.ChickenCare.prefetch.initialize();
 
 document.getElementById('fp-skeleton')?.remove();
 
