@@ -3,6 +3,7 @@
 use App\Http\Middleware\DetectHtmx;
 use App\Http\Middleware\EnsurePremiumTier;
 use App\Http\Middleware\ResolveLocale;
+use App\Http\Middleware\ServerTiming;
 use App\Http\Middleware\SetDynamicResponseCacheHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo('/login');
         $middleware->web(prepend: [
+            ServerTiming::class,
             SetDynamicResponseCacheHeaders::class,
         ]);
         $middleware->web(append: [

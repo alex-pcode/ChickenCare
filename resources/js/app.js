@@ -323,7 +323,7 @@ window.ChickenCare.skeletons = (() => {
     // Only show the loading skeleton if a boosted navigation is still pending after
     // this delay. Fast/warmed pages resolve first and swap with a clean view
     // transition (no placeholder flash); genuinely slow pages still get a skeleton.
-    const SHOW_DELAY_MS = 180;
+    const SHOW_DELAY_MS = 400;
     let pendingTimer = null;
 
     function clearPending() {
