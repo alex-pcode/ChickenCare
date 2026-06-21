@@ -851,3 +851,44 @@
     display: inline !important;
   }
 }
+
+// View transitions (boosted navigation)
+//
+// htmx swaps the whole <body> on every boosted navigation, so the default
+// `root` view transition crossfades the entire page — including the persistent
+// chrome (sidebar, navbar, mobile dock), which makes them flicker on each nav.
+// Lift the chrome into its own named snapshots so the API holds it in place,
+// and leave only the page content under `root` for a snappy, eased crossfade.
+@media (prefers-reduced-motion: no-preference) {
+  .sidebar {
+    view-transition-name: app-sidebar;
+  }
+
+  .navbar {
+    view-transition-name: app-navbar;
+  }
+
+  .mobile-dock {
+    view-transition-name: app-dock;
+  }
+
+  // Freeze persistent chrome: no crossfade, state (active link) updates instantly.
+  ::view-transition-group(app-sidebar),
+  ::view-transition-group(app-navbar),
+  ::view-transition-group(app-dock),
+  ::view-transition-old(app-sidebar),
+  ::view-transition-new(app-sidebar),
+  ::view-transition-old(app-navbar),
+  ::view-transition-new(app-navbar),
+  ::view-transition-old(app-dock),
+  ::view-transition-new(app-dock) {
+    animation: none;
+  }
+
+  // Content area (everything left under `root`): quick eased crossfade, no slide.
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 200ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
