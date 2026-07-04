@@ -46,6 +46,48 @@ Overwrite existing files.
 
 ---
 
+## Combined changes (PHP + frontend in one feature)
+
+Many features touch **both** PHP and the JS/SCSS bundle (e.g. a middleware change plus an `app.js` change). These have two independent deploy halves and the feature is **not live until both land**:
+
+1. **PHP + committed assets** → reach the server only via the `main` git pull. This includes `app/`, `routes/`, `lang/`, Blade, and committed `public/` files such as `public/images/*`. **If your commits are on a feature branch, merge to `main` first** — Plesk pulls `main`, not the branch (this is the usual reason a "deployed" change doesn't show up).
+2. **`public/build/`** (gitignored) → `pnpm run build` + manual File Manager upload.
+
+After the `main` pull, confirm state with `php artisan about` (Environment, cached config/routes/views, drivers).
+
+---
+
+## Redis (production sessions + cache)
+
+Production runs **sessions and cache on Redis**, not the database. The DB is remote (`DB_HOST=db2.paukhost.com`), so database-backed sessions cost a network round trip per request; Redis (`127.0.0.1:6379`, local) replaces those with in-memory hits.
+
+Production `.env`:
+
+```env
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=null
+SESSION_DRIVER=redis
+CACHE_STORE=redis
+```
+
+- After editing `.env`, run `php artisan config:cache` (config is cached, so `.env` edits are otherwise ignored).
+- `phpredis` is the PHP extension (enabled in Plesk PHP settings); no `predis` Composer package needed.
+- Switching the session driver logs out existing sessions once (everyone re-logs in).
+- If a shared Redis instance evicts keys (`allkeys-lru`) and causes random logouts, fall back to `SESSION_DRIVER=file` (still avoids the remote-DB hop) and keep Redis only for `CACHE_STORE`.
+
+---
+
+## Diagnostics
+
+Run via the Laravel Toolkit (PHP 8.3):
+
+- **`php artisan redis:check`** (`--host`/`--port` to override `127.0.0.1:6379`) — reports whether the `phpredis` extension and `predis` package are present and whether it can connect + PING Redis. On success it prints the `.env` lines to enable Redis.
+- **`Server-Timing` header** — every web response carries `Server-Timing: app;desc="PHP wall time";dur=<ms>` (from the `ServerTiming` middleware). In the browser, `TTFB − app;dur` ≈ network latency, so you can tell server-processing time apart from network. Baseline after the Redis switch: PHP wall time ~120–140ms, dominated by the remote-MySQL page queries.
+
+---
+
 ## Static asset cache headers
 
 Static-file browser cache headers are owned by Apache via `public/.htaccess`, not by Laravel middleware.
@@ -57,6 +99,8 @@ Static-file browser cache headers are owned by Apache via `public/.htaccess`, no
 The immutable policy is only safe for content-hashed files. When Vite output changes, the filename changes too, so a one-year TTL does not risk serving stale assets after deploys.
 
 The repo still contains duplicate font files under `public/fonts/` in addition to Vite-emitted hashed fonts under `/build/assets/*`. Keep the conservative `/fonts/*` rule in place until that duplicate public path is confirmed unused or removed.
+
+**Dynamic page responses** are owned by `SetDynamicResponseCacheHeaders`, not Apache. They are `private, no-store` — **except boosted GET navigations** (htmx `HX-Boosted: true`), which get `private, max-age=5` + `Vary: HX-Request` so the intent-based link prefetch (`window.ChickenCare.prefetch` in `app.js`) can serve the next navigation from the browser cache. The 5s window only spans hover→click; direct (non-boosted) loads and non-boosted partials stay `no-store`. See `docs/architecture/security-and-performance.md` for the full prefetch design.
 
 Validate `/build/assets/*` cache headers in a built environment that serves the real files through Apache/Plesk. Responses from the Vite dev server on `:5173` do not prove the production cache policy.
 
@@ -225,6 +269,8 @@ Already done — kept here for disaster recovery.
 - **500 on any page** → check `storage/logs/laravel.log`
 - **"Vite manifest not found"** → rebuild and upload `public/build/`
 - **"php version 8.1 does not satisfy"** on composer → Toolkit is using wrong CLI version; select PHP 8.3 in the composer UI
-- **"Nothing to migrate"** but app breaks → DB schema may be partial; check tables exist for sessions/cache/jobs (required by `.env` drivers)
+- **"Nothing to migrate"** but app breaks → DB schema may be partial; check tables exist for any DB-backed drivers in `.env`. Note production sessions/cache are on **Redis** (not the `sessions`/`cache` tables); only `QUEUE_CONNECTION=database` still needs the `jobs` table.
+- **Random logouts after a deploy** → likely Redis key eviction on a shared instance; set `SESSION_DRIVER=file` and keep Redis for `CACHE_STORE` only (see Redis section).
+- **A change "deployed" but isn't live** → commits are probably on a feature branch; Plesk pulls `main`. Merge to `main`. If it's a frontend change, also rebuild and upload `public/build/`.
 - **"could not read Username" on Git pull** → repo is private or URL typo; use public HTTPS URL or SSH deploy key
 - **Permissions errors writing logs/cache** → `storage/` and `bootstrap/cache/` need 755 or 775, owned by Plesk system user
