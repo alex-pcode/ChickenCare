@@ -24,10 +24,11 @@
 (function initProductionChart() {
     const ctx = document.getElementById('production-trend');
     if (!ctx) return;
-    if (!window.Chart) {
+    if (!window.deferChart) {
         document.addEventListener('DOMContentLoaded', initProductionChart, { once: true });
         return;
     }
+    window.deferChart(ctx, () => {
     const tooltipSuffix = @js(__('dashboard.production_chart.tooltip_suffix'));
     window.Chart.getChart(ctx)?.destroy();
     const isDark = document.documentElement.classList.contains('dark');
@@ -71,6 +72,7 @@
                 }
             }
         }
+    });
     });
 })();
 </script>

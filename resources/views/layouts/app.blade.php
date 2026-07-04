@@ -15,6 +15,9 @@
             if (t === 'dark' || (t === 'system' && d)) document.documentElement.classList.add('dark');
         })();
     </script>
+    {{-- Above-the-fold Fraunces weights (body + headings): preload so text doesn't wait for the CSS to discover them --}}
+    <link rel="preload" href="{{ Vite::asset('resources/fonts/fraunces-400.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ Vite::asset('resources/fonts/fraunces-600.woff2') }}" as="font" type="font/woff2" crossorigin>
     @include('partials.first-paint-styles')
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>

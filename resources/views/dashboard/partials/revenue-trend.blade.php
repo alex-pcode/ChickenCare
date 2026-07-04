@@ -38,10 +38,13 @@
     @push('scripts')
     <script>
     (function initRevenueTrend() {
-        if (!window.Chart) {
+        const section = document.getElementById('revenue-trend-desktop')?.closest('section');
+        if (!section) return;
+        if (!window.deferChart) {
             document.addEventListener('DOMContentLoaded', initRevenueTrend, { once: true });
             return;
         }
+        window.deferChart(section, () => {
         const weekOfLabel = @js(__('dashboard.analytics.week_of'));
         const isDark = document.documentElement.classList.contains('dark');
         const chartConfig = (canvasId, chartData) => {
@@ -98,6 +101,7 @@
         mobileData.labels = mobileData.labels.slice(-6);
         mobileData.datasets[0].data = mobileData.datasets[0].data.slice(-6);
         chartConfig('revenue-trend-mobile', mobileData);
+        });
     })();
     </script>
     @endpush

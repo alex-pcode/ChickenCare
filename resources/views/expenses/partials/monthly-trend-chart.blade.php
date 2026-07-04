@@ -10,10 +10,11 @@
 (function initExpenseMonthlyChart() {
     const ctx = document.getElementById('expense-monthly-trend');
     if (!ctx) return;
-    if (!window.Chart) {
+    if (!window.deferChart) {
         document.addEventListener('DOMContentLoaded', initExpenseMonthlyChart, { once: true });
         return;
     }
+    window.deferChart(ctx, () => {
     window.Chart.getChart(ctx)?.destroy();
     const isDark = document.documentElement.classList.contains('dark');
 
@@ -59,6 +60,7 @@
                 }
             }
         }
+    });
     });
 })();
 </script>

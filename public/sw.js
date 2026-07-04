@@ -1,4 +1,4 @@
-const SW_VERSION = '2026-04-26-1';
+const SW_VERSION = '2026-07-04-1';
 const CACHE_PREFIX = 'chickencare-sw-';
 const PRECACHE_NAME = `${CACHE_PREFIX}precache-v${SW_VERSION}`;
 const ASSET_CACHE_NAME = `${CACHE_PREFIX}assets-v${SW_VERSION}`;
@@ -19,10 +19,6 @@ const PRECACHE_URLS = [
     '/images/pwa/icon-192-maskable.png',
     '/images/pwa/icon-512-maskable.png',
     '/images/pwa/icon-512.png',
-    '/fonts/fraunces-400.woff2',
-    '/fonts/fraunces-500.woff2',
-    '/fonts/fraunces-600.woff2',
-    '/fonts/fraunces-700.woff2',
 ];
 const CURRENT_CACHE_NAMES = [PRECACHE_NAME, ASSET_CACHE_NAME, HTML_CACHE_NAME];
 

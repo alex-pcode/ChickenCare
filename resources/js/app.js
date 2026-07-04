@@ -1,7 +1,6 @@
 import htmx from 'htmx.org';
 import Alpine from 'alpinejs';
 import intersect from '@alpinejs/intersect';
-import Chart from 'chart.js/auto';
 import { createOfflineQueueManager } from './offline-queue.js';
 import './viability-calculator.js';
 
@@ -10,9 +9,37 @@ window.htmx = htmx;
 // using the browser's View Transitions API (no-op in browsers without support).
 htmx.config.globalViewTransitions = true;
 window.Alpine = Alpine;
-window.Chart = Chart;
 window.ChickenCare = window.ChickenCare || {};
 window.ChickenCare.offlineQueue = createOfflineQueueManager();
+
+// Chart.js is code-split out of the main bundle: deferChart() loads it on
+// demand and initialises each chart only when its canvas scrolls near the
+// viewport, keeping chart work off the navigation critical path.
+window.deferChart = (el, init) => {
+    const run = () => {
+        const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+        idle(() => {
+            const ready = window.Chart
+                ? Promise.resolve()
+                : import('chart.js/auto').then((m) => { window.Chart = window.Chart || m.default; });
+            ready.then(init);
+        });
+    };
+
+    if (!('IntersectionObserver' in window)) {
+        run();
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            run();
+        }
+    }, { rootMargin: '200px' });
+
+    observer.observe(el);
+};
 
 // Select the whole value of numeric "value" inputs on focus and click so a
 // pre-filled number (e.g. 0 or 0.30) can be overwritten by just typing.

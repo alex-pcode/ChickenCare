@@ -888,7 +888,7 @@
   // Content area (everything left under `root`): quick eased crossfade, no slide.
   ::view-transition-old(root),
   ::view-transition-new(root) {
-    animation-duration: 200ms;
+    animation-duration: 100ms;
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
