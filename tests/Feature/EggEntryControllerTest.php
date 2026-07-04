@@ -1198,8 +1198,7 @@ class EggEntryControllerTest extends TestCase
         $response = $this->actingAs($user)->get("/app/eggs/{$entry->id}/row");
 
         $response->assertStatus(200);
-        $response->assertSee('max-w-32', false);
-        $response->assertSee('truncate', false);
+        $response->assertSee('egg-counter__table-notes', false);
         $response->assertSee('title="'.$entry->notes.'"', false);
     }
 

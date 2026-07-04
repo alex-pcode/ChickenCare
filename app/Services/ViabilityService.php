@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ExpenseCategory;
 use App\Models\User;
 
 class ViabilityService
@@ -71,8 +72,8 @@ class ViabilityService
         $activeBirds = (int) $user->flockBatches()->where('is_active', true)->sum('hens_count');
 
         $feedTotal = (float) $user->expenses()
-            ->where('category', 'feed')
-            ->where('date', '>=', now()->subMonths(3)->startOfMonth()->toDateString())
+            ->where('category', ExpenseCategory::Feed->value)
+            ->where('date', '>=', now()->startOfMonth()->subMonths(3)->toDateString())
             ->sum('amount');
         $avgFeedCost = $feedTotal > 0 ? $feedTotal / 3 : 0.0;
 

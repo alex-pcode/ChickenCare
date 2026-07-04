@@ -25,8 +25,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'tier',
-        'is_admin',
         'yearly_egg_goal',
         'egg_price',
         'chicken_goal',

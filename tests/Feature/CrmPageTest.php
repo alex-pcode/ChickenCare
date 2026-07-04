@@ -56,6 +56,19 @@ class CrmPageTest extends TestCase
         $response->assertSee('Overview');
     }
 
+    public function test_reports_tab_ignores_invalid_date_params(): void
+    {
+        $user = User::factory()->premium()->create();
+
+        $this->actingAs($user)
+            ->get('/app/crm?tab=reports&period=custom&from=garbage&to=2026-13-45')
+            ->assertStatus(200);
+
+        $this->actingAs($user)
+            ->get('/app/crm?tab=reports&period=custom&from[]=2026-01-01')
+            ->assertStatus(200);
+    }
+
     public function test_htmx_request_returns_partial_only(): void
     {
         $user = User::factory()->premium()->create();

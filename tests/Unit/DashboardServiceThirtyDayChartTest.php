@@ -26,7 +26,7 @@ class DashboardServiceThirtyDayChartTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function testReturnsThirtyElements(): void
+    public function test_returns_thirty_elements(): void
     {
         $result = $this->service->getThirtyDayProductionChart($this->user);
 
@@ -34,7 +34,7 @@ class DashboardServiceThirtyDayChartTest extends TestCase
         $this->assertCount(30, $result['datasets'][0]['data']);
     }
 
-    public function testZeroFillForDaysWithNoEntries(): void
+    public function test_zero_fill_for_days_with_no_entries(): void
     {
         EggEntry::factory()->for($this->user)->create(['date' => '2026-04-10', 'count' => 5]);
         EggEntry::factory()->for($this->user)->create(['date' => '2026-04-15', 'count' => 8]);
@@ -51,7 +51,19 @@ class DashboardServiceThirtyDayChartTest extends TestCase
         $this->assertContains(8, $data);
     }
 
-    public function testDatesAscending(): void
+    public function test_sums_multiple_entries_on_the_same_day(): void
+    {
+        EggEntry::factory()->for($this->user)->create(['date' => '2026-04-10', 'count' => 5, 'size' => 'large']);
+        EggEntry::factory()->for($this->user)->create(['date' => '2026-04-10', 'count' => 3, 'size' => 'medium']);
+
+        $result = $this->service->getThirtyDayProductionChart($this->user);
+        $data = $result['datasets'][0]['data'];
+
+        $nonZero = array_values(array_filter($data, fn (int $v) => $v > 0));
+        $this->assertSame([8], $nonZero);
+    }
+
+    public function test_dates_ascending(): void
     {
         $result = $this->service->getThirtyDayProductionChart($this->user);
         $labels = $result['labels'];
@@ -62,7 +74,7 @@ class DashboardServiceThirtyDayChartTest extends TestCase
         $this->assertSame('4/18', $labels[29]);
     }
 
-    public function testCorrectDatasetStructure(): void
+    public function test_correct_dataset_structure(): void
     {
         $result = $this->service->getThirtyDayProductionChart($this->user);
         $dataset = $result['datasets'][0];

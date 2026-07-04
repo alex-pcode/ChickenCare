@@ -15,7 +15,7 @@ class EggStatsService
         $prevWeekEnd = $now->copy()->subWeek()->endOfWeek()->toDateString();
         $thisMonthStart = $now->copy()->startOfMonth()->toDateString();
         $thisMonthEnd = $now->copy()->endOfMonth()->toDateString();
-        $prevMonthDate = $now->copy()->subMonth();
+        $prevMonthDate = $now->copy()->startOfMonth()->subMonth();
         $prevMonthStart = $prevMonthDate->copy()->startOfMonth()->toDateString();
         $prevMonthEnd = $prevMonthDate->copy()->endOfMonth()->toDateString();
 

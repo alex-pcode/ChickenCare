@@ -8,6 +8,8 @@ use App\Enums\DeathCause;
 use App\Enums\ExpenseCategory;
 use App\Enums\FeedType;
 use App\Models\Customer;
+use App\Models\EggEntry;
+use App\Models\Expense;
 use App\Models\FlockBatch;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +25,9 @@ class ImportDataService
     /** @var array<string, int> Map of original batch IDs to new DB IDs */
     private array $batchIdMap = [];
 
+    /** @var array<int, FlockBatch> Batch models keyed by new DB ID, to avoid re-querying inside record loops */
+    private array $batchModels = [];
+
     /**
      * Import data from the original ChickenCare app export (JSON).
      *
@@ -35,6 +40,7 @@ class ImportDataService
         $this->counts = [];
         $this->customerIdMap = [];
         $this->batchIdMap = [];
+        $this->batchModels = [];
 
         DB::transaction(function () use ($user, $data, &$errors) {
             $this->importFlockProfile($user, $data, $errors);
@@ -151,7 +157,8 @@ class ImportDataService
 
         $validSizes = ['small', 'medium', 'large', 'extra-large', 'jumbo'];
         $validColors = ['white', 'brown', 'blue', 'green', 'speckled', 'cream'];
-        $imported = 0;
+        $now = now();
+        $rows = [];
 
         foreach ($entries as $entry) {
             if (! is_array($entry)) {
@@ -173,17 +180,23 @@ class ImportDataService
                 $color = null;
             }
 
-            $user->eggEntries()->create([
-                'date' => $date,
+            $rows[] = [
+                'user_id' => $user->id,
+                'date' => $date.' 00:00:00',
                 'count' => max(0, (int) ($entry['count'] ?? 0)),
                 'size' => $size,
                 'color' => $color,
                 'notes' => isset($entry['notes']) ? $this->truncate((string) $entry['notes'], 1000) : null,
-            ]);
-            $imported++;
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
         }
 
-        $this->counts['egg_entries'] = $imported;
+        foreach (array_chunk($rows, 500) as $chunk) {
+            EggEntry::insert($chunk);
+        }
+
+        $this->counts['egg_entries'] = count($rows);
     }
 
     /**
@@ -198,7 +211,8 @@ class ImportDataService
         }
 
         $validCategories = array_map(fn (ExpenseCategory $c) => $c->value, ExpenseCategory::cases());
-        $imported = 0;
+        $now = now();
+        $rows = [];
 
         foreach ($expenses as $expense) {
             if (! is_array($expense)) {
@@ -215,18 +229,22 @@ class ImportDataService
                 $category = 'Other';
             }
 
-            $amount = max(0, (float) ($expense['amount'] ?? 0));
-
-            $user->expenses()->create([
-                'date' => $date,
+            $rows[] = [
+                'user_id' => $user->id,
+                'date' => $date.' 00:00:00',
                 'category' => $category,
                 'description' => $this->truncate($expense['description'] ?? '', 500),
-                'amount' => $amount,
-            ]);
-            $imported++;
+                'amount' => max(0, (float) ($expense['amount'] ?? 0)),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
         }
 
-        $this->counts['expenses'] = $imported;
+        foreach (array_chunk($rows, 500) as $chunk) {
+            Expense::insert($chunk);
+        }
+
+        $this->counts['expenses'] = count($rows);
     }
 
     /**
@@ -329,6 +347,8 @@ class ImportDataService
                 'is_active' => (bool) ($batch['isActive'] ?? $batch['is_active'] ?? true),
             ]);
 
+            $this->batchModels[$newBatch->id] = $newBatch;
+
             // Map the original export ID to the new database ID
             $originalId = $batch['id'] ?? null;
             if ($originalId) {
@@ -355,6 +375,8 @@ class ImportDataService
         $validCauses = array_map(fn (DeathCause $c) => $c->value, DeathCause::cases());
         $imported = 0;
         $skipped = 0;
+        $fallbackBatch = null;
+        $fallbackResolved = false;
 
         foreach ($records as $record) {
             if (! is_array($record)) {
@@ -371,13 +393,22 @@ class ImportDataService
             $batchId = $this->batchIdMap[$originalBatchId] ?? null;
 
             if (! $batchId) {
-                // Try to find the first active batch as fallback
-                $fallbackBatch = $user->flockBatches()->active()->first();
+                // Fall back to the first active batch (resolved once for the whole import)
+                if (! $fallbackResolved) {
+                    $fallbackBatch = $user->flockBatches()->active()->first();
+                    $fallbackResolved = true;
+
+                    if ($fallbackBatch) {
+                        $this->batchModels[$fallbackBatch->id] ??= $fallbackBatch;
+                    }
+                }
+
                 if (! $fallbackBatch) {
                     $skipped++;
 
                     continue;
                 }
+
                 $batchId = $fallbackBatch->id;
             }
 
@@ -388,7 +419,7 @@ class ImportDataService
 
             $count = max(1, (int) ($record['count'] ?? 1));
 
-            $batchModel = FlockBatch::find($batchId);
+            $batchModel = $this->batchModels[$batchId];
             $batchModel->deathRecords()->create([
                 'user_id' => $user->id,
                 'date' => $date,
@@ -447,7 +478,7 @@ class ImportDataService
                 $type = 'other';
             }
 
-            $batchModel = FlockBatch::find($batchId);
+            $batchModel = $this->batchModels[$batchId];
             $batchModel->batchEvents()->create([
                 'user_id' => $user->id,
                 'date' => $date,

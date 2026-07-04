@@ -65,6 +65,18 @@
         padding: $space-6;
     }
 
+    &__text {
+        color: var(--color-text-muted, $color-neutral-600);
+        margin: 0 0 $space-4;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: $space-3;
+        padding: 0 $space-6 $space-6;
+    }
+
     &--sm .modal__content {
         max-width: 400px;
     }

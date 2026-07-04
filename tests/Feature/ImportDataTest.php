@@ -69,6 +69,32 @@ class ImportDataTest extends TestCase
             ->assertSessionHasErrors('import_file');
     }
 
+    public function test_import_rejects_files_exceeding_row_cap(): void
+    {
+        $user = User::factory()->create();
+        $file = $this->makeJsonFile([
+            'exportedAt' => '2025-01-15T10:00:00.000Z',
+            'eggEntries' => array_fill(0, 10001, ['date' => '2025-01-10', 'count' => 1]),
+        ]);
+
+        $this->actingAs($user)
+            ->post('/app/import', ['import_file' => $file])
+            ->assertSessionHasErrors('import_file');
+
+        $this->assertDatabaseCount('egg_entries', 0);
+    }
+
+    public function test_import_is_rate_limited(): void
+    {
+        $user = User::factory()->create();
+
+        for ($i = 0; $i < 6; $i++) {
+            $this->actingAs($user)->post('/app/import', [])->assertStatus(302);
+        }
+
+        $this->actingAs($user)->post('/app/import', [])->assertStatus(429);
+    }
+
     // === Egg Entries Import ===
 
     public function test_import_egg_entries(): void

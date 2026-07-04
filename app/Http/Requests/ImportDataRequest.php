@@ -8,6 +8,9 @@ use Illuminate\Validation\Validator;
 
 class ImportDataRequest extends FormRequest
 {
+    /** Maximum total records across all collections in one import. */
+    public const MAX_ROWS = 10000;
+
     public function authorize(): bool
     {
         return true;
@@ -74,6 +77,21 @@ class ImportDataRequest extends FormRequest
 
                 if (! $hasValidKey) {
                     $validator->errors()->add('import_file', 'The file does not appear to be a valid ChickenCare export. Expected keys like eggEntries, expenses, etc.');
+
+                    return;
+                }
+
+                $collectionKeys = ['eggEntries', 'expenses', 'feedInventory', 'flockBatches', 'flockEvents', 'deathRecords', 'customers', 'sales', 'batchEvents'];
+                $totalRows = 0;
+
+                foreach ($collectionKeys as $key) {
+                    if (is_array($data[$key] ?? null)) {
+                        $totalRows += count($data[$key]);
+                    }
+                }
+
+                if ($totalRows > self::MAX_ROWS) {
+                    $validator->errors()->add('import_file', 'The file contains too many records ('.number_format($totalRows).'). The maximum is '.number_format(self::MAX_ROWS).' per import.');
                 }
             },
         ];

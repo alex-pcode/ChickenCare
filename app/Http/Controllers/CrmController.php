@@ -97,8 +97,8 @@ class CrmController extends Controller
         $user = $request->user();
         $view = $request->query('view', 'overview');
         $period = $request->query('period', 'all');
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $from = $this->sanitizeDateParam($request->query('from'));
+        $to = $this->sanitizeDateParam($request->query('to'));
         $customerId = $request->query('customer_id');
 
         $data = [
@@ -123,5 +123,17 @@ class CrmController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * Only accept valid Y-m-d date strings from the query string; anything else becomes null.
+     */
+    private function sanitizeDateParam(mixed $value): ?string
+    {
+        if (! is_string($value) || preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $matches) !== 1) {
+            return null;
+        }
+
+        return checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1]) ? $value : null;
     }
 }

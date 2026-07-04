@@ -53,6 +53,8 @@ class SaleController extends Controller
     {
         Gate::authorize('view', $sale);
 
+        $sale->load('customer');
+
         return view('sales.partials.entry-row', compact('sale'));
     }
 

@@ -47,7 +47,7 @@ Route::middleware(['auth'])->prefix('app')->name('app.')->group(function () {
 
     // Import data from original app
     Route::get('import', [ImportController::class, 'index'])->name('import.index');
-    Route::post('import', [ImportController::class, 'store'])->name('import.store');
+    Route::post('import', [ImportController::class, 'store'])->middleware('throttle:6,1')->name('import.store');
 
     Route::get('/components', function () {
         return view('app.components-showcase');

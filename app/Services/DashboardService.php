@@ -161,8 +161,9 @@ class DashboardService
         $thisMonthStart = $today->copy()->startOfMonth()->toDateString();
         $thisMonthEnd = $today->copy()->endOfMonth()->toDateString();
 
-        $lastMonthStart = $today->copy()->subMonth()->startOfMonth()->toDateString();
-        $lastMonthCutoff = $today->copy()->subMonth()->startOfMonth()->addDays($currentDay - 1)->toDateString();
+        $lastMonth = $today->copy()->startOfMonth()->subMonth();
+        $lastMonthStart = $lastMonth->toDateString();
+        $lastMonthCutoff = $lastMonth->copy()->addDays(min($currentDay, $lastMonth->daysInMonth) - 1)->toDateString();
 
         $stats = $user->eggEntries()
             ->selectRaw('COALESCE(SUM(count), 0) as total_eggs')
@@ -205,18 +206,20 @@ class DashboardService
     }
 
     /**
+     * Daily egg totals for the last 30 days, keyed by Y-m-d date string.
+     *
      * @return Collection<string, mixed>
      */
-    private function getThirtyDayEggEntries(User $user): Collection
+    private function getThirtyDayDailyTotals(User $user): Collection
     {
         return once(function () use ($user) {
             $startDate = now()->subDays(29)->startOfDay();
 
             return $user->eggEntries()
                 ->where('date', '>=', $startDate->toDateString())
-                ->orderBy('date')
-                ->get()
-                ->keyBy(fn ($entry) => $entry->date->format('Y-m-d'));
+                ->selectRaw('DATE(date) as day, SUM(count) as daily_total')
+                ->groupByRaw('DATE(date)')
+                ->pluck('daily_total', 'day');
         });
     }
 
@@ -227,7 +230,7 @@ class DashboardService
     {
         $startDate = now()->subDays(29)->startOfDay();
         $endDate = now()->endOfDay();
-        $entries = $this->getThirtyDayEggEntries($user);
+        $dailyTotals = $this->getThirtyDayDailyTotals($user);
 
         $labels = [];
         $data = [];
@@ -235,7 +238,7 @@ class DashboardService
         foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
             $key = $date->format('Y-m-d');
             $labels[] = $date->format('M d');
-            $data[] = isset($entries[$key]) ? (int) $entries[$key]->count : 0;
+            $data[] = (int) ($dailyTotals[$key] ?? 0);
         }
 
         return [
@@ -254,7 +257,7 @@ class DashboardService
     {
         $startDate = now()->subDays(29)->startOfDay();
         $endDate = now()->endOfDay();
-        $entries = $this->getThirtyDayEggEntries($user);
+        $dailyTotals = $this->getThirtyDayDailyTotals($user);
 
         $labels = [];
         $data = [];
@@ -262,7 +265,7 @@ class DashboardService
         foreach (CarbonPeriod::create($startDate, $endDate) as $date) {
             $key = $date->format('Y-m-d');
             $labels[] = $date->format('n/j');
-            $data[] = isset($entries[$key]) ? (int) $entries[$key]->count : 0;
+            $data[] = (int) ($dailyTotals[$key] ?? 0);
         }
 
         return [

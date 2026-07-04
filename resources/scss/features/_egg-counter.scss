@@ -356,6 +356,15 @@
         &-empty {
             color: var(--text-muted, #9ca3af);
         }
+
+        &-notes {
+            display: inline-block;
+            max-width: 8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+        }
     }
 
     &__color-dot {

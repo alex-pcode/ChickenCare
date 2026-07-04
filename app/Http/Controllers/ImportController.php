@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportDataRequest;
+use App\Services\CrmReportsService;
 use App\Services\ImportDataService;
 use App\Traits\HandlesHtmx;
 use Illuminate\Http\RedirectResponse;
@@ -26,6 +27,8 @@ class ImportController extends Controller
         $data = json_decode($contents, true);
 
         $result = $service->import($request->user(), $data);
+
+        app(CrmReportsService::class)->clearCacheForUser($request->user());
 
         if ($this->isHtmx($request)) {
             return $this->htmxRedirect(route('app.import.index', ['success' => 1]));

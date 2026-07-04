@@ -22,7 +22,7 @@
     </td>
     <td class="data-table__cell" data-label="{{ __('eggs.table.columns.notes') }}">
         @if($entry->notes)
-            <span class="egg-counter__table-cell-secondary max-w-32 truncate"
+            <span class="egg-counter__table-cell-secondary egg-counter__table-notes"
                   title="{{ $entry->notes }}">
                 {{ $entry->notes }}
             </span>

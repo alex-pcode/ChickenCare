@@ -42,6 +42,15 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['name', 'email', 'password']);
     }
 
+    public function test_registration_is_rate_limited(): void
+    {
+        for ($i = 0; $i < 6; $i++) {
+            $this->post('/register', [])->assertStatus(302);
+        }
+
+        $this->post('/register', [])->assertStatus(429);
+    }
+
     public function test_registration_page_renders_serbian_copy_when_locale_cookie_is_serbian(): void
     {
         $response = $this->withCookie(config('app.locale_cookie'), 'sr')->get('/register');

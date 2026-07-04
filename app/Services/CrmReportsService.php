@@ -316,7 +316,7 @@ class CrmReportsService
                 $monthExpr = $this->monthKeyExpression('sale_date');
                 $trendRows = $user->sales()
                     ->where('customer_id', $customerId)
-                    ->where('sale_date', '>=', $now->copy()->subMonths(5)->startOfMonth()->toDateString())
+                    ->where('sale_date', '>=', $now->copy()->startOfMonth()->subMonths(5)->toDateString())
                     ->selectRaw("{$monthExpr} as month_key, COALESCE(SUM(total_amount), 0) as revenue, COALESCE(SUM(dozen_count * 12 + individual_count), 0) as eggs")
                     ->groupByRaw($monthExpr)
                     ->get()
@@ -386,10 +386,12 @@ class CrmReportsService
             ])
             ->count();
 
+        $lastMonth = $now->copy()->startOfMonth()->subMonth();
+
         $lastMonthSales = (int) $user->sales()
             ->whereBetween('sale_date', [
-                $now->copy()->subMonth()->startOfMonth()->toDateString(),
-                $now->copy()->subMonth()->endOfMonth()->toDateString(),
+                $lastMonth->toDateString(),
+                $lastMonth->copy()->endOfMonth()->toDateString(),
             ])
             ->count();
 
@@ -429,7 +431,7 @@ class CrmReportsService
             ],
             'custom' => $this->resolveCustomChartRange($from, $to, $now, $defaultMonths),
             default => [
-                $now->copy()->subMonths($defaultMonths - 1)->startOfMonth(),
+                $now->copy()->startOfMonth()->subMonths($defaultMonths - 1),
                 $now->copy()->endOfMonth(),
                 $defaultMonths,
             ],
@@ -441,7 +443,7 @@ class CrmReportsService
      */
     private function resolveCustomChartRange(?string $from, ?string $to, Carbon $now, int $defaultMonths): array
     {
-        $start = $from ? Carbon::parse($from)->startOfMonth() : $now->copy()->subMonths($defaultMonths - 1)->startOfMonth();
+        $start = $from ? Carbon::parse($from)->startOfMonth() : $now->copy()->startOfMonth()->subMonths($defaultMonths - 1);
         $end = $to ? Carbon::parse($to)->endOfMonth() : $now->copy()->endOfMonth();
         $months = max(1, (int) $start->diffInMonths($end) + 1);
 

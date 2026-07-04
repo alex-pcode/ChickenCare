@@ -839,6 +839,12 @@
                 color: #fff;
             }
         }
+
+        &--warning {
+            background: var(--color-warning-bg, $color-warning-bg);
+            border: 1px solid rgba($color-warning, 0.35);
+            color: var(--color-warning-text, $color-warning-text);
+        }
     }
 
     &__form-banner-title {
@@ -848,6 +854,26 @@
     &__form-banner-body {
         margin-top: 0.125rem;
         font-size: $font-size-sm;
+    }
+
+    &__composition-preview {
+        margin-top: $space-4;
+        padding: $space-4;
+        border-radius: $radius-lg;
+        background: var(--color-bg-alt, $color-neutral-100);
+        font-size: $font-size-sm;
+        color: var(--color-text, $color-neutral-700);
+
+        h4 {
+            margin: 0 0 0.25rem;
+            font-size: $font-size-sm;
+            font-weight: $font-weight-medium;
+        }
+
+        p {
+            margin: 0.25rem 0 0;
+            color: var(--color-text-muted, $color-neutral-500);
+        }
     }
 
     &__form-hint-inline {

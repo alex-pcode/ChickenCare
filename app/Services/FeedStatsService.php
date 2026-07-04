@@ -98,7 +98,7 @@ final class FeedStatsService
             $avgFlockSize = $this->averageFlockSizeInRange($start, $end);
             if ($avgFlockSize > 0) {
                 $months = max(1, $start->diffInMonths($end));
-                $monthlyCostPerBird = $depletedCost / $months / $avgFlockSize * 30;
+                $monthlyCostPerBird = $depletedCost / $months / $avgFlockSize;
             }
         }
 

@@ -108,7 +108,7 @@ final class ExpenseStatsService
             $now = now();
             $thisStart = $now->copy()->startOfMonth()->toDateString();
             $thisEnd = $now->copy()->endOfMonth()->toDateString();
-            $prev = $now->copy()->subMonth();
+            $prev = $now->copy()->startOfMonth()->subMonth();
             $prevStart = $prev->copy()->startOfMonth()->toDateString();
             $prevEnd = $prev->copy()->endOfMonth()->toDateString();
 
@@ -134,7 +134,7 @@ final class ExpenseStatsService
     public function monthlyTrend(int $months = 12): array
     {
         return once(function () use ($months) {
-            $start = now()->subMonths($months - 1)->startOfMonth();
+            $start = now()->startOfMonth()->subMonths($months - 1);
             $end = now()->endOfMonth();
 
             $buckets = Expense::where('user_id', $this->userId)

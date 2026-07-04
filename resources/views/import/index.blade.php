@@ -170,35 +170,31 @@
                      @dragover.prevent="dragging = true"
                      @dragleave.prevent="dragging = false"
                      @drop.prevent="handleDrop($event)">
-                    <template x-if="!fileName">
-                        <div class="import-page__dropzone-content">
-                            <span class="import-page__dropzone-icon">📁</span>
-                            <p class="import-page__dropzone-text">Drag & drop your JSON file here</p>
-                            <p class="import-page__dropzone-subtext">or</p>
-                            <label class="btn btn--secondary import-page__browse-btn">
-                                Browse Files
-                                <input type="file"
-                                       name="import_file"
-                                       accept=".json"
-                                       class="sr-only"
-                                       @change="handleFileSelect($event)"
-                                       x-ref="fileInput" />
-                            </label>
+                    <div class="import-page__dropzone-content" x-show="!fileName">
+                        <span class="import-page__dropzone-icon">📁</span>
+                        <p class="import-page__dropzone-text">Drag & drop your JSON file here</p>
+                        <p class="import-page__dropzone-subtext">or</p>
+                        <label class="btn btn--secondary import-page__browse-btn">
+                            Browse Files
+                            <input type="file"
+                                   name="import_file"
+                                   accept=".json"
+                                   class="sr-only"
+                                   @change="handleFileSelect($event)"
+                                   x-ref="fileInput" />
+                        </label>
+                    </div>
+                    <div class="import-page__file-info" x-show="fileName" x-cloak>
+                        <span class="import-page__file-icon">📄</span>
+                        <div>
+                            <p class="import-page__file-name" x-text="fileName"></p>
+                            <p class="import-page__file-size" x-text="fileSize"></p>
                         </div>
-                    </template>
-                    <template x-if="fileName">
-                        <div class="import-page__file-info">
-                            <span class="import-page__file-icon">📄</span>
-                            <div>
-                                <p class="import-page__file-name" x-text="fileName"></p>
-                                <p class="import-page__file-size" x-text="fileSize"></p>
-                            </div>
-                            <button type="button"
-                                    class="import-page__file-remove"
-                                    @click="clearFile()"
-                                    aria-label="Remove file">&times;</button>
-                        </div>
-                    </template>
+                        <button type="button"
+                                class="import-page__file-remove"
+                                @click="clearFile()"
+                                aria-label="Remove file">&times;</button>
+                    </div>
                 </div>
 
                 {{-- Preview --}}

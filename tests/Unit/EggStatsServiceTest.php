@@ -92,7 +92,7 @@ class EggStatsServiceTest extends TestCase
         // Previous month entry
         EggEntry::factory()->create([
             'user_id' => $user->id,
-            'date' => now()->subMonth()->startOfMonth()->addDays(2)->format('Y-m-d'),
+            'date' => now()->startOfMonth()->subMonth()->addDays(2)->format('Y-m-d'),
             'count' => 7,
         ]);
 
